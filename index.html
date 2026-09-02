@@ -519,7 +519,6 @@ function exportSave() {
   );
 }
 
-// --- SYSTÈME DE SAUVEGARDE VIA EXPORT ---
 
 function SaveGame() {
     // 1. On appelle la fonction native du jeu qui génère la chaîne de caractères
@@ -532,9 +531,8 @@ function SaveGame() {
 
         // 3. Feedback visuel (Optionnel : vous pouvez créer un petit texte qui apparaît)
         console.log("Sauvegarde effectuée !");
+        Save();
 
-        // Optionnel: afficher un message dans l'interface si vous avez un élément id="log"
-        l('log').innerHTML = "Game saved.";
     }
 }
 
@@ -581,6 +579,7 @@ window.addEventListener('load', function() {
 function Reset() {
   if (confirm('Do you REALLY want to start over?')) {
     document.cookie = 'CookieClickerSave=0; expires=Fri, 3 Aug 2001 20:47:11 UTC;';
+    localStorage.removeItem("CookieClickerClassic_Reborn_Save");
     location.reload(true);
   }
 }
