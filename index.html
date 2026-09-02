@@ -428,6 +428,7 @@ let PortalsBasePrice = 1000000;
 let Times = 0;
 let TimesBasePrice = 123456789;
 let Pledge = 0;
+let PledgeBasePrice = 6666666;
 
 /** Per-building production multiplier, doubled by each matching upgrade. */
 const Multipliers = {
@@ -472,6 +473,28 @@ function MakeSaveString() {
     Object.keys(Upgrades).filter(name => Upgrades[name].bought).join(','),
     parseInt(Pledge),    parseInt(Buyables['Elder Pledge'].price),
     parseInt(Prestige),
+  ].join('|');
+}
+
+/* ---------------------------------------------------------------- */
+/*  Reset save string                                               */
+/* ---------------------------------------------------------------- */
+
+function ResetSaveString() {
+  return [
+    Version,
+    0,
+    0, CursorsBasePrice,
+    0, GrandmasBasePrice,
+    0, FactoriesBasePrice,
+    0, MinesBasePrice,
+    0, ShipmentsBasePrice,
+    0, LabsBasePrice),
+    0, PortalsBasePrice,
+    0, TimesBasePrice),
+    "",
+    0,PledgeBasePrice,
+    Prestige,
   ].join('|');
 }
 
@@ -601,7 +624,7 @@ function Reset() {
     Prestige += calculatePrestige(); // Add new prestige to previous prestige
     console.log("New prestige: " + Prestige);
 
-    localStorage.setItem("CookieClickerClassic_Reborn_Save", MakeSaveString(Prestige));
+    localStorage.setItem("CookieClickerClassic_Reborn_Save", ResetSaveString());
 
     location.reload(true);
   }
@@ -720,7 +743,7 @@ function RebuildStore() {
   // Elder Pledge stays visible after a reload if it was already unlocked
   // (i.e. its price has moved away from the default 666,666).
   const pledgeBtn = l('buyElder Pledge');
-  if (pledgeBtn && Buyables['Elder Pledge'].price !== 6666666) {
+  if (pledgeBtn && Buyables['Elder Pledge'].price !== PledgeBasePrice) {
     pledgeBtn.style.display = 'none';
   }
 
@@ -830,7 +853,7 @@ new Buyable(
 new Buyable(
   'Elder Pledge',
   '<span style="font-size:80%;">Puts an end to the Ancients\' wrath, at least for a while.</span>',
-  'pledgeicon', 6666666,
+  'pledgeicon', PledgeBasePrice,
   function (buy) {
     if (buy && Pledge <= 0) {
       Pledge *= 2;
