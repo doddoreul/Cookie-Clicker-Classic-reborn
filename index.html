@@ -334,6 +334,9 @@
     <div id="saveMenu">
       <div id="cps"></div>
       <div id="pledgeTime">Elder Pledge <span id="pledgeTimer">00:00</span></div>
+      <div id="prestige">Prestige <span id="prestigeDisplay">0</span></div>
+      <div id="prestigeGain">Prestige gain <span id="prestigeGainDisplay">0</span></div>
+
       <br>
       <div class="button" id="save">Save</div>
       <div class="button" id="exportSave">Export save</div>
@@ -395,7 +398,7 @@ function Beautify(value) {
 /*  Game state                                                       */
 /* ---------------------------------------------------------------- */
 
-const Version = 0.1251;
+const Version = 0.127;
 l('version').innerHTML = 'running v.' + Version;
 
 let Loaded = false;
@@ -406,15 +409,24 @@ let StoreToRebuild = false;
 let Cookies = 0;
 let CookiesDisplay = 0;
 let T = 0;
+let Prestige = 0;
 
 let Cursors = 0;
+let CursorsBasePrice = 15;
 let Grandmas = 0;
+let GrandmasBasePrice = 100;
 let Factories = 0;
+let FactoriesBasePrice = 500;
 let Mines = 0;
+let MinesBasePrice = 2000;
 let Shipments = 0;
+let ShipmentsBasePrice = 7000;
 let Labs = 0;
+let LabsBasePrice = 50000;
 let Portals = 0;
+let PortalsBasePrice = 1000000;
 let Times = 0;
+let TimesBasePrice = 123456789;
 let Pledge = 0;
 
 /** Per-building production multiplier, doubled by each matching upgrade. */
@@ -459,6 +471,7 @@ function MakeSaveString() {
     parseInt(Times),     parseInt(Buyables['Time machine'].price),
     Object.keys(Upgrades).filter(name => Upgrades[name].bought).join(','),
     parseInt(Pledge),    parseInt(Buyables['Elder Pledge'].price),
+    parseInt(Prestige),
   ].join('|');
 }
 
@@ -498,6 +511,9 @@ function ApplySaveString(str) {
 
   ['Grandma', 'Factory', 'Mine', 'Shipment', 'Alchemy lab', 'Portal', 'Time machine']
     .forEach(name => Buyables[name].func(0));
+
+  // Prestige
+  if (r[22]) Prestige = parseInt(r[22]);
 
   StoreToRebuild = true;
   UpgradesToRebuild = true;
@@ -579,10 +595,15 @@ window.addEventListener('load', function() {
 /* Reset and prestige function */
 function Reset() {
   if (confirm('Do you REALLY want to start over?')) {
+    console.log("Resetting game");
     document.cookie = 'CookieClickerSave=0; expires=Fri, 3 Aug 2001 20:47:11 UTC;';
-    localStorage.removeItem("CookieClickerClassic_Reborn_Save");
+
+    Prestige += calculatePrestige(); // Add new prestige to previous prestige
+    console.log("New prestige: " + Prestige);
+
+    localStorage.setItem("CookieClickerClassic_Reborn_Save", MakeSaveString(Prestige));
+
     location.reload(true);
-    calculatePrestige();
   }
 }
 
@@ -708,9 +729,9 @@ function RebuildStore() {
 
 /* ---- Building definitions ---- */
 
-new Buyable('Cursor', 'Autoclicks every 5 seconds.', 'cursoricon', 15, () => { Cursors++; });
+new Buyable('Cursor', 'Autoclicks every 5 seconds.', 'cursoricon', CursorsBasePrice, () => { Cursors++; });
 
-new Buyable('Grandma', 'A nice grandma to bake more cookies.', 'grandmaicon', 100, function (buy) {
+new Buyable('Grandma', 'A nice grandma to bake more cookies.', 'grandmaicon', GrandmasBasePrice, function (buy) {
   if (buy) Grandmas++;
   let str = '';
   for (let i = 0; i < Grandmas; i++) {
@@ -729,7 +750,7 @@ new Buyable('Grandma', 'A nice grandma to bake more cookies.', 'grandmaicon', 10
   l('grandmas').innerHTML = str;
 });
 
-new Buyable('Factory', 'Produces large quantities of cookies.', 'factoryicon', 500, function (buy) {
+new Buyable('Factory', 'Produces large quantities of cookies.', 'factoryicon', FactoriesBasePrice, function (buy) {
   if (buy) Factories++;
   if (buy && Factories === 1) Buyables['Grandma'].func(0);
   let str = '';
@@ -741,7 +762,7 @@ new Buyable('Factory', 'Produces large quantities of cookies.', 'factoryicon', 5
   l('factories').innerHTML = str;
 });
 
-new Buyable('Mine', 'Mines out cookie dough and chocolate chips.', 'mineicon', 2000, function (buy) {
+new Buyable('Mine', 'Mines out cookie dough and chocolate chips.', 'mineicon', MinesBasePrice, function (buy) {
   if (buy) Mines++;
   if (buy && Mines === 1) Buyables['Grandma'].func(0);
   let str = '';
@@ -753,7 +774,7 @@ new Buyable('Mine', 'Mines out cookie dough and chocolate chips.', 'mineicon', 2
   l('mines').innerHTML = str;
 });
 
-new Buyable('Shipment', 'Brings in fresh cookies from the cookie planet.', 'shipmenticon', 7000, function (buy) {
+new Buyable('Shipment', 'Brings in fresh cookies from the cookie planet.', 'shipmenticon', ShipmentsBasePrice, function (buy) {
   if (buy) Shipments++;
   if (buy && Shipments === 1) Buyables['Grandma'].func(0);
   let str = '';
@@ -765,7 +786,7 @@ new Buyable('Shipment', 'Brings in fresh cookies from the cookie planet.', 'ship
   l('shipments').innerHTML = str;
 });
 
-new Buyable('Alchemy lab', 'Turns gold into cookies!', 'labicon', 50000, function (buy) {
+new Buyable('Alchemy lab', 'Turns gold into cookies!', 'labicon', LabsBasePrice, function (buy) {
   if (buy) Labs++;
   if (buy && Labs === 1) Buyables['Grandma'].func(0);
   let str = '';
@@ -777,7 +798,7 @@ new Buyable('Alchemy lab', 'Turns gold into cookies!', 'labicon', 50000, functio
   l('labs').innerHTML = str;
 });
 
-new Buyable('Portal', 'Opens a door to the Cookieverse.', 'portalicon', 1000000, function (buy) {
+new Buyable('Portal', 'Opens a door to the Cookieverse.', 'portalicon', PortalsBasePrice, function (buy) {
   if (buy) Portals++;
   if (buy && Portals === 1) Buyables['Grandma'].func(0);
   let str = '';
@@ -792,7 +813,7 @@ new Buyable('Portal', 'Opens a door to the Cookieverse.', 'portalicon', 1000000,
 new Buyable(
   'Time machine',
   '<span style="font-size:80%;">Brings cookies from the past, before they were even eaten.</span>',
-  'timemachineicon', 123456789,
+  'timemachineicon', TimesBasePrice,
   function (buy) {
     if (buy) Times++;
     if (buy && Times === 1) Buyables['Grandma'].func(0);
@@ -1019,6 +1040,13 @@ function Main() {
 
   l('buyElder Pledge').style.display = 'none';
 
+  /* Display Prestige */
+
+  l('prestigeDisplay').innerHTML = Prestige;
+  l('prestigeGainDisplay').innerHTML = calculatePrestige();
+
+
+
   applyFlashEffect();
 
   if (T % 30 === 0 && Loaded) document.title = Beautify(Cookies) + ' cookies - Cookie Clicker';
@@ -1090,8 +1118,16 @@ function applyFlashEffect() {
 /* Calculate Prestige level                  */
 /* ----------------------------------------- */
 
-function calculatePrestige(){
-  ////// TODO: do it
+function calculatePrestige() {
+  console.log("Calculating prestige");
+  const prestige = Math.max(
+    0,
+    Math.floor(
+      (-1 + Math.sqrt(1 + 8 * (Cookies / 100000000))) / 2
+    )
+  );
+
+  return prestige;
 }
 
 
