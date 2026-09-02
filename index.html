@@ -108,7 +108,7 @@
   #store_upgrades {
     margin-top: 25px;
   }
-  
+
   #store_upgrades > div {
     background: #eee no-repeat;
     width: 256px;
@@ -441,6 +441,7 @@ function MakeSaveString() {
     parseInt(Portals),   parseInt(Buyables['Portal'].price),
     parseInt(Times),     parseInt(Buyables['Time machine'].price),
     Object.keys(Upgrades).filter(name => Upgrades[name].bought).join(','),
+    parseInt(Pledge),    parseInt(Buyables['Elder Pledge'].price),
   ].join('|');
 }
 
@@ -472,6 +473,11 @@ function ApplySaveString(str) {
       }
     });
   }
+
+  // Elder Pledge: remaining active duration + current (inflated) price.
+  // Without this, the price silently reset to 666,666 on every reload.
+  if (r[20]) Pledge = parseInt(r[20]);
+  if (r[21]) Buyables['Elder Pledge'].price = parseInt(r[21]);
 
   ['Grandma', 'Factory', 'Mine', 'Shipment', 'Alchemy lab', 'Portal', 'Time machine']
     .forEach(name => Buyables[name].func(0));
@@ -613,6 +619,13 @@ function RebuildStore() {
     el.addEventListener('click', () => Buy(el.dataset.buy));
   });
 
+  // Elder Pledge stays visible after a reload if it was already unlocked
+  // (i.e. its price has moved away from the default 666,666).
+  const pledgeBtn = l('buyElder Pledge');
+  if (pledgeBtn && Buyables['Elder Pledge'].price !== 666666) {
+    pledgeBtn.style.display = 'block';
+  }
+
   StoreToRebuild = false;
 }
 
@@ -719,7 +732,7 @@ new Buyable(
 new Buyable(
   'Elder Pledge',
   '<span style="font-size:80%;">Puts an end to the Ancients\' wrath, at least for a while.</span>',
-  'pledgeicon', 666666,
+  'pledgeicon', 6666666,
   function (buy) {
     if (buy) { Pledge *= 2; Pledge += 30 * 60 * 10; }
     if (buy) Buyables['Grandma'].func(0);
