@@ -74,8 +74,13 @@
     z-index: 100000;
   }
 
+  #store_title{
+    margin-top: 15px;
+    font-size: 1.1em;
+  }
+
   #store {
-    margin-top: 25px;
+    margin-top: 15px;
     position: relative;
   }
 
@@ -105,8 +110,14 @@
   }
 
   /* ---------- Upgrades ---------- */
+
+  #store_upgrades_title{
+    margin-top: 15px;
+    font-size: 1.1em;
+  }
+
   #store_upgrades {
-    margin-top: 25px;
+    margin-top: 15px;
   }
 
   #store_upgrades > div {
@@ -333,7 +344,9 @@
     </div>
 
     <div id="rightPanel">
+      <div id="store_upgrades_title">Upgrades</div>
       <div id="store_upgrades"></div>
+      <div id="store_title">Buildings</div>
       <div id="store"></div>
     </div>
 
@@ -623,7 +636,7 @@ function RebuildStore() {
   // (i.e. its price has moved away from the default 666,666).
   const pledgeBtn = l('buyElder Pledge');
   if (pledgeBtn && Buyables['Elder Pledge'].price !== 666666) {
-    pledgeBtn.style.display = 'block';
+    pledgeBtn.style.display = 'none';
   }
 
   StoreToRebuild = false;
