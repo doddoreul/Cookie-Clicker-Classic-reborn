@@ -670,13 +670,13 @@ function CursorGain() {
 
 function ClickCookie() {
   let howMany = CursorGain();
-  howMany *= Prestige;
+  howMany *= Prestige+1;
   Cookies += howMany;
   if (Pops.length < 260 && NumbersOn) new Pop('cookie', '+' + howMany);
 }
 
 function AddCookie(howMany, el) {
-  howMany *= Prestige;
+  howMany *= Prestige+1;
   Cookies += howMany;
   if (el && Pops.length < 250 && NumbersOn) new Pop(el, '+' + howMany);
 }
