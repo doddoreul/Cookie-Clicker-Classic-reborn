@@ -335,8 +335,10 @@
       <div id="cps"></div>
       <div id="pledgeTime">Elder Pledge <span id="pledgeTimer">00:00</span></div>
       <br>
+      <div class="button" id="save">Save</div>
       <div class="button" id="exportSave">Export save</div>
       <div class="button" id="importSave">Import save</div>
+      <br>
       <div class="button" id="reset">Reset</div>
       <br>
       <div class="button" id="toggleNumbers">Numbers On</div>
@@ -516,6 +518,65 @@ function exportSave() {
     MakeSaveString()
   );
 }
+
+// --- SYSTÈME DE SAUVEGARDE VIA EXPORT ---
+
+function SaveGame() {
+    // 1. On appelle la fonction native du jeu qui génère la chaîne de caractères
+    // Dans Classic, elle s'appelle généralement ExportSave()
+    var saveString = MakeSaveString();
+    console.log(saveString);
+    if (saveString) {
+        // 2. On stocke cette chaîne dans le localStorage
+        localStorage.setItem("CookieClickerClassic_Reborn_Save", saveString);
+
+        // 3. Feedback visuel (Optionnel : vous pouvez créer un petit texte qui apparaît)
+        console.log("Sauvegarde effectuée !");
+
+        // Optionnel: afficher un message dans l'interface si vous avez un élément id="log"
+        l('log').innerHTML = "Game saved.";
+    }
+}
+
+function LoadGame() {
+    // 1. On récupère la chaîne stockée
+    var savedData = localStorage.getItem("CookieClickerClassic_Reborn_Save");
+    console.log("Save found, loading save");
+
+    if (savedData) {
+        // 2. On utilise la fonction native du jeu pour charger cette chaîne
+        // Dans Classic, il faut souvent passer la chaîne à ImportSave()
+
+        if (ApplySaveString('1|' + savedData)) new Pop('credits', 'Imported.');
+        Save();
+        console.log("Sauvegarde chargée avec succès.");
+    }
+}
+
+// Détection du CTRL+S pour save
+document.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault(); // Empêche d'enregistrer la page HTML
+        SaveGame();
+    }
+});
+
+// Initialisation au chargement de la page
+window.addEventListener('load', function() {
+    // Liaison avec le bouton #save
+
+    var saveBtn = document.getElementById('save');
+
+    if (saveBtn) {
+        saveBtn.onclick = function() {
+            SaveGame();
+        };
+    }
+
+    // Chargement automatique au lancement du jeu
+    // On met un petit délai (100ms) pour s'assurer que le moteur du jeu est prêt
+    setTimeout(LoadGame, 100);
+});
 
 function Reset() {
   if (confirm('Do you REALLY want to start over?')) {
