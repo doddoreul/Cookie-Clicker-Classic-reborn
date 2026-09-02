@@ -576,11 +576,13 @@ window.addEventListener('load', function() {
     setTimeout(LoadGame, 100);
 });
 
+/* Reset and prestige function */
 function Reset() {
   if (confirm('Do you REALLY want to start over?')) {
     document.cookie = 'CookieClickerSave=0; expires=Fri, 3 Aug 2001 20:47:11 UTC;';
     localStorage.removeItem("CookieClickerClassic_Reborn_Save");
     location.reload(true);
+    calculatePrestige();
   }
 }
 
@@ -1082,6 +1084,18 @@ function applyFlashEffect() {
     whole.style.background = '#ccc';
   }
 }
+
+
+/* ----------------------------------------- */
+/* Calculate Prestige level                  */
+/* ----------------------------------------- */
+
+function calculatePrestige(){
+  ////// TODO: do it
+}
+
+
+
 
 /* ---------------------------------------------------------------- */
 /*  UI toggles                                                       */
