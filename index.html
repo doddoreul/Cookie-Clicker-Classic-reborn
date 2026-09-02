@@ -333,6 +333,8 @@
 
     <div id="saveMenu">
       <div id="cps"></div>
+      <div id="pledgeTime">Elder Pledge <span id="pledgeTimer">00:00</span></div>
+      <br>
       <div class="button" id="exportSave">Export save</div>
       <div class="button" id="importSave">Import save</div>
       <div class="button" id="reset">Reset</div>
@@ -635,7 +637,7 @@ function RebuildStore() {
   // Elder Pledge stays visible after a reload if it was already unlocked
   // (i.e. its price has moved away from the default 666,666).
   const pledgeBtn = l('buyElder Pledge');
-  if (pledgeBtn && Buyables['Elder Pledge'].price !== 666666) {
+  if (pledgeBtn && Buyables['Elder Pledge'].price !== 6666666) {
     pledgeBtn.style.display = 'none';
   }
 
@@ -747,7 +749,10 @@ new Buyable(
   '<span style="font-size:80%;">Puts an end to the Ancients\' wrath, at least for a while.</span>',
   'pledgeicon', 6666666,
   function (buy) {
-    if (buy) { Pledge *= 2; Pledge += 30 * 60 * 10; }
+    if (buy && Pledge <= 0) {
+      Pledge *= 2;
+      Pledge += 30 * 60 * 10;
+    }
     if (buy) Buyables['Grandma'].func(0);
     const el = l('buyElder Pledge');
     if (el) el.style.display = 'none';
@@ -911,7 +916,7 @@ function Main() {
   cps += Cursors * cursorGain / 5;
 
   const floater = Math.round(cps * 10 - Math.floor(cps) * 10);
-  l('cps').innerHTML = 'cookies/second : ' + Beautify(cps) + (floater ? '.' + floater : '');
+  l('cps').innerHTML = 'Cookies per second : ' + Beautify(cps) + (floater ? '.' + floater : '');
 
   for (const name in Buyables) {
     const el = l('buy' + name);
@@ -931,7 +936,27 @@ function Main() {
 
   l('comment').innerHTML = commentFor(Cookies);
 
-  if (Pledge > 0) Pledge--;
+  if (Pledge > 0) {
+      Pledge--;
+
+      // Calcul des minutes et secondes
+      // Note : On divise par 30 car le jeu tourne à 30 images par seconde (FPS)
+      var secondsLeft = Math.ceil(Pledge / 30);
+      var min = Math.floor(secondsLeft / 60);
+      var sec = secondsLeft % 60;
+
+      // Ajout d'un 0 devant les secondes si nécessaire (ex: 09 au lieu de 9)
+      if (sec < 10) sec = '0' + sec;
+
+      // Affichage dans l'element
+      l('pledgeTimer').innerHTML = min + ':' + sec;
+  } else {
+      // Si le pledge est terminé, on peut remettre le prix par défaut ou masquer
+      l('pledgeTimer').innerHTML = '666';
+  }
+
+  l('buyElder Pledge').style.display = 'none';
+
   applyFlashEffect();
 
   if (T % 30 === 0 && Loaded) document.title = Beautify(Cookies) + ' cookies - Cookie Clicker';
