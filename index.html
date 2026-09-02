@@ -489,12 +489,12 @@ function ResetSaveString() {
     0, FactoriesBasePrice,
     0, MinesBasePrice,
     0, ShipmentsBasePrice,
-    0, LabsBasePrice),
+    0, LabsBasePrice,
     0, PortalsBasePrice,
-    0, TimesBasePrice),
-    "",
+    0, TimesBasePrice,
+    {},
     0,PledgeBasePrice,
-    Prestige,
+    Prestige
   ].join('|');
 }
 
@@ -669,12 +669,14 @@ function CursorGain() {
 }
 
 function ClickCookie() {
-  const howMany = CursorGain();
+  let howMany = CursorGain();
+  howMany *= Prestige;
   Cookies += howMany;
   if (Pops.length < 260 && NumbersOn) new Pop('cookie', '+' + howMany);
 }
 
 function AddCookie(howMany, el) {
+  howMany *= Prestige;
   Cookies += howMany;
   if (el && Pops.length < 250 && NumbersOn) new Pop(el, '+' + howMany);
 }
