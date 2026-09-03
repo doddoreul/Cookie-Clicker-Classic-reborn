@@ -592,14 +592,14 @@ function rebuildStore() {
   Object.keys(buildings).forEach(name => {
     const building = buildings[name];
     const hidden = "";
-    const smallFont = name === "Time machine" ? "font-size:90%;" : "";
+    const smallFont = "font-size:90%;";
 
     output += `
-      <div id="buy${name}" data-buy="${name}" style="${hidden}${smallFont}background-image:url(${building.icon}.png);">
+      <div id="buy${name}" data-buy="${name}" style="${hidden}background-image:url(${building.icon}.png);">
         <div class="tooltipStore">
           <div class="building-icon"></div>
-          <b>${name} - <moni></moni> ${beautify(building.currentPrice)}</b>
-          ${building.description}
+          <b>${name}</b>
+          <moni></moni> ${beautify(building.currentPrice)}
           ${building.count > 0 ? `<div class="amount">${building.count}</div>` : ""}
           <span class="tooltipTextStore">${building.description}</span>
         </div>
@@ -682,6 +682,7 @@ function rebuildUpgradesStore() {
   Object.keys(upgrades).forEach(name => {
     const upgrade = upgrades[name];
     const buyable = getBuildingCount(upgrade.building) >= upgrade.requiredCount;
+    const smallFont = "font-size:80%;";
 
     if (upgrade.bought || !buyable) return;
 
@@ -689,10 +690,11 @@ function rebuildUpgradesStore() {
     visibleCount++;
 
     output += `
-      <div id="upgrade${name}" data-upgrade="${name}" class="${classes}" style="background-image:url(${upgrade.building}icon.png);">
+      <div id="upgrade${name}" data-upgrade="${name}" class="${classes}" style="${smallFont}background-image:url(${upgrade.building}icon.png);">
         <div class="building-icon"></div>
-        <b>${upgrade.name} - <moni></moni> ${beautify(upgrade.price)}</b>
-        ${upgrade.description}
+        <b>${upgrade.name}</b>
+        <moni></moni> ${beautify(upgrade.price)}
+        <span class="tooltipTextStore">${upgrade.description}</span>
       </div>
     `;
   });

@@ -46,9 +46,10 @@ body::selection { background:transparent; }
 
 #store > div, #store_upgrades > div {
   background:#eee no-repeat;
-  width:256px; height:64px;
+  background-size: contain;
+  width:256px;
+  height:56px;
   padding-left:72px;
-  box-sizing:border-box;
   cursor:pointer;
   border:#000 2px solid;
   position:relative;
@@ -172,13 +173,6 @@ moni {
   padding:8px; z-index:20000000;
   visibility:hidden; font-size:14px;
 }
-/* Tooltip container */
-.tooltipStore {
-  position: relative;
-  display: inline-block;
-  border-bottom: 0px dotted black; /* Add dots under the hoverable text */
-  cursor: pointer;
-}
 
 /* Tooltip text */
 .tooltipTextStore {
@@ -188,12 +182,14 @@ moni {
   color: #ffffff;
   text-align: center;
   padding: 5px 0;
-  border-radius: 6px;
   position: absolute;
   z-index: 1; /* Ensure tooltip is displayed above content */
+  top: -5px;
+  right: 105%;
 }
 
 /* Show the tooltip text on hover */
-.tooltipStore:hover .tooltipTextStore {
+#store>div:hover .tooltipTextStore,
+#store_upgrades>div:hover .tooltipTextStore {
   visibility: visible;
 }
