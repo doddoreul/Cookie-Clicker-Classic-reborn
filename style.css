@@ -177,7 +177,7 @@ moni {
 /* Tooltip text */
 .tooltipTextStore {
   visibility: hidden; /* Hidden by default */
-  width: 130px;
+  width: 150px;
   background-color: black;
   color: #ffffff;
   text-align: center;

@@ -23,7 +23,7 @@ function beautify(value) {
   let output = "";
 
   digits.forEach((digit, index) => {
-    if (index % 3 === 0 && index > 0) output = "," + output;
+    if (index % 3 === 0 && index > 0) output = " " + output;
     output = digit + output;
   });
 
@@ -609,9 +609,12 @@ function rebuildStore() {
 
   output += `
     <div id="buyElder Pledge" data-buy="Elder Pledge" style="display:none;background-image:url(pledgeicon.png);">
-      <div class="building-icon"></div>
-      <b>Elder Pledge - <moni></moni> ${beautify(6666666)}</b>
-      <span style="font-size:80%;">Puts an end to the Ancients' wrath, at least for a while.</span>
+      <div class="tooltipStore">
+        <div class="building-icon"></div>
+        <b>Elder Pledge</b>
+        <moni></moni> ${beautify(6666666)}
+        <span class="tooltipTextStore">Puts an end to the Ancients' wrath, at least for a while.</span>
+      </div>
     </div>
   `;
 
@@ -691,10 +694,12 @@ function rebuildUpgradesStore() {
 
     output += `
       <div id="upgrade${name}" data-upgrade="${name}" class="${classes}" style="${smallFont}background-image:url(${upgrade.building}icon.png);">
-        <div class="building-icon"></div>
-        <b>${upgrade.name}</b>
-        <moni></moni> ${beautify(upgrade.price)}
-        <span class="tooltipTextStore">${upgrade.description}</span>
+        <div class="tooltipStore">
+          <div class="building-icon"></div>
+          <b>${upgrade.name}</b>
+          <moni></moni> ${beautify(upgrade.price)}
+          <span class="tooltipTextStore">${upgrade.description}</span>
+        </div>
       </div>
     `;
   });
