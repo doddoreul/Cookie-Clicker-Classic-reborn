@@ -419,34 +419,34 @@ let Grandmas = 0;
 let GrandmasBasePrice = 100;
 
 let Farms = 0;
-let FarmsBasePrice = 1100;
+let FarmsBasePrice = 500;
 
 let Mines = 0;
 let MinesBasePrice = 2000;
 
 let Factories = 0;
-let FactoriesBasePrice = 500;
+let FactoriesBasePrice = 7000;
 
 let Banks = 0;
-let BanksBasePrice = 5000;
+let BanksBasePrice = 50000;
 
 let Temples = 0;
-let TemplesBasePrice = 20000;
+let TemplesBasePrice = 1000000;
 
 let WizardTowers = 0;
-let WizardTowersBasePrice = 166666;
+let WizardTowersBasePrice = 123456789;
 
 let Shipments = 0;
-let ShipmentsBasePrice = 7000;
+let ShipmentsBasePrice = 1000000000;
 
 let Labs = 0;
-let LabsBasePrice = 50000;
+let LabsBasePrice = 20000000000;
 
 let Portals = 0;
-let PortalsBasePrice = 1000000;
+let PortalsBasePrice = 400000000000;
 
 let Times = 0;
-let TimesBasePrice = 123456789;
+let TimesBasePrice = 8000000000000;
 
 let Pledge = 0;
 let PledgeBasePrice = 6666666;
@@ -902,18 +902,6 @@ new Buyable(
   }
 );
 
-new Buyable('Mine', 'Mines out cookie dough and chocolate chips.', 'mineicon', MinesBasePrice, function (buy) {
-  if (buy) Mines++;
-  if (buy && Mines === 1) Buyables['Grandma'].func(0);
-  let str = '';
-  for (let i = 0; i < Mines; i++) {
-    const x = Math.floor(Math.random() * 20 + (i % 10) * 16);
-    const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 16);
-    str += `<div class="mine" style="left:${x}px;top:${y}px;"></div>`;
-  }
-  l('mines').innerHTML = str;
-});
-
 new Buyable('Factory', 'Produces large quantities of cookies.', 'factoryicon', FactoriesBasePrice, function (buy) {
   if (buy) Factories++;
   if (buy && Factories === 1) Buyables['Grandma'].func(0);
@@ -924,6 +912,18 @@ new Buyable('Factory', 'Produces large quantities of cookies.', 'factoryicon', F
     str += `<div class="factory" style="right:${x}px;top:${y}px;"></div>`;
   }
   l('factories').innerHTML = str;
+});
+
+new Buyable('Mine', 'Mines out cookie dough and chocolate chips.', 'mineicon', MinesBasePrice, function (buy) {
+  if (buy) Mines++;
+  if (buy && Mines === 1) Buyables['Grandma'].func(0);
+  let str = '';
+  for (let i = 0; i < Mines; i++) {
+    const x = Math.floor(Math.random() * 20 + (i % 10) * 16);
+    const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 16);
+    str += `<div class="mine" style="left:${x}px;top:${y}px;"></div>`;
+  }
+  l('mines').innerHTML = str;
 });
 
 new Buyable(
