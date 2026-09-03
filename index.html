@@ -546,8 +546,12 @@ function ResetSaveString() {
     0,
     0, CursorsBasePrice,
     0, GrandmasBasePrice,
-    0, FactoriesBasePrice,
+    0, FarmsBasePrice,
     0, MinesBasePrice,
+    0, FactoriesBasePrice,
+    0, BanksBasePrice,
+    0, TemplesBasePrice,
+    0, WizardTowersBasePrice,
     0, ShipmentsBasePrice,
     0, LabsBasePrice,
     0, PortalsBasePrice,
@@ -606,9 +610,6 @@ function ApplySaveString(str) {
     Buyables['Time machine'].price = parseInt(r[26]);
   }
 
-  if (r[15]) { Portals = Math.min(1000, parseInt(r[15])); Buyables['Portal'].price = parseInt(r[16]); }
-  if (r[17]) { Times   = Math.min(1000, parseInt(r[17])); Buyables['Time machine'].price = parseInt(r[18]); }
-
   // Reset upgrades then re-apply whichever ones were bought in this save
   for (const name in Upgrades) Upgrades[name].bought = false;
   for (const name in Multipliers) Multipliers[name] = 1;
@@ -625,8 +626,8 @@ function ApplySaveString(str) {
 
   // Elder Pledge: remaining active duration + current (inflated) price.
   // Without this, the price silently reset to 666,666 on every reload.
-  if (r[28]) Pledge = parseInt(r[20]);
-  if (r[29]) Buyables['Elder Pledge'].price = parseInt(r[21]);
+  if (r[28]) Pledge = parseInt(r[28]);
+  if (r[29]) Buyables['Elder Pledge'].price = parseInt(r[29]);
 
   [
     'Grandma',
