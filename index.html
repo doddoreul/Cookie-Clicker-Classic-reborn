@@ -405,6 +405,7 @@ let Loaded = false;
 let NumbersOn = true;
 let Flashing = true;
 let StoreToRebuild = false;
+let UpgradesToRebuild = false;
 
 let Cookies = 0;
 let CookiesDisplay = 0;
@@ -701,9 +702,11 @@ function Buyable(name, desc, pic, price, func) {
       this.price = Math.ceil(this.price * 1.1);
       this.func(1);
       StoreToRebuild = true;
+      UpgradesToRebuild = true;
     }
   };
 
+  UpgradesToRebuild = true;
   StoreToRebuild = true;
 }
 
@@ -872,15 +875,33 @@ new Buyable(
 /* ---------------------------------------------------------------- */
 
 const Upgrades = {};
-let UpgradesToRebuild = true;
 
-function Upgrade(name, desc, pic, price, building) {
+
+function BuildingCount(name) {
+  switch (name) {
+    case 'Cursor': return Cursors;
+    case 'Grandma': return Grandmas;
+    case 'Factory': return Factories;
+    case 'Mine': return Mines;
+    case 'Shipment': return Shipments;
+    case 'Alchemy lab': return Labs;
+    case 'Portal': return Portals;
+    case 'Time machine': return Times;
+    default: return 0;
+  }
+}
+
+function Upgrade(name, desc, pic, price, building, nbBuilding, multiplier) {
   this.name = name;
   this.desc = desc;
   this.pic = pic;
   this.price = price;
-  this.building = building; // key into Multipliers / Buyables
+  this.building = building;
+  this.nbBuilding = nbBuilding;
+  this.multiplier = multiplier;
   this.bought = false;
+  this.buyable = 0;
+
   Upgrades[name] = this;
   UpgradesToRebuild = true;
 }
@@ -891,7 +912,7 @@ function BuyUpgrade(name) {
 
   Cookies -= u.price;
   u.bought = true;
-  Multipliers[u.building] *= 2;
+  Multipliers[u.building] *= u.multiplier;
 
   UpgradesToRebuild = true;
   StoreToRebuild = true; // building prices/amounts panel doesn't change, but keep in sync
@@ -906,15 +927,13 @@ function RebuildUpgradesStore() {
 
   for (const name in Upgrades) {
     const u = Upgrades[name];
-    let classes = '';
 
-    if (u.bought) {
-      classes = 'bought';
-    } else if (visibleCount < MAX_VISIBLE_UPGRADES) {
-      visibleCount++;
-    } else {
-      classes = 'hidden';
-    }
+    u.buyable = BuildingCount(u.building) >= u.nbBuilding;
+
+    if (u.bought || !u.buyable) continue; // pas encore débloquée, ou déjà achetée
+
+    const classes = visibleCount < MAX_VISIBLE_UPGRADES ? '' : 'hidden';
+    visibleCount++;
 
     str += `<div id="upgrade${name}" data-upgrade="${name}" class="${classes}" style="background-image:url(${u.pic}.png);">
       <b>${u.name} - <moni></moni> ${Beautify(u.price)}</b>${u.desc}
@@ -929,14 +948,14 @@ function RebuildUpgradesStore() {
   UpgradesToRebuild = false;
 }
 
-new Upgrade('Reinforced index finger', 'Cursors x2.', 'cursoricon', 100, 'Cursor');
-new Upgrade('Farmer grandmas', 'Grandmas x2.', 'grandmaicon', 1000, 'Grandma');
-new Upgrade('Sturdier conveyor belts', 'Factories x2.', 'factoryicon', 5000, 'Factory');
-new Upgrade('Deeper shafts', 'Mines x2.', 'mineicon', 20000, 'Mine');
-new Upgrade('Faster rockets', 'Shipments x2.', 'shipmenticon', 70000, 'Shipment');
-new Upgrade('Concentrated gold', 'Alchemy labs x2.', 'labicon', 500000, 'Alchemy lab');
-new Upgrade('Stable wormholes', 'Portals x2.', 'portalicon', 10000000, 'Portal');
-new Upgrade('Flux capacitors', 'Time machines x2.', 'timemachineicon', 1234567890, 'Time machine');
+new Upgrade('Reinforced index finger', 'Cursors x2.', 'cursoricon', 100, 'Cursor', 1, 2);
+new Upgrade('Farmer grandmas', 'Grandmas x2.', 'grandmaicon', 1000, 'Grandma', 1, 2);
+new Upgrade('Sturdier conveyor belts', 'Factories x2.', 'factoryicon', 5000, 'Factory', 1, 2);
+new Upgrade('Deeper shafts', 'Mines x2.', 'mineicon', 20000, 'Mine', 1, 2);
+new Upgrade('Faster rockets', 'Shipments x2.', 'shipmenticon', 70000, 'Shipment', 1, 2);
+new Upgrade('Concentrated gold', 'Alchemy labs x2.', 'labicon', 500000, 'Alchemy lab', 1, 2);
+new Upgrade('Stable wormholes', 'Portals x2.', 'portalicon', 10000000, 'Portal', 1, 2);
+new Upgrade('Flux capacitors', 'Time machines x2.', 'timemachineicon', 1234567890, 'Time machine', 1, 2);
 
 /* ---------------------------------------------------------------- */
 /*  Floating pops                                                    */
