@@ -10,1524 +10,1410 @@
   Cleaned up / refactored version — same gameplay, tidier code.
 -->
 <style>
-  :root {
-    --panel-bg: rgba(255, 255, 255, 0.75);
-  }
+  :root { --panel-bg: rgba(255,255,255,.75); }
 
-  html, body {
-    margin: 0;
-    padding: 0;
-  }
-
+  html, body { margin:0; padding:0; }
   body {
-    font-family: "Courier New", monospace;
-    background: #ccc;
-    overflow-y: auto;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    user-select: none;
+    font-family:"Courier New", monospace;
+    background:#ccc;
+    overflow-y:auto;
+    -webkit-touch-callout:none;
+    -webkit-user-select:none;
+    user-select:none;
   }
+  body::selection { background:transparent; }
 
-  body::selection { background: transparent; }
-
-  /* ---------- Cookie ---------- */
   #cookie {
-    width: 128px;
-    height: 128px;
-    background: url(cookie.png);
-    position: absolute;
-    left: -64px;
-    cursor: pointer;
+    width:128px; height:128px;
+    background:url(cookie.png);
+    position:absolute; left:-64px;
+    cursor:pointer;
   }
-  #cookie:hover  { background-position: -128px; }
-  #cookie:active { background-position: -256px; }
+  #cookie:hover { background-position:-128px; }
+  #cookie:active { background-position:-256px; }
 
   #cookie .cursor {
-    width: 32px;
-    height: 32px;
-    position: absolute;
-    background: url(cursor.png);
+    width:32px; height:32px;
+    position:absolute;
+    background:url(cursor.png);
   }
 
-  /* ---------- Floating number pops ---------- */
   #pops {
-    position: absolute;
-    left: 0;
-    top: 0;
-    z-index: 10000;
-    pointer-events: none;
+    position:absolute; left:0; top:0;
+    z-index:10000; pointer-events:none;
   }
   .pop {
-    font-weight: bold;
-    color: #fff;
-    width: 200px;
-    height: 20px;
-    font-size: 20px;
-    text-align: center;
+    font-weight:bold; color:#fff;
+    width:200px; height:20px;
+    font-size:20px; text-align:center;
   }
 
-  /* ---------- Store / right panel ---------- */
   #rightPanel {
-    position: absolute;
-    right: 0;
-    top: 0;
-    z-index: 100000;
+    position:absolute; right:0; top:0; z-index:100000;
   }
+  #store_title, #store_upgrades_title {
+    margin-top:15px; font-size:1.1em;
+  }
+  #store, #store_upgrades { margin-top:15px; }
 
-  #store_title{
-    margin-top: 15px;
-    font-size: 1.1em;
+  #store > div, #store_upgrades > div {
+    background:#eee no-repeat;
+    width:256px; height:64px;
+    padding-left:72px;
+    box-sizing:border-box;
+    cursor:pointer;
+    border:#000 2px solid;
+    position:relative;
   }
-
-  #store {
-    margin-top: 15px;
-    position: relative;
-  }
-
-  #store > div {
-    background: #eee no-repeat;
-    width: 256px;
-    height: 64px;
-    padding-left: 72px;
-    cursor: pointer;
-    border: #000 2px solid;
-    position: relative;
-  }
-  #store > div:hover  { background-color: #fff; }
-  #store > div:active { background-color: #ccc; }
-  #store > div b { display: block; }
-  #store > div.grayed {
-    background-color: #666;
-    color: #f00;
+  #store > div:hover, #store_upgrades > div:hover { background-color:#fff; }
+  #store > div:active, #store_upgrades > div:active { background-color:#ccc; }
+  #store > div b, #store_upgrades > div b { display:block; }
+  #store > div.grayed, #store_upgrades > div.grayed {
+    background-color:#666;
+    color:#f00;
   }
   #store > div .amount {
-    position: absolute;
-    right: 8px;
-    top: 8px;
-    font-size: 48px;
-    color: #000;
-    opacity: 0.2;
-  }
-
-  /* ---------- Upgrades ---------- */
-
-  #store_upgrades_title{
-    margin-top: 15px;
-    font-size: 1.1em;
-  }
-
-  #store_upgrades {
-    margin-top: 15px;
-  }
-
-  #store_upgrades > div {
-    background: #eee no-repeat;
-    width: 256px;
-    height: 64px;
-    padding-left: 72px;
-    cursor: pointer;
-    border: #000 2px solid;
-    position: relative;
-  }
-  #store_upgrades > div:hover  { background-color: #fff; }
-  #store_upgrades > div:active { background-color: #ccc; }
-  #store_upgrades > div b { display: block; }
-  #store_upgrades > div.grayed {
-    background-color: #666;
-    color: #f00;
+    position:absolute; right:8px; top:8px;
+    font-size:48px; color:#000; opacity:.2;
   }
   #store_upgrades > div.bought,
-  #store_upgrades > div.hidden { display: none; }
+  #store_upgrades > div.hidden { display:none; }
 
-  /* ---------- HUD ---------- */
-  #money {
-    background: url(currency.png) no-repeat;
-    background-color: rgba(255, 255, 255, 0.75);
-    border-radius: 18px;
-    position: absolute;
-    left: 0;
-    top: 0;
-    margin: 16px;
-    height: 28px;
-    padding: 4px 4px 0 36px;
-    font-weight: bold;
-    font-size: 24px;
-    z-index: 100;
+  .building-icon-placeholder {
+    position:absolute;
+    left:4px; top:4px;
+    width:64px; height:56px;
+    background:#777;
+    border:1px solid #555;
+    box-sizing:border-box;
   }
 
+  #money {
+    background:url(currency.png) no-repeat;
+    background-color:rgba(255,255,255,.75);
+    border-radius:18px;
+    position:absolute; left:0; top:0;
+    margin:16px;
+    height:28px;
+    padding:4px 4px 0 36px;
+    font-weight:bold; font-size:24px;
+    z-index:100;
+  }
   #saveMenu {
-    position: absolute;
-    left: 0;
-    top: 45px;
-    margin: 10px 16px;
-    padding: 2px 6px;
-    font-weight: bold;
-    font-size: 12px;
-    background: var(--panel-bg);
-    border-radius: 8px;
-    line-height: 125%;
-    z-index: 100;
+    position:absolute; left:0; top:45px;
+    margin:10px 16px; padding:2px 6px;
+    font-weight:bold; font-size:12px;
+    background:var(--panel-bg);
+    border-radius:8px;
+    line-height:125%; z-index:100;
   }
   #saveMenu .button {
-    text-decoration: underline;
-    cursor: pointer;
-    font-size: 14px;
+    text-decoration:underline;
+    cursor:pointer; font-size:14px;
   }
-
   #updateLog {
-    position: fixed;
-    left: 0;
-    bottom: 20px;
-    margin: 16px;
-    padding: 6px;
-    font-weight: bold;
-    font-size: 12px;
-    color: #666;
-    background: var(--panel-bg);
-    border-radius: 8px;
-    line-height: 125%;
-    width: 250px;
-    height: 300px;
-    overflow-y: auto;
-    z-index: 100;
+    position:fixed; left:0; bottom:20px;
+    margin:16px; padding:6px;
+    font-weight:bold; font-size:12px;
+    color:#666; background:var(--panel-bg);
+    border-radius:8px; line-height:125%;
+    width:250px; height:300px;
+    overflow-y:auto; z-index:100;
   }
-  #updateLog b { color: #000; }
+  #updateLog b { color:#000; }
 
   moni {
-    background: url(currencysmall.png) no-repeat;
-    width: 16px;
-    height: 16px;
-    display: inline-block;
-    position: relative;
-    top: 4px;
-    margin-right: -8px;
+    background:url(currencysmall.png) no-repeat;
+    width:16px; height:16px;
+    display:inline-block; position:relative;
+    top:4px; margin-right:-8px;
   }
 
-  /* ---------- Buildings ---------- */
-  #grandmas   { position: absolute; left: 100px;  width: 240px; }
-  .grandma    { position: absolute; background: url(grandma.png); width: 24px; height: 48px; }
-  .goldengrandma  { background: url(goldengrandma.png); }
-  .factorygrandma { background: url(factorygrandma.png); }
-  .minegrandma    { background: url(minegrandma.png); }
-  .shipmentgrandma{ background: url(shipmentgrandma.png); }
-  .portalgrandma  { background: url(portalgrandma.png); }
-  .pledgedgrandma { background: url(pledgedgrandma.png); }
-  .timegrandma    { background: url(timegrandma.png); }
+  #grandmas { position:absolute; left:100px; width:240px; }
+  .grandma { position:absolute; background:url(grandma.png); width:24px; height:48px; }
+  .goldengrandma { background:url(goldengrandma.png); }
+  .factorygrandma { background:url(factorygrandma.png); }
+  .minegrandma { background:url(minegrandma.png); }
+  .shipmentgrandma { background:url(shipmentgrandma.png); }
+  .portalgrandma { background:url(portalgrandma.png); }
+  .pledgedgrandma { background:url(pledgedgrandma.png); }
+  .timegrandma { background:url(timegrandma.png); }
 
-  #factories { position: absolute; left: -420px; width: 320px; }
-  .factory   { position: absolute; background: url(factory.png); width: 32px; height: 48px; }
+  #factories { position:absolute; left:-420px; width:320px; }
+  .factory { position:absolute; background:url(factory.png); width:32px; height:48px; }
 
-  #mines { position: absolute; left: 100px; width: 160px; top: 100px; }
-  .mine  { position: absolute; background: url(mine.png); width: 32px; height: 32px; }
+  #mines { position:absolute; left:100px; width:160px; top:100px; }
+  .mine { position:absolute; background:url(mine.png); width:32px; height:32px; }
 
-  #shipments { position: absolute; left: -340px; width: 240px; top: 100px; }
-  .shipment  { position: absolute; background: url(shipment.png); width: 48px; height: 48px; }
+  #shipments { position:absolute; left:-340px; width:240px; top:100px; }
+  .shipment { position:absolute; background:url(shipment.png); width:48px; height:48px; }
 
-  #labs { position: absolute; left: -120px; width: 240px; top: 180px; }
-  .lab  { position: absolute; background: url(lab.png); width: 24px; height: 32px; }
+  #labs { position:absolute; left:-120px; width:240px; top:180px; }
+  .lab { position:absolute; background:url(lab.png); width:24px; height:32px; }
 
-  #portals { position: absolute; left: -340px; width: 240px; top: 180px; }
-  .portal  { position: absolute; background: url(portal.png); width: 48px; height: 48px; }
+  #portals { position:absolute; left:-340px; width:240px; top:180px; }
+  .portal { position:absolute; background:url(portal.png); width:48px; height:48px; }
 
-  #times { position: absolute; left: 100px; width: 240px; top: 180px; }
-  .time  { position: absolute; background: url(timemachine.png); width: 48px; height: 48px; }
+  #times { position:absolute; left:100px; width:240px; top:180px; }
+  .time { position:absolute; background:url(timemachine.png); width:48px; height:48px; }
 
   #comment {
-    position: absolute;
-    left: -200px;
-    top: -115px;
-    width: 400px;
-    font-weight: bold;
-    font-size: 16px;
-    text-align: center;
-    background-color: rgba(255, 255, 255, 0.75);
-    border-radius: 18px;
+    position:absolute; left:-200px; top:-115px;
+    width:400px; font-weight:bold; font-size:16px;
+    text-align:center;
+    background-color:rgba(255,255,255,.75);
+    border-radius:18px;
   }
 
-  #middle {
-    position: absolute;
-    left: 50%;
-    top: 150px;
-    width: 0;
-  }
+  #middle { position:absolute; left:50%; top:150px; width:0; }
 
   #credits {
-    width: 100%;
-    height: 20px;
-    background: #666;
-    color: #fff;
-    position: fixed;
-    bottom: 0;
-    margin: 0;
-    font-size: 12px;
-    border-top: 2px solid #999;
-    z-index: 100000;
+    width:100%; height:20px;
+    background:#666; color:#fff;
+    position:fixed; bottom:0; margin:0;
+    font-size:12px; border-top:2px solid #999;
+    z-index:100000;
   }
-  #credits span { margin: 4px; }
-  #credits a { color: #fff; }
+  #credits span { margin:4px; }
+  #credits a { color:#fff; }
 
   #alert {
-    background-color: #666;
-    color: #fff;
-    border: 2px solid #000;
-    position: fixed;
-    right: 0;
-    bottom: 0;
-    padding: 8px;
-    z-index: 20000000;
-    visibility: hidden;
-    font-size: 14px;
-  }
-
-  #tip {
-    position: fixed;
-    left: 0;
-    bottom: 20px;
-    width: 100%;
-    height: 20px;
+    background:#666; color:#fff;
+    border:2px solid #000;
+    position:fixed; right:0; bottom:0;
+    padding:8px; z-index:20000000;
+    visibility:hidden; font-size:14px;
   }
 </style>
 </head>
 
 <body id="whole">
+<div id="hiddenLoader" style="display:none;"></div>
 
-  <div id="hiddenLoader" style="display:none;"></div>
+<div id="credits">
+  <span><b>Cookie Clicker</b> &copy;
+    <a href="http://orteil.dashnet.org" target="_blank" rel="noopener">Orteil</a>, 2013
+  </span>
+</div>
 
-  <div id="credits">
-    <span>
-      <b>Cookie Clicker</b> &copy;
-      <a href="http://orteil.dashnet.org" target="_blank" rel="noopener">Orteil</a>, 2013
-    </span>
+<div id="game">
+  <div id="updateLog">
+    <b>03/09/2026</b><br>
+    <b>0.128</b><br>
+    -refactored naming and comments<br>
+    -refactored building state<br>
+    -cleaned up save handling<br>
+    <b>0.127</b><br>
+    -standalone, cleaned-up build<br>
+    <b>0.126</b><br>
+    -technical fixes<br>
+    -better servers!<br>
+    <b>0.125</b><br>
+    -added a new object<br>
+    -added option to disable flashing<br>
+    <b>0.124</b><br>
+    -elder pledge is cheaper and now buffs grandmas and clicking while active<br>
+    -page title now displays cookies<br>
+    <b>0.123</b><br>
+    -added cookies per second<br>
+    -reworked grandmas
   </div>
 
-  <div id="game">
-    <div id="log"></div>
+  <div id="money"></div>
 
-    <div id="updateLog">
-      <b>02/09/2026</b><br>
-      <b>0.127</b><br>
-      -standalone, cleaned-up build<br>
-      <b>0.126</b><br>
-      -technical fixes<br>
-      -better servers!<br>
-      <b>0.125</b><br>
-      -added a new object<br>
-      -added option to disable flashing<br>
-      <b>0.124</b><br>
-      -elder pledge is cheaper and now buffs grandmas and clicking while active<br>
-      -page title now displays cookies<br>
-      <b>0.123</b><br>
-      -added cookies per second<br>
-      -reworked grandmas<br>
-      <br>
-      <b>0.122</b><br>
-      -fixed background flashing<br>
-      -added a new secret end-game item to counter the grandmapocalypse<br>
-      <b>0.121</b><br>
-      -import/export save<br>
-      -ask confirm on reset<br>
-      -speed tweaks<br>
-    </div>
-
-    <div id="money"></div>
-
-    <div id="saveMenu">
-      <div id="cps"></div>
-      <div id="pledgeTime">Elder Pledge <span id="pledgeTimer">00:00</span></div>
-      <div id="prestige">Prestige <span id="prestigeDisplay">0</span></div>
-      <div id="prestigeGain">Prestige gain <span id="prestigeGainDisplay">0</span></div>
-
-      <br>
-      <div class="button" id="save">Save</div>
-      <div class="button" id="exportSave">Export save</div>
-      <div class="button" id="importSave">Import save</div>
-      <br>
-      <div class="button" id="reset">Reset</div>
-      <br>
-      <div class="button" id="toggleNumbers">Numbers On</div>
-      <div class="button" id="toggleFlash">Flashing On</div>
-      <br>
-      <div id="version"></div>
-    </div>
-
-    <div id="rightPanel">
-      <div id="store_upgrades_title">Upgrades</div>
-      <div id="store_upgrades"></div>
-      <div id="store_title">Buildings</div>
-      <div id="store"></div>
-    </div>
-
-    <div id="middle">
-      <div id="grandmas"></div>
-      <div id="factories"></div>
-      <div id="mines"></div>
-      <div id="shipments"></div>
-      <div id="labs"></div>
-      <div id="portals"></div>
-      <div id="times"></div>
-      <div id="comment">Loading...</div>
-      <div id="cookie"></div>
-    </div>
-
-    <div id="pops"></div>
+  <div id="saveMenu">
+    <div id="cps"></div>
+    <div id="pledgeTime">Elder Pledge <span id="pledgeTimer">00:00</span></div>
+    <div id="prestige">Prestige <span id="prestigeDisplay">0</span></div>
+    <div id="prestigeGain">Prestige gain <span id="prestigeGainDisplay">0</span></div>
+    <br>
+    <div class="button" id="save">Save</div>
+    <div class="button" id="exportSave">Export save</div>
+    <div class="button" id="importSave">Import save</div>
+    <br>
+    <div class="button" id="reset">Reset</div>
+    <br>
+    <div class="button" id="toggleNumbers">Numbers On</div>
+    <div class="button" id="toggleFlash">Flashing On</div>
+    <br>
+    <div id="version"></div>
   </div>
 
-  <div id="alert"></div>
+  <div id="rightPanel">
+    <div id="store_upgrades_title">Upgrades</div>
+    <div id="store_upgrades"></div>
+    <div id="store_title">Buildings</div>
+    <div id="store"></div>
+  </div>
+
+  <div id="middle">
+    <div id="grandmas"></div>
+    <div id="factories"></div>
+    <div id="mines"></div>
+    <div id="shipments"></div>
+    <div id="labs"></div>
+    <div id="portals"></div>
+    <div id="times"></div>
+    <div id="comment">Loading...</div>
+    <div id="cookie"></div>
+  </div>
+
+  <div id="pops"></div>
+</div>
 
 <script>
 "use strict";
 
 /* ---------------------------------------------------------------- */
-/*  Small DOM / formatting helpers                                   */
+/* DOM and formatting helpers                                      */
 /* ---------------------------------------------------------------- */
 
-const l = (id) => document.getElementById(id);
+const VERSION = 0.128;
+const SAVE_KEY = "CookieClickerClassic_Reborn_Save";
+const COOKIE_SAVE_NAME = "CookieClickerSave";
+const SAVE_FORMAT_VERSION = 2;
+const TICKS_PER_SECOND = 30;
+const SAVE_INTERVAL_SECONDS = 30 * 60;
+const MAX_BUILDING_COUNT = 1000;
+const MAX_VISIBLE_UPGRADES = 5;
 
-/** Turns 9999999 into "9,999,999" */
-function Beautify(value) {
-  const digits = Math.floor(value).toString().split('').reverse();
-  let out = '';
-  digits.forEach((digit, i) => {
-    if (i % 3 === 0 && i > 0) out = ',' + out;
-    out = digit + out;
+function getElement(id) {
+  return document.getElementById(id);
+}
+
+function beautify(value) {
+  const digits = Math.floor(value).toString().split("").reverse();
+  let output = "";
+
+  digits.forEach((digit, index) => {
+    if (index % 3 === 0 && index > 0) output = "," + output;
+    output = digit + output;
   });
-  return out;
+
+  return output;
 }
 
 /* ---------------------------------------------------------------- */
-/*  Game state                                                       */
+/* Game state                                                       */
 /* ---------------------------------------------------------------- */
 
-const Version = 0.127;
-l('version').innerHTML = 'running v.' + Version;
+let loaded = false;
+let numbersOn = true;
+let flashing = true;
+let storeToRebuild = true;
+let upgradesToRebuild = true;
+let cookies = 0;
+let cookiesDisplay = 0;
+let ticks = 0;
+let prestige = 0;
+let pledge = 0;
+let saveTimer = SAVE_INTERVAL_SECONDS;
 
-let Loaded = false;
-let NumbersOn = true;
-let Flashing = true;
-let StoreToRebuild = false;
-let UpgradesToRebuild = false;
-
-let Cookies = 0;
-let CookiesDisplay = 0;
-let T = 0;
-let Prestige = 0;
-
-let Cursors = 0;
-let CursorsBasePrice = 15;
-
-let Grandmas = 0;
-let GrandmasBasePrice = 100;
-
-let Farms = 0;
-let FarmsBasePrice = 500;
-
-let Mines = 0;
-let MinesBasePrice = 2000;
-
-let Factories = 0;
-let FactoriesBasePrice = 7000;
-
-let Banks = 0;
-let BanksBasePrice = 50000;
-
-let Temples = 0;
-let TemplesBasePrice = 1000000;
-
-let WizardTowers = 0;
-let WizardTowersBasePrice = 123456789;
-
-let Shipments = 0;
-let ShipmentsBasePrice = 1000000000;
-
-let Labs = 0;
-let LabsBasePrice = 20000000000;
-
-let Portals = 0;
-let PortalsBasePrice = 400000000000;
-
-let Times = 0;
-let TimesBasePrice = 8000000000000;
-
-let Pledge = 0;
-let PledgeBasePrice = 6666666;
-
-/** Per-building production multiplier, doubled by each matching upgrade. */
-const Multipliers = {
-  Cursor: 1,
-  Grandma: 1,
-  Farm: 1,
-  Mine: 1,
-  Factory: 1,
-  Bank: 1,
-  Temple: 1,
-  'Wizard tower': 1,
-  Shipment: 1,
-  'Alchemy lab': 1,
-  Portal: 1,
-  'Time machine': 1,
+const buildings = {
+  Cursor: {
+    count: 0,
+    basePrice: 15,
+    gain: 1,
+    description: "Autoclicks every 5 seconds.",
+    icon: "cursoricon"
+  },
+  Grandma: {
+    count: 0,
+    basePrice: 100,
+    gain: 4,
+    description: "A nice grandma to bake more cookies.",
+    icon: "grandmaicon"
+  },
+  Farm: {
+    count: 0,
+    basePrice: 500,
+    gain: 40,
+    description: "Grows cookie plants from cookie seeds.",
+    icon: "farmicon"
+  },
+  Mine: {
+    count: 0,
+    basePrice: 2000,
+    gain: 50,
+    description: "Mines out cookie dough and chocolate chips.",
+    icon: "mineicon"
+  },
+  Factory: {
+    count: 0,
+    basePrice: 7000,
+    gain: 20,
+    description: "Produces large quantities of cookies.",
+    icon: "factoryicon"
+  },
+  Bank: {
+    count: 0,
+    basePrice: 50000,
+    gain: 250,
+    description: "Generates cookies from interest.",
+    icon: "bankicon"
+  },
+  Temple: {
+    count: 0,
+    basePrice: 1000000,
+    gain: 390,
+    description: "Full of precious, ancient chocolate.",
+    icon: "templeicon"
+  },
+  "Wizard tower": {
+    count: 0,
+    basePrice: 123456789,
+    gain: 2200,
+    description: "Summons cookies with magic spells.",
+    icon: "wizardtowericon"
+  },
+  Shipment: {
+    count: 0,
+    basePrice: 1000000000,
+    gain: 100,
+    description: "Brings in fresh cookies from the cookie planet.",
+    icon: "shipmenticon"
+  },
+  "Alchemy lab": {
+    count: 0,
+    basePrice: 20000000000,
+    gain: 500,
+    description: "Turns gold into cookies!",
+    icon: "labicon"
+  },
+  Portal: {
+    count: 0,
+    basePrice: 400000000000,
+    gain: 6666,
+    description: "Opens a door to the Cookieverse.",
+    icon: "portalicon"
+  },
+  "Time machine": {
+    count: 0,
+    basePrice: 8000000000000,
+    gain: 123456,
+    description: '<span style="font-size:80%;">Brings cookies from the past, before they were even eaten.</span>',
+    icon: "timemachineicon"
+  }
 };
 
-/* Preload building images referenced only via CSS backgrounds */
-(function preloadImages() {
-  const pics = [
-    'cursor', 'grandma', 'mine', 'factory', 'lab', 'shipment',
-    'goldengrandma', 'grandmaiconinvert', 'grandmaiconlustful', 'portal',
-    'skellington', 'kaleigrandma', 'factorygrandma', 'minegrandma',
-    'shipmentgrandma', 'portalgrandma', 'pledgedgrandma', 'pledgeicon',
-    'timemachine', 'timegrandma'
-  ];
-  l('hiddenLoader').innerHTML = pics.map(p => `<img src="${p}.png">`).join('');
-})();
+const multipliers = {};
+Object.keys(buildings).forEach(name => multipliers[name] = 1);
+
+const upgrades = {};
+const pops = [];
 
 /* ---------------------------------------------------------------- */
-/*  Save / load / import / export                                    */
+/* Building helpers                                                 */
 /* ---------------------------------------------------------------- */
 
-function MakeSaveString() {
-  return [
-    Version,
-    parseInt(Cookies),
+function getBuilding(name) {
+  return buildings[name];
+}
 
-    parseInt(Cursors),
-    parseInt(Buyables['Cursor'].price),
+function getBuildingCount(name) {
+  return getBuilding(name)?.count || 0;
+}
 
-    parseInt(Grandmas),
-    parseInt(Buyables['Grandma'].price),
+function getBuildingPrice(name) {
+  const building = getBuilding(name);
+  return building.currentPrice;
+}
 
-    parseInt(Farms),
-    parseInt(Buyables['Farm'].price),
+function updateBuildingPrice(name) {
+  const building = getBuilding(name);
+  building.currentPrice = Math.ceil(
+    building.basePrice * Math.pow(1.1, building.count)
+  );
+}
 
-    parseInt(Mines),
-    parseInt(Buyables['Mine'].price),
+function initializeBuildingPrices() {
+  Object.keys(buildings).forEach(updateBuildingPrice);
+}
 
-    parseInt(Factories),
-    parseInt(Buyables['Factory'].price),
-
-    parseInt(Banks),
-    parseInt(Buyables['Bank'].price),
-
-    parseInt(Temples),
-    parseInt(Buyables['Temple'].price),
-
-    parseInt(WizardTowers),
-    parseInt(Buyables['Wizard tower'].price),
-
-    parseInt(Shipments),
-    parseInt(Buyables['Shipment'].price),
-
-    parseInt(Labs),
-    parseInt(Buyables['Alchemy lab'].price),
-
-    parseInt(Portals),
-    parseInt(Buyables['Portal'].price),
-
-    parseInt(Times),
-    parseInt(Buyables['Time machine'].price),
-
-    Object.keys(Upgrades)
-      .filter(name => Upgrades[name].bought)
-      .join(','),
-
-    parseInt(Pledge),
-    parseInt(Buyables['Elder Pledge'].price),
-
-    parseInt(Prestige),
-
-  ].join('|');
+function createBuilding(name, options) {
+  buildings[name] = {
+    count: 0,
+    basePrice: options.basePrice,
+    gain: options.gain,
+    description: options.description,
+    icon: options.icon,
+    currentPrice: options.basePrice
+  };
+  multipliers[name] = 1;
 }
 
 /* ---------------------------------------------------------------- */
-/*  Reset save string                                               */
+/* Save and load                                                    */
 /* ---------------------------------------------------------------- */
 
-function ResetSaveString() {
-  return [
-    Version,
-    0,
-    0, CursorsBasePrice,
-    0, GrandmasBasePrice,
-    0, FarmsBasePrice,
-    0, MinesBasePrice,
-    0, FactoriesBasePrice,
-    0, BanksBasePrice,
-    0, TemplesBasePrice,
-    0, WizardTowersBasePrice,
-    0, ShipmentsBasePrice,
-    0, LabsBasePrice,
-    0, PortalsBasePrice,
-    0, TimesBasePrice,
-    {},
-    0,PledgeBasePrice,
-    Prestige
-  ].join('|');
-}
+function getSaveData() {
+  const buildingData = {};
 
-/** Shared by both Load and Import — applies a "1|..." save string to game state */
-function ApplySaveString(str) {
-  const r = str.split('|');
-  if (str === '0' || !str || r[0] !== '1') return false;
-
-  Cookies = parseInt(r[2]);
-  Pledge = 0;
-
-  Cursors = Math.min(1000, parseInt(r[3]));
-  Buyables['Cursor'].price = parseInt(r[4]);
-
-  Grandmas = Math.min(1000, parseInt(r[5]));
-  Buyables['Grandma'].price = parseInt(r[6]);
-
-  Farms = Math.min(1000, parseInt(r[7]));
-  Buyables['Farm'].price = parseInt(r[8]);
-
-  Mines = Math.min(1000, parseInt(r[9]));
-  Buyables['Mine'].price = parseInt(r[10]);
-
-  Factories = Math.min(1000, parseInt(r[11]));
-  Buyables['Factory'].price = parseInt(r[12]);
-
-  Banks = Math.min(1000, parseInt(r[13]));
-  Buyables['Bank'].price = parseInt(r[14]);
-
-  Temples = Math.min(1000, parseInt(r[15]));
-  Buyables['Temple'].price = parseInt(r[16]);
-
-  WizardTowers = Math.min(1000, parseInt(r[17]));
-  Buyables['Wizard tower'].price = parseInt(r[18]);
-
-  Shipments = Math.min(1000, parseInt(r[19]));
-  Buyables['Shipment'].price = parseInt(r[20]);
-
-  Labs = Math.min(1000, parseInt(r[21]));
-  Buyables['Alchemy lab'].price = parseInt(r[22]);
-
-  if (r[23]) {
-    Portals = Math.min(1000, parseInt(r[23]));
-    Buyables['Portal'].price = parseInt(r[24]);
-  }
-
-  if (r[25]) {
-    Times = Math.min(1000, parseInt(r[25]));
-    Buyables['Time machine'].price = parseInt(r[26]);
-  }
-
-  // Reset upgrades then re-apply whichever ones were bought in this save
-  for (const name in Upgrades) Upgrades[name].bought = false;
-  for (const name in Multipliers) Multipliers[name] = 1;
-
-  if (r[27]) {
-    r[27].split(',').filter(Boolean).forEach(name => {
-      const u = Upgrades[name];
-      if (u && !u.bought) {
-        u.bought = true;
-        Multipliers[u.building] *= 2;
-      }
-    });
-  }
-
-  // Elder Pledge: remaining active duration + current (inflated) price.
-  // Without this, the price silently reset to 666,666 on every reload.
-  if (r[28]) Pledge = parseInt(r[28]);
-  if (r[29]) Buyables['Elder Pledge'].price = parseInt(r[29]);
-
-  [
-    'Grandma',
-    'Farm',
-    'Mine',
-    'Factory',
-    'Bank',
-    'Temple',
-    'Wizard tower',
-    'Shipment',
-    'Alchemy lab',
-    'Portal',
-    'Time machine'
-  ].forEach(name => {
-    Buyables[name].func(0);
+  Object.keys(buildings).forEach(name => {
+    buildingData[name] = {
+      count: buildings[name].count,
+      price: buildings[name].currentPrice
+    };
   });
 
-  // Prestige
-  if (r[30]) Prestige = parseInt(r[30]);
+  return {
+    formatVersion: SAVE_FORMAT_VERSION,
+    gameVersion: VERSION,
+    cookies: Math.floor(cookies),
+    prestige,
+    pledge,
+    buildings: buildingData,
+    upgrades: Object.keys(upgrades).filter(name => upgrades[name].bought)
+  };
+}
 
-  StoreToRebuild = true;
-  UpgradesToRebuild = true;
+function makeSaveString() {
+  return JSON.stringify(getSaveData());
+}
+
+function resetSaveString() {
+  const data = {
+    formatVersion: SAVE_FORMAT_VERSION,
+    gameVersion: VERSION,
+    cookies: 0,
+    prestige,
+    pledge: 0,
+    buildings: {},
+    upgrades: []
+  };
+
+  Object.keys(buildings).forEach(name => {
+    data.buildings[name] = {
+      count: 0,
+      price: buildings[name].basePrice
+    };
+  });
+
+  return JSON.stringify(data);
+}
+
+function applySaveData(data) {
+  if (!data || typeof data !== "object") return false;
+  if (data.formatVersion !== SAVE_FORMAT_VERSION) return false;
+
+  cookies = Number.isFinite(data.cookies) ? data.cookies : 0;
+  prestige = Number.isFinite(data.prestige) ? data.prestige : 0;
+  pledge = Number.isFinite(data.pledge) ? data.pledge : 0;
+
+  Object.keys(buildings).forEach(name => {
+    const saved = data.buildings?.[name];
+    const building = buildings[name];
+
+    building.count = Math.min(
+      MAX_BUILDING_COUNT,
+      Math.max(0, Number.parseInt(saved?.count ?? 0, 10))
+    );
+
+    building.currentPrice = Number.isFinite(saved?.price)
+      ? saved.price
+      : building.basePrice;
+
+    if (building.currentPrice < building.basePrice) {
+      building.currentPrice = building.basePrice;
+    }
+  });
+
+  Object.keys(upgrades).forEach(name => {
+    upgrades[name].bought = false;
+  });
+
+  Object.keys(multipliers).forEach(name => {
+    multipliers[name] = 1;
+  });
+
+  (data.upgrades || []).forEach(name => {
+    const upgrade = upgrades[name];
+    if (!upgrade) return;
+
+    upgrade.bought = true;
+    multipliers[upgrade.building] *= upgrade.multiplier;
+  });
+
+  refreshAllBuildingVisuals();
+  storeToRebuild = true;
+  upgradesToRebuild = true;
   return true;
 }
 
-function importSave() {
-  const save = prompt('Please paste in the text that was given to you on save export.', '');
-  if (save) {
-    if (ApplySaveString('1|' + save)) new Pop('credits', 'Imported.');
-    Save();
+function applyLegacySaveString(str) {
+  const values = str.split("|");
+  if (!str || values[0] !== "1") return false;
+
+  const readInt = index => {
+    const value = Number.parseInt(values[index], 10);
+    return Number.isFinite(value) ? value : 0;
+  };
+
+  cookies = readInt(2);
+
+  const legacyOrder = [
+    "Cursor", "Grandma", "Farm", "Mine", "Factory", "Bank",
+    "Temple", "Wizard tower", "Shipment", "Alchemy lab",
+    "Portal", "Time machine"
+  ];
+
+  let index = 3;
+
+  legacyOrder.forEach(name => {
+    const building = buildings[name];
+    building.count = Math.min(MAX_BUILDING_COUNT, Math.max(0, readInt(index)));
+    building.currentPrice = Math.max(
+      building.basePrice,
+      readInt(index + 1) || building.basePrice
+    );
+    index += 2;
+  });
+
+  const upgradeNames = values[index] ? values[index].split(",").filter(Boolean) : [];
+  index++;
+
+  Object.keys(upgrades).forEach(name => upgrades[name].bought = false);
+  Object.keys(multipliers).forEach(name => multipliers[name] = 1);
+
+  upgradeNames.forEach(name => {
+    const upgrade = upgrades[name];
+    if (!upgrade) return;
+    upgrade.bought = true;
+    multipliers[upgrade.building] *= upgrade.multiplier;
+  });
+
+  index++;
+  index++;
+  prestige = readInt(index);
+
+  refreshAllBuildingVisuals();
+  storeToRebuild = true;
+  upgradesToRebuild = true;
+  return true;
+}
+
+function applySaveString(str) {
+  if (!str || str === "0") return false;
+
+  try {
+    const data = JSON.parse(str);
+    return applySaveData(data);
+  } catch {
+    return applyLegacySaveString(str);
   }
+}
+
+function saveGameToLocalStorage() {
+  localStorage.setItem(SAVE_KEY, makeSaveString());
+}
+
+function loadGameFromLocalStorage() {
+  const savedData = localStorage.getItem(SAVE_KEY);
+  if (!savedData) return false;
+  return applySaveString(savedData);
+}
+
+function saveGameToCookie() {
+  const saveString = makeSaveString();
+  const expiry = new Date();
+  expiry.setFullYear(expiry.getFullYear() + 5);
+
+  document.cookie =
+    `${COOKIE_SAVE_NAME}=${encodeURIComponent(saveString)}; expires=${expiry.toUTCString()}; path=/;`;
+
+  saveTimer = SAVE_INTERVAL_SECONDS;
+}
+
+function loadGameFromCookie() {
+  const match = document.cookie.match(
+    new RegExp(`(?:^|; )${COOKIE_SAVE_NAME}=([^;]*)`)
+  );
+
+  if (!match) return false;
+
+  try {
+    return applySaveString(decodeURIComponent(match[1]));
+  } catch {
+    return false;
+  }
+}
+
+function saveGame() {
+  saveGameToLocalStorage();
+  saveGameToCookie();
+  new Pop("credits", "Saved");
+}
+
+function loadGame() {
+  const loadedFromLocalStorage = loadGameFromLocalStorage();
+
+  if (!loadedFromLocalStorage) {
+    loadGameFromCookie();
+  }
+
+  loaded = true;
+  getElement("comment").innerHTML = "Ready.";
+  main();
 }
 
 function exportSave() {
   prompt(
     "Copy this text and keep it somewhere safe! (yes, it's easy to edit — but remember: cheated cookies taste terrible!)",
-    MakeSaveString()
+    makeSaveString()
   );
 }
 
+function importSave() {
+  const save = prompt(
+    "Please paste in the text that was given to you on save export.",
+    ""
+  );
 
-function SaveGame() {
-    // 1. On appelle la fonction native du jeu qui génère la chaîne de caractères
-    // Dans Classic, elle s'appelle généralement ExportSave()
-    var saveString = MakeSaveString();
-    console.log(saveString);
-    if (saveString) {
-        // 2. On stocke cette chaîne dans le localStorage
-        localStorage.setItem("CookieClickerClassic_Reborn_Save", saveString);
+  if (!save) return;
 
-        // 3. Feedback visuel (Optionnel : vous pouvez créer un petit texte qui apparaît)
-        console.log("Sauvegarde effectuée !");
-        Save();
-
-    }
-}
-
-function LoadGame() {
-    // 1. On récupère la chaîne stockée
-    var savedData = localStorage.getItem("CookieClickerClassic_Reborn_Save");
-    console.log("Save found, loading save");
-
-    if (savedData) {
-        // 2. On utilise la fonction native du jeu pour charger cette chaîne
-        // Dans Classic, il faut souvent passer la chaîne à ImportSave()
-
-        if (ApplySaveString('1|' + savedData)) new Pop('credits', 'Imported.');
-        Save();
-        console.log("Sauvegarde chargée avec succès.");
-    }
-}
-
-// Détection du CTRL+S pour save
-document.addEventListener('keydown', function(e) {
-    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-        e.preventDefault(); // Empêche d'enregistrer la page HTML
-        SaveGame();
-    }
-});
-
-// Initialisation au chargement de la page
-window.addEventListener('load', function() {
-    // Liaison avec le bouton #save
-
-    var saveBtn = document.getElementById('save');
-
-    if (saveBtn) {
-        saveBtn.onclick = function() {
-            SaveGame();
-        };
-    }
-
-    // Chargement automatique au lancement du jeu
-    // On met un petit délai (100ms) pour s'assurer que le moteur du jeu est prêt
-    setTimeout(LoadGame, 100);
-});
-
-/* Reset and prestige function */
-function Reset() {
-  if (confirm('Do you REALLY want to start over?')) {
-    console.log("Resetting game");
-    document.cookie = 'CookieClickerSave=0; expires=Fri, 3 Aug 2001 20:47:11 UTC;';
-
-    Prestige += calculatePrestige(); // Add new prestige to previous prestige
-    console.log("New prestige: " + Prestige);
-
-    localStorage.setItem("CookieClickerClassic_Reborn_Save", ResetSaveString());
-
-    location.reload(true);
-  }
-}
-
-let SaveTimer = 30 * 60;
-
-function Save() {
-  const str = MakeSaveString();
-  const expiry = new Date();
-  expiry.setFullYear(expiry.getFullYear() + 5);
-  document.cookie = `CookieClickerSave=${escape(str)}; expires=${expiry.toUTCString()};`;
-
-  if (document.cookie.indexOf('CookieClickerSave') < 0) {
-    new Pop('credits', '<span style="color:#f00;">Error while saving. Export your save instead!</span>');
+  if (applySaveString(save)) {
+    saveGameToLocalStorage();
+    saveGameToCookie();
+    new Pop("credits", "Imported.");
   } else {
-    new Pop('credits', 'Saved');
+    new Pop("credits", "Invalid save.");
   }
-  SaveTimer = 30 * 60;
 }
 
-function Load() {
-  const raw = document.cookie.indexOf('CookieClickerSave') >= 0
-    ? '1|' + unescape(document.cookie.split('CookieClickerSave=')[1])
-    : '0';
+function resetGame() {
+  if (!confirm("Do you REALLY want to start over?")) return;
 
-  ApplySaveString(raw);
-  new Pop('credits', 'Loaded.');
-  l('comment').innerHTML = 'Loading cookie...';
-  Loaded = true;
-  Main();
-}
+  prestige += calculatePrestige();
 
-/* ---------------------------------------------------------------- */
-/*  Clicking                                                         */
-/* ---------------------------------------------------------------- */
+  localStorage.setItem(SAVE_KEY, resetSaveString());
 
-/** Cookies gained per click / per cursor auto-click. */
-function CursorGain() {
-  const base = Pledge > 0 ? Math.ceil(Cursors * 1.5) : 1;
-  return base * Multipliers.Cursor;
-}
+  document.cookie =
+    `${COOKIE_SAVE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
 
-function ClickCookie() {
-  let howMany = CursorGain();
-  howMany *= Prestige+1;
-  Cookies += howMany;
-  if (Pops.length < 260 && NumbersOn) new Pop('cookie', '+' + howMany);
-}
-
-function AddCookie(howMany, el) {
-  howMany *= Prestige+1;
-  Cookies += howMany;
-  if (el && Pops.length < 250 && NumbersOn) new Pop(el, '+' + howMany);
+  location.reload();
 }
 
 /* ---------------------------------------------------------------- */
-/*  Store / buyables                                                 */
+/* Cookie clicking                                                  */
 /* ---------------------------------------------------------------- */
 
-const Buyables = {};
-
-function Buyable(name, desc, pic, price, func) {
-  this.name = name;
-  this.desc = desc;
-  this.pic = pic;
-  this.price = price;
-  this.func = func;
-  Buyables[name] = this;
-
-  this.Buy = function () {
-    if (Cookies >= this.price && Loaded) {
-      Cookies -= this.price;
-      this.price = Math.ceil(this.price * 1.1);
-      this.func(1);
-      StoreToRebuild = true;
-      UpgradesToRebuild = true;
-    }
-  };
-
-  UpgradesToRebuild = true;
-  StoreToRebuild = true;
+function getCursorGain() {
+  const cursor = buildings.Cursor;
+  const base = pledge > 0 ? Math.ceil(cursor.count * 1.5) : 1;
+  return base * multipliers.Cursor;
 }
 
-function Buy(what) {
-  Buyables[what].Buy();
-}
+function clickCookie() {
+  let amount = getCursorGain();
+  amount *= prestige + 1;
+  cookies += amount;
 
-function RebuildStore() {
-  const amountFor = {
-    Cursor: () => Cursors,
-    Grandma: () => Grandmas,
-    Farm: () => Farms,
-    Mine: () => Mines,
-    Factory: () => Factories,
-    Bank: () => Banks,
-    Temple: () => Temples,
-    'Wizard tower': () => WizardTowers,
-    Shipment: () => Shipments,
-    'Alchemy lab': () => Labs,
-    Portal: () => Portals,
-    'Time machine': () => Times,
-  };
-
-  let str = '';
-  for (const name in Buyables) {
-    const b = Buyables[name];
-    const amount = amountFor[name] ? amountFor[name]() : 0;
-    const hidden = name === 'Elder Pledge' ? 'display:none;' : '';
-    const smallFont = name === 'Time machine' ? 'font-size:90%;' : '';
-
-    str += `<div id="buy${name}" data-buy="${name}" style="${hidden}${smallFont}background-image:url(${b.pic}.png);">
-      <b>${name} - <moni></moni> ${Beautify(b.price)}</b>${b.desc}
-      ${amount > 0 ? `<div class="amount">${amount}</div>` : ''}
-    </div>`;
+  if (pops.length < 260 && numbersOn) {
+    new Pop("cookie", "+" + amount);
   }
-  l('store').innerHTML = str;
-
-  // Re-attach click handlers (CSP-friendly, no inline onclick)
-  l('store').querySelectorAll('[data-buy]').forEach(el => {
-    el.addEventListener('click', () => Buy(el.dataset.buy));
-  });
-
-  // Elder Pledge stays visible after a reload if it was already unlocked
-  // (i.e. its price has moved away from the default 666,666).
-  const pledgeBtn = l('buyElder Pledge');
-  if (pledgeBtn && Buyables['Elder Pledge'].price !== PledgeBasePrice) {
-    pledgeBtn.style.display = 'none';
-  }
-
-  StoreToRebuild = false;
 }
 
-/* ---- Building definitions ---- */
+function addCookies(amount, elementId) {
+  amount *= prestige + 1;
+  cookies += amount;
 
-new Buyable('Cursor', 'Autoclicks every 5 seconds.', 'cursoricon', CursorsBasePrice, () => { Cursors++; });
+  if (elementId && pops.length < 250 && numbersOn) {
+    new Pop(elementId, "+" + amount);
+  }
+}
 
-new Buyable('Grandma', 'A nice grandma to bake more cookies.', 'grandmaicon', GrandmasBasePrice, function (buy) {
-  if (buy) Grandmas++;
-  let str = '';
-  for (let i = 0; i < Grandmas; i++) {
+/* ---------------------------------------------------------------- */
+/* Building rendering                                               */
+/* ---------------------------------------------------------------- */
+
+function refreshGrandmas() {
+  const count = buildings.Grandma.count;
+  let output = "";
+
+  for (let i = 0; i < count; i++) {
     const x = Math.floor(Math.random() * 20 + (i % 10) * 24);
     const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 24);
-    let cl = '';
-    if (Labs && Math.random() < 0.2) cl = 'goldengrandma';
-    if (Factories && Math.random() < 0.2) cl = 'factorygrandma';
-    if (Mines && Math.random() < 0.2) cl = 'minegrandma';
-    if (Shipments && Math.random() < 0.2) cl = 'shipmentgrandma';
-    if (Portals && Pledge <= 0 && Math.random() < 0.2) cl = 'portalgrandma';
-    if (Times && Math.random() < 0.2) cl = 'timegrandma';
-    if (Pledge && Math.random() < 0.2) cl = 'pledgedgrandma';
-    str += `<div class="${cl ? cl + ' ' : ''}grandma" style="left:${x}px;top:${y}px;"></div>`;
+    let className = "";
+
+    if (buildings["Alchemy lab"].count && Math.random() < 0.2) className = "goldengrandma";
+    if (buildings.Factory.count && Math.random() < 0.2) className = "factorygrandma";
+    if (buildings.Mine.count && Math.random() < 0.2) className = "minegrandma";
+    if (buildings.Shipment.count && Math.random() < 0.2) className = "shipmentgrandma";
+    if (buildings.Portal.count && pledge <= 0 && Math.random() < 0.2) className = "portalgrandma";
+    if (buildings["Time machine"].count && Math.random() < 0.2) className = "timegrandma";
+    if (pledge && Math.random() < 0.2) className = "pledgedgrandma";
+
+    output += `<div class="${className ? className + " " : ""}grandma" style="left:${x}px;top:${y}px;"></div>`;
   }
-  l('grandmas').innerHTML = str;
-});
 
-new Buyable(
-  'Farm',
-  'Grows cookie plants from cookie seeds.',
-  'farmicon',
-  FarmsBasePrice,
-  function (buy) {
-    if (buy) Farms++;
+  getElement("grandmas").innerHTML = output;
+}
 
-    // TODO: farm stuff
-  }
-);
+function refreshMines() {
+  let output = "";
 
-new Buyable('Factory', 'Produces large quantities of cookies.', 'factoryicon', FactoriesBasePrice, function (buy) {
-  if (buy) Factories++;
-  if (buy && Factories === 1) Buyables['Grandma'].func(0);
-  let str = '';
-  for (let i = 0; i < Factories; i++) {
-    const x = Math.floor(Math.random() * 20 + (i % 10) * 32);
-    const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 24);
-    str += `<div class="factory" style="right:${x}px;top:${y}px;"></div>`;
-  }
-  l('factories').innerHTML = str;
-});
-
-new Buyable('Mine', 'Mines out cookie dough and chocolate chips.', 'mineicon', MinesBasePrice, function (buy) {
-  if (buy) Mines++;
-  if (buy && Mines === 1) Buyables['Grandma'].func(0);
-  let str = '';
-  for (let i = 0; i < Mines; i++) {
+  for (let i = 0; i < buildings.Mine.count; i++) {
     const x = Math.floor(Math.random() * 20 + (i % 10) * 16);
     const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 16);
-    str += `<div class="mine" style="left:${x}px;top:${y}px;"></div>`;
+    output += `<div class="mine" style="left:${x}px;top:${y}px;"></div>`;
   }
-  l('mines').innerHTML = str;
-});
 
-new Buyable(
-  'Bank',
-  'Generates cookies from interest.',
-  'bankicon',
-  BanksBasePrice,
-  function (buy) {
-    if (buy) Banks++;
-    // TODO: bank stuff
-  }
-);
+  getElement("mines").innerHTML = output;
+}
 
-new Buyable(
-  'Temple',
-  'Full of precious, ancient chocolate.',
-  'templeicon',
-  TemplesBasePrice,
-  function (buy) {
-    if (buy) Temples++;
-    // TODO: temple stuff
-  }
-);
-new Buyable(
-  'Wizard tower',
-  'Summons cookies with magic spells.',
-  'wizardtowericon',
-  WizardTowersBasePrice,
-  function (buy) {
-    if (buy) WizardTowers++;
-    // TODO: WT stuff
-  }
-);
+function refreshFactories() {
+  let output = "";
 
-new Buyable('Shipment', 'Brings in fresh cookies from the cookie planet.', 'shipmenticon', ShipmentsBasePrice, function (buy) {
-  if (buy) Shipments++;
-  if (buy && Shipments === 1) Buyables['Grandma'].func(0);
-  let str = '';
-  for (let i = 0; i < Shipments; i++) {
+  for (let i = 0; i < buildings.Factory.count; i++) {
+    const x = Math.floor(Math.random() * 20 + (i % 10) * 32);
+    const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 24);
+    output += `<div class="factory" style="right:${x}px;top:${y}px;"></div>`;
+  }
+
+  getElement("factories").innerHTML = output;
+}
+
+function refreshShipments() {
+  let output = "";
+
+  for (let i = 0; i < buildings.Shipment.count; i++) {
     const x = Math.floor(Math.random() * 20 + (i % 10) * 24);
     const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 24);
-    str += `<div class="shipment" style="right:${x}px;top:${y}px;"></div>`;
+    output += `<div class="shipment" style="right:${x}px;top:${y}px;"></div>`;
   }
-  l('shipments').innerHTML = str;
-});
 
-new Buyable('Alchemy lab', 'Turns gold into cookies!', 'labicon', LabsBasePrice, function (buy) {
-  if (buy) Labs++;
-  if (buy && Labs === 1) Buyables['Grandma'].func(0);
-  let str = '';
-  for (let i = 0; i < Labs; i++) {
+  getElement("shipments").innerHTML = output;
+}
+
+function refreshLabs() {
+  let output = "";
+
+  for (let i = 0; i < buildings["Alchemy lab"].count; i++) {
     const x = Math.floor(Math.random() * 20 + (i % 10) * 24);
     const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 16);
-    str += `<div class="lab" style="right:${x}px;top:${y}px;"></div>`;
+    output += `<div class="lab" style="right:${x}px;top:${y}px;"></div>`;
   }
-  l('labs').innerHTML = str;
-});
 
-new Buyable('Portal', 'Opens a door to the Cookieverse.', 'portalicon', PortalsBasePrice, function (buy) {
-  if (buy) Portals++;
-  if (buy && Portals === 1) Buyables['Grandma'].func(0);
-  let str = '';
-  for (let i = 0; i < Portals; i++) {
+  getElement("labs").innerHTML = output;
+}
+
+function refreshPortals() {
+  let output = "";
+
+  for (let i = 0; i < buildings.Portal.count; i++) {
     const x = Math.floor(Math.random() * 20 + (i % 10) * 24);
     const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 24);
-    str += `<div class="portal" style="right:${x}px;top:${y}px;"></div>`;
+    output += `<div class="portal" style="right:${x}px;top:${y}px;"></div>`;
   }
-  l('portals').innerHTML = str;
-});
 
-new Buyable(
-  'Time machine',
-  '<span style="font-size:80%;">Brings cookies from the past, before they were even eaten.</span>',
-  'timemachineicon', TimesBasePrice,
-  function (buy) {
-    if (buy) Times++;
-    if (buy && Times === 1) Buyables['Grandma'].func(0);
-    let str = '';
-    for (let i = 0; i < Times; i++) {
-      const x = Math.floor(Math.random() * 20 + (i % 10) * 24);
-      const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 24);
-      str += `<div class="time" style="right:${x}px;top:${y}px;"></div>`;
-    }
-    l('times').innerHTML = str;
+  getElement("portals").innerHTML = output;
+}
+
+function refreshTimeMachines() {
+  let output = "";
+
+  for (let i = 0; i < buildings["Time machine"].count; i++) {
+    const x = Math.floor(Math.random() * 20 + (i % 10) * 24);
+    const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 24);
+    output += `<div class="time" style="right:${x}px;top:${y}px;"></div>`;
   }
-);
 
+  getElement("times").innerHTML = output;
+}
 
+function refreshAllBuildingVisuals() {
+  refreshGrandmas();
+  refreshMines();
+  refreshFactories();
+  refreshShipments();
+  refreshLabs();
+  refreshPortals();
+  refreshTimeMachines();
+}
 
-new Buyable(
-  'Elder Pledge',
-  '<span style="font-size:80%;">Puts an end to the Ancients\' wrath, at least for a while.</span>',
-  'pledgeicon', PledgeBasePrice,
-  function (buy) {
-    if (buy && Pledge <= 0) {
-      Pledge *= 2;
-      Pledge += 30 * 60 * 10;
-    }
-    if (buy) Buyables['Grandma'].func(0);
-    const el = l('buyElder Pledge');
-    if (el) el.style.display = 'none';
-  }
-);
+function buyBuilding(name) {
+  const building = getBuilding(name);
+
+  if (!building || !loaded || cookies < building.currentPrice) return;
+
+  cookies -= building.currentPrice;
+  building.count++;
+  updateBuildingPrice(name);
+
+  refreshAllBuildingVisuals();
+  storeToRebuild = true;
+  upgradesToRebuild = true;
+}
 
 /* ---------------------------------------------------------------- */
-/*  Upgrades — each one doubles the output of a single building      */
+/* Store                                                             */
 /* ---------------------------------------------------------------- */
 
-const Upgrades = {};
+function rebuildStore() {
+  let output = "";
 
+  Object.keys(buildings).forEach(name => {
+    const building = buildings[name];
+    const hidden = "";
+    const smallFont = name === "Time machine" ? "font-size:90%;" : "";
 
-function BuildingCount(name) {
-  switch (name) {
-    case 'Cursor': return Cursors;
-    case 'Grandma': return Grandmas;
-    case 'Farm': return Farms;
-    case 'Mine': return Mines;
-    case 'Factory': return Factories;
-    case 'Bank': return Banks;
-    case 'Temple': return Temples;
-    case 'Wizard tower': return WizardTowers;
-    case 'Shipment': return Shipments;
-    case 'Alchemy lab': return Labs;
-    case 'Portal': return Portals;
-    case 'Time machine': return Times;
-    default: return 0;
-  }
-}
-
-function Upgrade(name, desc, pic, price, building, nbBuilding, multiplier) {
-  this.name = name;
-  this.desc = desc;
-  this.pic = pic;
-  this.price = price;
-  this.building = building;
-  this.nbBuilding = nbBuilding;
-  this.multiplier = multiplier;
-  this.bought = false;
-  this.buyable = 0;
-
-  Upgrades[name] = this;
-  UpgradesToRebuild = true;
-}
-
-function BuyUpgrade(name) {
-  const u = Upgrades[name];
-  if (!u || u.bought || !Loaded || Cookies < u.price) return;
-
-  Cookies -= u.price;
-  u.bought = true;
-  Multipliers[u.building] *= u.multiplier;
-
-  UpgradesToRebuild = true;
-  StoreToRebuild = true; // building prices/amounts panel doesn't change, but keep in sync
-  new Pop('store_upgrades', u.name + ' bought!');
-}
-
-const MAX_VISIBLE_UPGRADES = 5;
-
-function RebuildUpgradesStore() {
-  let str = '';
-  let visibleCount = 0;
-
-  for (const name in Upgrades) {
-    const u = Upgrades[name];
-
-    u.buyable = BuildingCount(u.building) >= u.nbBuilding;
-
-    if (u.bought || !u.buyable) continue; // pas encore débloquée, ou déjà achetée
-
-    const classes = visibleCount < MAX_VISIBLE_UPGRADES ? '' : 'hidden';
-    visibleCount++;
-
-    str += `<div id="upgrade${name}" data-upgrade="${name}" class="${classes}" style="background-image:url(${u.pic}.png);">
-      <b>${u.name} - <moni></moni> ${Beautify(u.price)}</b>${u.desc}
-    </div>`;
-  }
-  l('store_upgrades').innerHTML = str;
-
-  l('store_upgrades').querySelectorAll('[data-upgrade]').forEach(el => {
-    el.addEventListener('click', () => BuyUpgrade(el.dataset.upgrade));
+    output += `
+      <div id="buy${name}" data-buy="${name}" style="${hidden}${smallFont}background-image:url(${building.icon}.png);">
+        <div class="building-icon"></div>
+        <b>${name} - <moni></moni> ${beautify(building.currentPrice)}</b>
+        ${building.description}
+        ${building.count > 0 ? `<div class="amount">${building.count}</div>` : ""}
+      </div>
+    `;
   });
 
-  UpgradesToRebuild = false;
+  output += `
+    <div id="buyElder Pledge" data-buy="Elder Pledge" style="display:none;background-image:url(pledgeicon.png);">
+      <div class="building-icon"></div>
+      <b>Elder Pledge - <moni></moni> ${beautify(6666666)}</b>
+      <span style="font-size:80%;">Puts an end to the Ancients' wrath, at least for a while.</span>
+    </div>
+  `;
+
+  getElement("store").innerHTML = output;
+
+  getElement("store").querySelectorAll("[data-buy]").forEach(element => {
+    element.addEventListener("click", () => {
+      if (element.dataset.buy === "Elder Pledge") {
+        buyElderPledge();
+      } else {
+        buyBuilding(element.dataset.buy);
+      }
+    });
+  });
+
+  storeToRebuild = false;
 }
 
-// Cursors
-new Upgrade('Reinforced index finger', 'Cursors x2.', 'cursoricon', 100, 'Cursor', 1, 2);
-new Upgrade('Carpal tunnel prevention cream', 'Cursors x2.', 'cursoricon', 500, 'Cursor', 1, 2);
-new Upgrade('Ambidextrous', 'Cursors x2.', 'cursoricon', 10000, 'Cursor', 10, 2);
-
-// Special Cursor upgrades for future building
-// new Upgrade('Thousand fingers', 'Cursors gain +0.1 cookies for each non-cursor object owned.', 'cursoricon', 100000, 'Cursor', 25, 0.1);
-// new Upgrade('Million fingers', 'Multiplies the gain from Thousand fingers by 5.', 'cursoricon', 10000000, 'Cursor', 50, 5);
-// new Upgrade('Billion fingers', 'Multiplies the gain from Thousand fingers by 10.', 'cursoricon', 100000000, 'Cursor', 100, 10);
-// new Upgrade('Trillion fingers', 'Multiplies the gain from Thousand fingers by 20.', 'cursoricon', 1000000000, 'Cursor', 150, 20);
-
-
-// Grandmas
-new Upgrade('Forwards from grandma', 'Grandmas x2.', 'grandmaicon', 1000, 'Grandma', 1, 2);
-new Upgrade('Steel-plated rolling pins', 'Grandmas x2.', 'grandmaicon', 5000, 'Grandma', 5, 2);
-new Upgrade('Lubricated dentures', 'Grandmas x2.', 'grandmaicon', 50000, 'Grandma', 25, 2);
-new Upgrade('Prune juice', 'Grandmas x2.', 'grandmaicon', 5000000, 'Grandma', 50, 2);
-new Upgrade('Double-thick glasses', 'Grandmas x2.', 'grandmaicon', 500000000, 'Grandma', 100, 2);
-new Upgrade('Aging agents', 'Grandmas x2.', 'grandmaicon', 50000000000, 'Grandma', 150, 2);
-new Upgrade('Xtreme walkers', 'Grandmas x2.', 'grandmaicon', 50000000000000, 'Grandma', 200, 2);
-
-
-// Farms — for future building
-// new Upgrade('Cheap hoes', 'Farms x2.', 'farmicon', 11000, 'Farm', 1, 2);
-// new Upgrade('Fertilizer', 'Farms x2.', 'farmicon', 55000, 'Farm', 5, 2);
-// new Upgrade('Cookie trees', 'Farms x2.', 'farmicon', 550000, 'Farm', 25, 2);
-// new Upgrade('Genetically-modified cookies', 'Farms x2.', 'farmicon', 55000000, 'Farm', 50, 2);
-// new Upgrade('Gingerbread scarecrows', 'Farms x2.', 'farmicon', 5500000000, 'Farm', 100, 2);
-// new Upgrade('Pulsar sprinklers', 'Farms x2.', 'farmicon', 550000000000, 'Farm', 150, 2);
-// new Upgrade('Fudge fungus', 'Farms x2.', 'farmicon', 550000000000000, 'Farm', 200, 2);
-
-
-// Mines
-new Upgrade('Sugar gas', 'Mines x2.', 'mineicon', 120000, 'Mine', 1, 2);
-new Upgrade('Megadrill', 'Mines x2.', 'mineicon', 600000, 'Mine', 5, 2);
-new Upgrade('Ultradrill', 'Mines x2.', 'mineicon', 6000000, 'Mine', 25, 2);
-new Upgrade('Ultimadrill', 'Mines x2.', 'mineicon', 600000000, 'Mine', 50, 2);
-new Upgrade('H-bomb mining', 'Mines x2.', 'mineicon', 60000000000, 'Mine', 100, 2);
-new Upgrade('Coreforge', 'Mines x2.', 'mineicon', 6000000000000, 'Mine', 150, 2);
-new Upgrade('Planetsplitters', 'Mines x2.', 'mineicon', 6000000000000000, 'Mine', 200, 2);
-
-
-// Factories
-new Upgrade('Sturdier conveyor belts', 'Factories x2.', 'factoryicon', 1300000, 'Factory', 1, 2);
-new Upgrade('Child labor', 'Factories x2.', 'factoryicon', 6500000, 'Factory', 5, 2);
-new Upgrade('Sweatshop', 'Factories x2.', 'factoryicon', 65000000, 'Factory', 25, 2);
-new Upgrade('Radium reactors', 'Factories x2.', 'factoryicon', 6500000000, 'Factory', 50, 2);
-new Upgrade('Recombobulators', 'Factories x2.', 'factoryicon', 650000000000, 'Factory', 100, 2);
-new Upgrade('Deep-bake process', 'Factories x2.', 'factoryicon', 65000000000000, 'Factory', 150, 2);
-new Upgrade('Cyborg workforce', 'Factories x2.', 'factoryicon', 65000000000000000, 'Factory', 200, 2);
-
-
-// Banks — for future building
-// new Upgrade('Dizzy miss lizzy', 'Banks x2.', 'bankicon', 14000000, 'Bank', 1, 2);
-// new Upgrade('A very special dude', 'Banks x2.', 'bankicon', 70000000, 'Bank', 5, 2);
-// new Upgrade('Acid-proof vaults', 'Banks x2.', 'bankicon', 700000000, 'Bank', 25, 2);
-// new Upgrade('Chocolate coins', 'Banks x2.', 'bankicon', 70000000000, 'Bank', 50, 2);
-// new Upgrade('Taller vaults', 'Banks x2.', 'bankicon', 7000000000000, 'Bank', 100, 2);
-// new Upgrade('Sugar gas', 'Banks x2.', 'bankicon', 700000000000000, 'Bank', 150, 2);
-// new Upgrade('Snack production', 'Banks x2.', 'bankicon', 700000000000000000, 'Bank', 200, 2);
-
-
-// Temples — for future building
-// new Upgrade('Golden idols', 'Temples x2.', 'templeicon', 200000000, 'Temple', 1, 2);
-// new Upgrade('Sacrificial rolling pins', 'Temples x2.', 'templeicon', 1000000000, 'Temple', 5, 2);
-// new Upgrade('Fierce glow', 'Temples x2.', 'templeicon', 10000000000, 'Temple', 25, 2);
-// new Upgrade('Slaughterhouse', 'Temples x2.', 'templeicon', 1000000000000, 'Temple', 50, 2);
-// new Upgrade('Theoretic chocolate', 'Temples x2.', 'templeicon', 100000000000000, 'Temple', 100, 2);
-// new Upgrade('Temple kneading', 'Temples x2.', 'templeicon', 10000000000000000, 'Temple', 150, 2);
-// new Upgrade('Patience abolished', 'Temples x2.', 'templeicon', 1000000000000000000, 'Temple', 200, 2);
-
-
-// Wizard Towers — for future building
-// new Upgrade('Pointier hats', 'Wizard towers x2.', 'wizardtowericon', 3300000000, 'Wizard tower', 1, 2);
-// new Upgrade('Beardier beards', 'Wizard towers x2.', 'wizardtowericon', 16500000000, 'Wizard tower', 5, 2);
-// new Upgrade('Ancient grimoires', 'Wizard towers x2.', 'wizardtowericon', 165000000000, 'Wizard tower', 25, 2);
-// new Upgrade('Kitchen curses', 'Wizard towers x2.', 'wizardtowericon', 16500000000000, 'Wizard tower', 50, 2);
-// new Upgrade('School of sorcery', 'Wizard towers x2.', 'wizardtowericon', 1650000000000000, 'Wizard tower', 100, 2);
-// new Upgrade('Dark magic', 'Wizard towers x2.', 'wizardtowericon', 165000000000000000, 'Wizard tower', 150, 2);
-// new Upgrade('Primal chocolate', 'Wizard towers x2.', 'wizardtowericon', 16500000000000000000, 'Wizard tower', 200, 2);
-
-
-// Shipments
-new Upgrade('Vanilla nebulae', 'Shipments x2.', 'shipmenticon', 51000000000, 'Shipment', 1, 2);
-new Upgrade('Wormholes', 'Shipments x2.', 'shipmenticon', 255000000000, 'Shipment', 5, 2);
-new Upgrade('Frequent flyer', 'Shipments x2.', 'shipmenticon', 2550000000000, 'Shipment', 25, 2);
-new Upgrade('Warp drive', 'Shipments x2.', 'shipmenticon', 255000000000000, 'Shipment', 50, 2);
-new Upgrade('Chocolate monoliths', 'Shipments x2.', 'shipmenticon', 25500000000000000, 'Shipment', 100, 2);
-new Upgrade('Generation ship', 'Shipments x2.', 'shipmenticon', 2550000000000000000, 'Shipment', 150, 2);
-new Upgrade('Dyson sphere', 'Shipments x2.', 'shipmenticon', 255000000000000000000, 'Shipment', 200, 2);
-
-
-// Alchemy Labs
-new Upgrade('Antimony', 'Alchemy labs x2.', 'alchemyicon', 750000000000, 'Alchemy lab', 1, 2);
-new Upgrade('Essence of dough', 'Alchemy labs x2.', 'alchemyicon', 3750000000000, 'Alchemy lab', 5, 2);
-new Upgrade('True chocolate', 'Alchemy labs x2.', 'alchemyicon', 37500000000000, 'Alchemy lab', 25, 2);
-new Upgrade('Ambrosia', 'Alchemy labs x2.', 'alchemyicon', 3750000000000000, 'Alchemy lab', 50, 2);
-new Upgrade('Aqua crustulae', 'Alchemy labs x2.', 'alchemyicon', 375000000000000000, 'Alchemy lab', 100, 2);
-new Upgrade('Origin crucible', 'Alchemy labs x2.', 'alchemyicon', 3750000000000000000000, 'Alchemy lab', 200, 2);
-
-
-// Portals
-new Upgrade('Elder pact', 'Portals x2.', 'portalicon', 1000000000000, 'Portal', 1, 2);
-new Upgrade('Labyrinth', 'Portals x2.', 'portalicon', 5000000000000, 'Portal', 5, 2);
-new Upgrade('Neverclick', 'Portals x2.', 'portalicon', 50000000000000, 'Portal', 25, 2);
-new Upgrade('Heavenly chip secret', 'Portals x2.', 'portalicon', 5000000000000000, 'Portal', 50, 2);
-new Upgrade('Arcane aura', 'Portals x2.', 'portalicon', 500000000000000000, 'Portal', 100, 2);
-new Upgrade('The final frontier', 'Portals x2.', 'portalicon', 50000000000000000000, 'Portal', 150, 2);
-new Upgrade('Cookie dimensionality', 'Portals x2.', 'portalicon', 5000000000000000000000, 'Portal', 200, 2);
-
-
-// Time Machines
-new Upgrade('Flux capacitor', 'Time machines x2.', 'timemachineicon', 14000000000000, 'Time machine', 1, 2);
-new Upgrade('Time paradox resolver', 'Time machines x2.', 'timemachineicon', 70000000000000, 'Time machine', 5, 2);
-new Upgrade('Quantum chocolatification', 'Time machines x2.', 'timemachineicon', 700000000000000, 'Time machine', 25, 2);
-new Upgrade('Causality enforcer', 'Time machines x2.', 'timemachineicon', 70000000000000000, 'Time machine', 50, 2);
-new Upgrade('Golden verse', 'Time machines x2.', 'timemachineicon', 7000000000000000000, 'Time machine', 100, 2);
-new Upgrade('Eternal cycle', 'Time machines x2.', 'timemachineicon', 700000000000000000000, 'Time machine', 150, 2);
-new Upgrade('Recursive causality', 'Time machines x2.', 'timemachineicon', 70000000000000000000000, 'Time machine', 200, 2);
-
-
-// You — for future building
-// new Upgrade('The illusion of life', 'You x2.', 'youicon', 1700000000000000, 'You', 1, 2);
-// new Upgrade('The reality of life', 'You x2.', 'youicon', 8500000000000000, 'You', 5, 2);
-// new Upgrade('The essence of life', 'You x2.', 'youicon', 85000000000000000, 'You', 25, 2);
-// new Upgrade('The fabric of reality', 'You x2.', 'youicon', 8500000000000000000, 'You', 50, 2);
-// new Upgrade('The meaning of life', 'You x2.', 'youicon', 850000000000000000000, 'You', 100, 2);
-// new Upgrade('The nature of existence', 'You x2.', 'youicon', 85000000000000000000000, 'You', 150, 2);
-// new Upgrade('The end of everything', 'You x2.', 'youicon', 8500000000000000000000000, 'You', 200, 2);
-
 /* ---------------------------------------------------------------- */
-/*  Floating pops                                                    */
+/* Elder Pledge                                                     */
 /* ---------------------------------------------------------------- */
 
-let Pops = [];
+function buyElderPledge() {
+  const price = 6666666;
 
-function Pop(el, str) {
-  this.el = el;
-  this.str = str;
+  if (!loaded || pledge > 0 || cookies < price) return;
+
+  cookies -= price;
+  pledge += 30 * 60 * 10;
+
+  refreshGrandmas();
+  storeToRebuild = true;
+}
+
+/* ---------------------------------------------------------------- */
+/* Upgrades                                                         */
+/* ---------------------------------------------------------------- */
+
+function createUpgrade(name, description, price, building, requiredCount, multiplier = 2) {
+  upgrades[name] = {
+    name,
+    description,
+    price,
+    building,
+    requiredCount,
+    multiplier,
+    bought: false
+  };
+}
+
+function buyUpgrade(name) {
+  const upgrade = upgrades[name];
+
+  if (!upgrade || upgrade.bought || !loaded || cookies < upgrade.price) return;
+
+  cookies -= upgrade.price;
+  upgrade.bought = true;
+  multipliers[upgrade.building] *= upgrade.multiplier;
+
+  upgradesToRebuild = true;
+  new Pop("store_upgrades", upgrade.name + " bought!");
+}
+
+function rebuildUpgradesStore() {
+  let output = "";
+  let visibleCount = 0;
+
+  Object.keys(upgrades).forEach(name => {
+    const upgrade = upgrades[name];
+    const buyable = getBuildingCount(upgrade.building) >= upgrade.requiredCount;
+
+    if (upgrade.bought || !buyable) return;
+
+    const classes = visibleCount < MAX_VISIBLE_UPGRADES ? "" : "hidden";
+    visibleCount++;
+
+    output += `
+      <div id="upgrade${name}" data-upgrade="${name}" class="${classes}" style="background-image:url(${upgrade.building}icon.png);">
+        <div class="building-icon"></div>
+        <b>${upgrade.name} - <moni></moni> ${beautify(upgrade.price)}</b>
+        ${upgrade.description}
+      </div>
+    `;
+  });
+
+  getElement("store_upgrades").innerHTML = output;
+
+  getElement("store_upgrades").querySelectorAll("[data-upgrade]").forEach(element => {
+    element.addEventListener("click", () => buyUpgrade(element.dataset.upgrade));
+  });
+
+  upgradesToRebuild = false;
+}
+
+/* Cursor upgrades */
+createUpgrade("Reinforced index finger", "Cursors x2.", 100, "Cursor", 1);
+createUpgrade("Carpal tunnel prevention cream", "Cursors x2.", 500, "Cursor", 1);
+createUpgrade("Ambidextrous", "Cursors x2.", 10000, "Cursor", 10);
+
+/* Grandma upgrades */
+createUpgrade("Forwards from grandma", "Grandmas x2.", 1000, "Grandma", 1);
+createUpgrade("Steel-plated rolling pins", "Grandmas x2.", 5000, "Grandma", 5);
+createUpgrade("Lubricated dentures", "Grandmas x2.", 50000, "Grandma", 25);
+createUpgrade("Prune juice", "Grandmas x2.", 5000000, "Grandma", 50);
+createUpgrade("Double-thick glasses", "Grandmas x2.", 500000000, "Grandma", 100);
+createUpgrade("Aging agents", "Grandmas x2.", 50000000000, "Grandma", 150);
+createUpgrade("Xtreme walkers", "Grandmas x2.", 50000000000000, "Grandma", 200);
+
+/* Farm upgrades */
+createUpgrade("Cheap hoes", "Farms x2.", 11000, "Farm", 1);
+createUpgrade("Fertilizer", "Farms x2.", 55000, "Farm", 5);
+createUpgrade("Cookie trees", "Farms x2.", 550000, "Farm", 25);
+createUpgrade("Genetically-modified cookies", "Farms x2.", 55000000, "Farm", 50);
+createUpgrade("Gingerbread scarecrows", "Farms x2.", 5500000000, "Farm", 100);
+createUpgrade("Pulsar sprinklers", "Farms x2.", 550000000000, "Farm", 150);
+createUpgrade("Fudge fungus", "Farms x2.", 550000000000000, "Farm", 200);
+
+/* Mine upgrades */
+createUpgrade("Sugar gas", "Mines x2.", 120000, "Mine", 1);
+createUpgrade("Megadrill", "Mines x2.", 600000, "Mine", 5);
+createUpgrade("Ultradrill", "Mines x2.", 6000000, "Mine", 25);
+createUpgrade("Ultimadrill", "Mines x2.", 600000000, "Mine", 50);
+createUpgrade("H-bomb mining", "Mines x2.", 60000000000, "Mine", 100);
+createUpgrade("Coreforge", "Mines x2.", 6000000000000, "Mine", 150);
+createUpgrade("Planetsplitters", "Mines x2.", 6000000000000000, "Mine", 200);
+
+/* Factory upgrades */
+createUpgrade("Sturdier conveyor belts", "Factories x2.", 1300000, "Factory", 1);
+createUpgrade("Child labor", "Factories x2.", 6500000, "Factory", 5);
+createUpgrade("Sweatshop", "Factories x2.", 65000000, "Factory", 25);
+createUpgrade("Radium reactors", "Factories x2.", 6500000000, "Factory", 50);
+createUpgrade("Recombobulators", "Factories x2.", 650000000000, "Factory", 100);
+createUpgrade("Deep-bake process", "Factories x2.", 65000000000000, "Factory", 150);
+createUpgrade("Cyborg workforce", "Factories x2.", 65000000000000000, "Factory", 200);
+
+/* Bank upgrades */
+createUpgrade("Dizzy miss lizzy", "Banks x2.", 14000000, "Bank", 1);
+createUpgrade("A very special dude", "Banks x2.", 70000000, "Bank", 5);
+createUpgrade("Acid-proof vaults", "Banks x2.", 700000000, "Bank", 25);
+createUpgrade("Chocolate coins", "Banks x2.", 70000000000, "Bank", 50);
+createUpgrade("Taller vaults", "Banks x2.", 7000000000000, "Bank", 100);
+createUpgrade("Sugar gas bank", "Banks x2.", 700000000000000, "Bank", 150);
+createUpgrade("Snack production", "Banks x2.", 700000000000000000, "Bank", 200);
+
+/* Temple upgrades */
+createUpgrade("Golden idols", "Temples x2.", 200000000, "Temple", 1);
+createUpgrade("Sacrificial rolling pins", "Temples x2.", 1000000000, "Temple", 5);
+createUpgrade("Fierce glow", "Temples x2.", 10000000000, "Temple", 25);
+createUpgrade("Slaughterhouse", "Temples x2.", 1000000000000, "Temple", 50);
+createUpgrade("Theoretic chocolate", "Temples x2.", 100000000000000, "Temple", 100);
+createUpgrade("Temple kneading", "Temples x2.", 10000000000000000, "Temple", 150);
+createUpgrade("Patience abolished", "Temples x2.", 1000000000000000000, "Temple", 200);
+
+/* Wizard Tower upgrades */
+createUpgrade("Pointier hats", "Wizard towers x2.", 3300000000, "Wizard tower", 1);
+createUpgrade("Beardier beards", "Wizard towers x2.", 16500000000, "Wizard tower", 5);
+createUpgrade("Ancient grimoires", "Wizard towers x2.", 165000000000, "Wizard tower", 25);
+createUpgrade("Kitchen curses", "Wizard towers x2.", 16500000000000, "Wizard tower", 50);
+createUpgrade("School of sorcery", "Wizard towers x2.", 1650000000000000, "Wizard tower", 100);
+createUpgrade("Dark magic", "Wizard towers x2.", 165000000000000000, "Wizard tower", 150);
+createUpgrade("Primal chocolate", "Wizard towers x2.", 16500000000000000000, "Wizard tower", 200);
+
+/* Shipment upgrades */
+createUpgrade("Vanilla nebulae", "Shipments x2.", 51000000000, "Shipment", 1);
+createUpgrade("Wormholes", "Shipments x2.", 255000000000, "Shipment", 5);
+createUpgrade("Frequent flyer", "Shipments x2.", 2550000000000, "Shipment", 25);
+createUpgrade("Warp drive", "Shipments x2.", 255000000000000, "Shipment", 50);
+createUpgrade("Chocolate monoliths", "Shipments x2.", 25500000000000000, "Shipment", 100);
+createUpgrade("Generation ship", "Shipments x2.", 2550000000000000000, "Shipment", 150);
+createUpgrade("Dyson sphere", "Shipments x2.", 255000000000000000000, "Shipment", 200);
+
+/* Alchemy Lab upgrades */
+createUpgrade("Antimony", "Alchemy labs x2.", 750000000000, "Alchemy lab", 1);
+createUpgrade("Essence of dough", "Alchemy labs x2.", 3750000000000, "Alchemy lab", 5);
+createUpgrade("True chocolate", "Alchemy labs x2.", 37500000000000, "Alchemy lab", 25);
+createUpgrade("Ambrosia", "Alchemy labs x2.", 3750000000000000, "Alchemy lab", 50);
+createUpgrade("Aqua crustulae", "Alchemy labs x2.", 375000000000000000, "Alchemy lab", 100);
+createUpgrade("Origin crucible", "Alchemy labs x2.", 3750000000000000000000, "Alchemy lab", 200);
+
+/* Portal upgrades */
+createUpgrade("Elder pact", "Portals x2.", 1000000000000, "Portal", 1);
+createUpgrade("Labyrinth", "Portals x2.", 5000000000000, "Portal", 5);
+createUpgrade("Neverclick", "Portals x2.", 50000000000000, "Portal", 25);
+createUpgrade("Heavenly chip secret", "Portals x2.", 5000000000000000, "Portal", 50);
+createUpgrade("Arcane aura", "Portals x2.", 500000000000000000, "Portal", 100);
+createUpgrade("The final frontier", "Portals x2.", 50000000000000000000, "Portal", 150);
+createUpgrade("Cookie dimensionality", "Portals x2.", 5000000000000000000000, "Portal", 200);
+
+/* Time Machine upgrades */
+createUpgrade("Flux capacitor", "Time machines x2.", 14000000000000, "Time machine", 1);
+createUpgrade("Time paradox resolver", "Time machines x2.", 70000000000000, "Time machine", 5);
+createUpgrade("Quantum chocolatification", "Time machines x2.", 700000000000000, "Time machine", 25);
+createUpgrade("Causality enforcer", "Time machines x2.", 70000000000000000, "Time machine", 50);
+createUpgrade("Golden verse", "Time machines x2.", 7000000000000000000, "Time machine", 100);
+createUpgrade("Eternal cycle", "Time machines x2.", 700000000000000000000, "Time machine", 150);
+createUpgrade("Recursive causality", "Time machines x2.", 70000000000000000000000, "Time machine", 200);
+
+/* ---------------------------------------------------------------- */
+/* Floating number pops                                             */
+/* ---------------------------------------------------------------- */
+
+function Pop(elementId, text) {
+  this.elementId = elementId;
+  this.text = text;
   this.life = 0;
-  this.offx = Math.floor(Math.random() * 20 - 10);
-  this.offy = Math.floor(Math.random() * 20 - 10);
-  Pops.push(this);
+  this.offsetX = Math.floor(Math.random() * 20 - 10);
+  this.offsetY = Math.floor(Math.random() * 20 - 10);
+  pops.push(this);
 }
 
 /* ---------------------------------------------------------------- */
-/*  Main loop                                                        */
+/* Game loop                                                        */
 /* ---------------------------------------------------------------- */
 
-function Main() {
-  if (StoreToRebuild) RebuildStore();
-  if (UpgradesToRebuild) RebuildUpgradesStore();
-
-  // Render pops
-  let popsHtml = '';
-  for (let i = Pops.length - 1; i >= 0; i--) {
-    const p = Pops[i];
-    const rect = l(p.el).getBoundingClientRect();
-    const x = Math.floor((rect.left + rect.right) / 2 + p.offx) - 100;
-    const y = Math.floor((rect.top + rect.bottom) / 2 - Math.pow(p.life / 100, 0.5) * 100 + p.offy) - 10;
-    const opacity = 1 - (Math.max(p.life, 80) - 80) / 20;
-    popsHtml += `<div class="pop" style="position:absolute;left:${x}px;top:${y}px;opacity:${opacity};">${p.str}</div>`;
-    p.life += 2;
-    if (p.life >= 100) Pops.splice(i, 1);
-  }
-  l('pops').innerHTML = popsHtml;
-
-  // Render cursors orbiting the cookie
-  let cursorsHtml = '';
-  for (let i = 0; i < Cursors; i++) {
-    const rot = -Math.floor((360 / Cursors) * i);
-    let x = Math.floor(64 + Math.sin((Math.PI * 2 / Cursors) * i) * 64) - 16;
-    let y = Math.floor(64 + Math.cos((Math.PI * 2 / Cursors) * i) * 64) - 16;
-    if (T % 150 === Math.ceil((150 / Cursors) * i)) y += 2;
-    cursorsHtml += `<div class="cursor" style="left:${x}px;top:${y}px;transform:rotate(${rot}deg);"></div>`;
-  }
-  l('cookie').innerHTML = cursorsHtml;
-
-  const grandmaGain = Math.ceil(
+function getGrandmaGain() {
+  return Math.ceil(
     4
-    + (Factories ? 1 : 0)
-    + (Mines ? 2 : 0)
-    + (Shipments ? 3 : 0)
-    + (Labs ? 4 : 0)
-    + (Portals ? (Pledge ? 5 + Portals * 0.5 : 5) : 0)
-    + (Times ? 6 : 0)
-  ) * Multipliers.Grandma;
-  const cursorGain = CursorGain();
+    + (buildings.Factory.count ? 1 : 0)
+    + (buildings.Mine.count ? 2 : 0)
+    + (buildings.Shipment.count ? 3 : 0)
+    + (buildings["Alchemy lab"].count ? 4 : 0)
+    + (buildings.Portal.count ? (pledge ? 5 + buildings.Portal.count * 0.5 : 5) : 0)
+    + (buildings["Time machine"].count ? 6 : 0)
+  ) * multipliers.Grandma;
+}
 
-  const factoryGain = 20 * Multipliers.Factory;
-  const mineGain = 50 * Multipliers.Mine;
-  const shipmentGain = 100 * Multipliers.Shipment;
-  const labGain = 500 * Multipliers['Alchemy lab'];
-  const portalGain = 6666 * Multipliers.Portal;
-  const timeGain = 123456 * Multipliers['Time machine'];
-  const farmGain = 40 * Multipliers.Farm;
-  const bankGain = 250 * Multipliers.Bank;
-  const templeGain = 390 * Multipliers.Temple;
-  const wizardTowerGain = 2200 * Multipliers['Wizard tower'];
+function getBuildingGain(name) {
+  return buildings[name].gain * multipliers[name];
+}
 
-  if (Times && T % Math.ceil(150 / Times) === 0)
-    AddCookie(timeGain, 'times');
+function renderPops() {
+  let output = "";
 
-  if (Portals && T % Math.ceil(150 / Portals) === 0)
-    AddCookie(portalGain, 'portals');
+  for (let i = pops.length - 1; i >= 0; i--) {
+    const pop = pops[i];
+    const element = getElement(pop.elementId);
+    if (!element) {
+      pops.splice(i, 1);
+      continue;
+    }
 
-  if (Labs && T % Math.ceil(150 / Labs) === 0)
-    AddCookie(labGain, 'labs');
+    const rect = element.getBoundingClientRect();
+    const x = Math.floor((rect.left + rect.right) / 2 + pop.offsetX) - 100;
+    const y = Math.floor(
+      (rect.top + rect.bottom) / 2
+      - Math.pow(pop.life / 100, 0.5) * 100
+      + pop.offsetY
+    ) - 10;
+    const opacity = 1 - (Math.max(pop.life, 80) - 80) / 20;
 
-  if (Shipments && T % Math.ceil(150 / Shipments) === 0)
-    AddCookie(shipmentGain, 'shipments');
+    output += `
+      <div class="pop"
+        style="position:absolute;left:${x}px;top:${y}px;opacity:${opacity};">
+        ${pop.text}
+      </div>
+    `;
 
-  if (WizardTowers && T % Math.ceil(150 / WizardTowers) === 0)
-    AddCookie(wizardTowerGain, 'wizardtowers');
+    pop.life += 2;
+    if (pop.life >= 100) pops.splice(i, 1);
+  }
 
-  if (Temples && T % Math.ceil(150 / Temples) === 0)
-    AddCookie(templeGain, 'temples');
+  getElement("pops").innerHTML = output;
+}
 
-  if (Banks && T % Math.ceil(150 / Banks) === 0)
-    AddCookie(bankGain, 'banks');
+function renderCursors() {
+  let output = "";
+  const count = buildings.Cursor.count;
 
-  if (Factories && T % Math.ceil(150 / Factories) === 0)
-    AddCookie(factoryGain, 'factories');
+  if (!count) {
+    getElement("cookie").innerHTML = "";
+    return;
+  }
 
-  if (Mines && T % Math.ceil(150 / Mines) === 0)
-    AddCookie(mineGain, 'mines');
+  for (let i = 0; i < count; i++) {
+    const rotation = -Math.floor((360 / count) * i);
+    let x = Math.floor(64 + Math.sin((Math.PI * 2 / count) * i) * 64) - 16;
+    let y = Math.floor(64 + Math.cos((Math.PI * 2 / count) * i) * 64) - 16;
 
-  if (Farms && T % Math.ceil(150 / Farms) === 0)
-    AddCookie(farmGain, 'farms');
+    if (ticks % 150 === Math.ceil((150 / count) * i)) y += 2;
 
-  if (Grandmas && T % Math.ceil(150 / Grandmas) === 0)
-    AddCookie(grandmaGain, 'grandmas');
+    output += `
+      <div class="cursor"
+        style="left:${x}px;top:${y}px;transform:rotate(${rotation}deg);">
+      </div>
+    `;
+  }
 
-  if (Cursors && T % Math.ceil(150 / Cursors) === 0)
-    ClickCookie();
+  getElement("cookie").innerHTML = output;
+}
 
+function produceBuildingCookies(name, elementId) {
+  const count = buildings[name].count;
+  if (!count) return;
+
+  const interval = Math.max(1, Math.ceil(150 / count));
+
+  if (ticks % interval === 0) {
+    addCookies(getBuildingGain(name), elementId);
+  }
+}
+
+function getCookiesPerSecond() {
   let cps = 0;
 
-  cps += Times * timeGain / 5;
-  cps += Portals * portalGain / 5;
-  cps += Labs * labGain / 5;
-  cps += Shipments * shipmentGain / 5;
+  Object.keys(buildings).forEach(name => {
+    cps += buildings[name].count * getBuildingGain(name) / 5;
+  });
 
-  cps += WizardTowers * wizardTowerGain / 5;
-  cps += Temples * templeGain / 5;
-  cps += Banks * bankGain / 5;
+  return cps * (prestige + 1);
+}
 
-  cps += Factories * factoryGain / 5;
-  cps += Mines * mineGain / 5;
-  cps += Farms * farmGain / 5;
+function updateStoreAffordability() {
+  Object.keys(buildings).forEach(name => {
+    const element = getElement("buy" + name);
+    if (!element) return;
 
-  cps += Grandmas * grandmaGain / 5;
-  cps += Cursors * cursorGain / 5;
+    element.classList.toggle(
+      "grayed",
+      cookies < buildings[name].currentPrice
+    );
+  });
 
-  const floater = Math.round(cps * 10 - Math.floor(cps) * 10);
-  l('cps').innerHTML = 'Cookies per second : ' + Beautify(cps) + (floater ? '.' + floater : '');
-
-  for (const name in Buyables) {
-    const el = l('buy' + name);
-    if (!el) continue;
-    el.className = Cookies >= Buyables[name].price ? '' : 'grayed';
+  const pledgeElement = getElement("buyElder Pledge");
+  if (pledgeElement) {
+    pledgeElement.classList.toggle("grayed", cookies < 6666666);
   }
+}
 
-  for (const name in Upgrades) {
-    const u = Upgrades[name];
-    const el = l('upgrade' + name);
-    if (!el || u.bought || el.classList.contains('hidden')) continue;
-    el.className = Cookies >= u.price ? '' : 'grayed';
-  }
+function updateUpgradeAffordability() {
+  Object.keys(upgrades).forEach(name => {
+    const upgrade = upgrades[name];
+    const element = getElement("upgrade" + name);
 
-  CookiesDisplay += (Cookies - CookiesDisplay) * 0.5;
-  l('money').innerHTML = Beautify(Math.round(CookiesDisplay));
+    if (!element || upgrade.bought || element.classList.contains("hidden")) return;
 
-  l('comment').innerHTML = commentFor(Cookies);
+    element.classList.toggle("grayed", cookies < upgrade.price);
+  });
+}
 
-  if (Pledge > 0) {
-      Pledge--;
+function updatePledgeTimer() {
+  if (pledge > 0) {
+    pledge--;
 
-      // Calcul des minutes et secondes
-      // Note : On divise par 30 car le jeu tourne à 30 images par seconde (FPS)
-      var secondsLeft = Math.ceil(Pledge / 30);
-      var min = Math.floor(secondsLeft / 60);
-      var sec = secondsLeft % 60;
+    const secondsLeft = Math.ceil(pledge / TICKS_PER_SECOND);
+    const minutes = Math.floor(secondsLeft / 60);
+    let seconds = secondsLeft % 60;
 
-      // Ajout d'un 0 devant les secondes si nécessaire (ex: 09 au lieu de 9)
-      if (sec < 10) sec = '0' + sec;
+    if (seconds < 10) seconds = "0" + seconds;
 
-      // Affichage dans l'element
-      l('pledgeTimer').innerHTML = min + ':' + sec;
+    getElement("pledgeTimer").innerHTML = minutes + ":" + seconds;
   } else {
-      // Si le pledge est terminé, on peut remettre le prix par défaut ou masquer
-      l('pledgeTimer').innerHTML = '666';
+    getElement("pledgeTimer").innerHTML = "00:00";
+  }
+}
+
+function main() {
+  if (storeToRebuild) rebuildStore();
+  if (upgradesToRebuild) rebuildUpgradesStore();
+
+  renderPops();
+  renderCursors();
+
+  produceBuildingCookies("Time machine", "times");
+  produceBuildingCookies("Portal", "portals");
+  produceBuildingCookies("Alchemy lab", "labs");
+  produceBuildingCookies("Shipment", "shipments");
+  produceBuildingCookies("Wizard tower", "middle");
+  produceBuildingCookies("Temple", "middle");
+  produceBuildingCookies("Bank", "middle");
+  produceBuildingCookies("Factory", "factories");
+  produceBuildingCookies("Mine", "mines");
+  produceBuildingCookies("Farm", "middle");
+  produceBuildingCookies("Grandma", "grandmas");
+
+  if (
+    buildings.Cursor.count &&
+    ticks % Math.max(1, Math.ceil(150 / buildings.Cursor.count)) === 0
+  ) {
+    clickCookie();
   }
 
-  l('buyElder Pledge').style.display = 'none';
+  const cps = getCookiesPerSecond();
+  const floater = Math.round(cps * 10 - Math.floor(cps) * 10);
 
-  /* Display Prestige */
+  getElement("cps").innerHTML =
+    "Cookies per second : " +
+    beautify(cps) +
+    (floater ? "." + floater : "");
 
-  l('prestigeDisplay').innerHTML = Prestige;
-  l('prestigeGainDisplay').innerHTML = calculatePrestige();
+  updateStoreAffordability();
+  updateUpgradeAffordability();
 
+  cookiesDisplay += (cookies - cookiesDisplay) * 0.5;
+  getElement("money").innerHTML = beautify(Math.round(cookiesDisplay));
+  getElement("comment").innerHTML = getComment(cookies);
 
+  updatePledgeTimer();
+
+  getElement("prestigeDisplay").innerHTML = prestige;
+  getElement("prestigeGainDisplay").innerHTML = calculatePrestige();
 
   applyFlashEffect();
 
-  if (T % 30 === 0 && Loaded) document.title = Beautify(Cookies) + ' cookies - Cookie Clicker';
-
-  SaveTimer--;
-  if (SaveTimer === 0 && Loaded) Save();
-
-  T++;
-  setTimeout(Main, 1000 / 30);
-}
-
-/** Flavor-text milestones, based on total cookies. */
-function commentFor(cookies) {
-  const milestones = [
-    [5,        'You feel like making cookies.<br>But nobody wants to eat your cookies.'],
-    [25,       'Your cookies are popular<br>with your dog.'],
-    [50,       'Your cookies are popular<br>with your family.'],
-    [100,      'Your cookies are popular<br>in the neighborhood.'],
-    [500,      'Your cookies are renowned<br>in the whole town!'],
-    [2000,     'Your cookies are worth<br>a lot of money.'],
-    [5000,     'Your cookies bring<br>all the boys to the yard.'],
-    [10000,    'People come from very far away<br>to get a taste of your cookies.'],
-    [17000,    'Kings and queens from all over the world<br>are enjoying your cookies.'],
-    [30000,    'Your cookies have been named<br>a part of the world wonders.'],
-    [60000,    'Your cookies have been placed<br>under government surveillance.'],
-    [100000,   'The whole planet is<br>enjoying your cookies!'],
-    [150000,   'Creatures from neighboring planets<br>wish to try your cookies.'],
-    [250000,   'Elder gods from the whole cosmos<br>have awoken to taste your cookies.'],
-    [400000,   'Your cookies have achieved sentience.'],
-    [1000000,  'The universe has now turned into<br>cookie dough, to the molecular level.'],
-    [1000000000, 'A local news station runs<br>a 10-minute segment about your cookies. Success!<br><span style="font-size:50%;">(you win a cookie)</span>'],
-  ];
-  for (const [threshold, text] of milestones) {
-    if (cookies < threshold) return text;
+  if (ticks % 30 === 0 && loaded) {
+    document.title = beautify(cookies) + " cookies - Cookie Clicker";
   }
-  return "it's time to stop playing<br><span style=\"font-size:50%;\">(more fun milestones in the next update I promise)</span>";
+
+  saveTimer--;
+  if (saveTimer <= 0 && loaded) saveGame();
+
+  ticks++;
+  setTimeout(main, 1000 / TICKS_PER_SECOND);
 }
 
-/** The "grandmapocalypse" background flashing effect once cookies get very high. */
+/* ---------------------------------------------------------------- */
+/* Flavor text and visual effects                                   */
+/* ---------------------------------------------------------------- */
+
+function getComment(totalCookies) {
+  const milestones = [
+    [5, "You feel like making cookies.<br>But nobody wants to eat your cookies."],
+    [25, "Your cookies are popular<br>with your dog."],
+    [50, "Your cookies are popular<br>with your family."],
+    [100, "Your cookies are popular<br>in the neighborhood."],
+    [500, "Your cookies are renowned<br>in the whole town!"],
+    [2000, "Your cookies are worth<br>a lot of money."],
+    [5000, "Your cookies bring<br>all the boys to the yard."],
+    [10000, "People come from very far away<br>to get a taste of your cookies."],
+    [17000, "Kings and queens from all over the world<br>are enjoying your cookies."],
+    [30000, "Your cookies have been named<br>a part of the world wonders."],
+    [60000, "Your cookies have been placed<br>under government surveillance."],
+    [100000, "The whole planet is<br>enjoying your cookies!"],
+    [150000, "Creatures from neighboring planets<br>wish to try your cookies."],
+    [250000, "Elder gods from the whole cosmos<br>have awoken to taste your cookies."],
+    [400000, "Your cookies have achieved sentience."],
+    [1000000, "The universe has now turned into<br>cookie dough, to the molecular level."],
+    [1000000000, 'A local news station runs<br>a 10-minute segment about your cookies. Success!<br><span style="font-size:50%;">(you win a cookie)</span>']
+  ];
+
+  for (const [threshold, text] of milestones) {
+    if (totalCookies < threshold) return text;
+  }
+
+  return 'it\'s time to stop playing<br><span style="font-size:50%;">(more fun milestones in the next update I promise)</span>';
+}
+
 function applyFlashEffect() {
-  const whole = l('whole');
+  const whole = getElement("whole");
 
-  if (Cookies >= 1000000 && Pledge <= 0 && Flashing) {
-    const r = (Cookies - 1000000) / 2000000;
-    const r2 = Math.max(0, (Cookies - 100000000) / 400000000);
-    let icon = 'grandmaicon';
+  if (cookies >= 1000000 && pledge <= 0 && flashing) {
+    const intensity = (cookies - 1000000) / 2000000;
+    const intensity2 = Math.max(0, (cookies - 100000000) / 400000000);
+    let icon = "grandmaicon";
 
-    if (Cookies >= 2000000) {
-      const pledgeBtn = l('buyElder Pledge');
-      if (pledgeBtn) pledgeBtn.style.display = 'block';
-      if (Math.random() < 0.02) icon = 'grandmaiconinvert';
-      else if (Math.random() < 0.02) icon = 'grandmaiconlustful';
+    if (cookies >= 2000000) {
+      const pledgeButton = getElement("buyElder Pledge");
+      if (pledgeButton) pledgeButton.style.display = "block";
+
+      if (Math.random() < 0.02) icon = "grandmaiconinvert";
+      else if (Math.random() < 0.02) icon = "grandmaiconlustful";
     }
-    if (Cookies >= 10000000 && Math.random() < 0.02) icon = 'skellington';
 
-    if (Cookies >= 1000000000) {
-      whole.style.background = `url(kaleigrandma.png) ${Math.floor(T * 0.2)}px -${Math.floor(T * 0.1)}px`;
-    } else if (Math.random() < r) {
-      whole.style.background = `url(${icon}.png) ${Math.floor(Math.random() * 4)}px ${Math.floor(Math.random() * 4)}px`;
-      whole.style.backgroundSize = `${Math.floor(r2 * Math.random() * 64 + 64)}px ${Math.floor(r2 * Math.random() * 64 + 64)}px`;
+    if (cookies >= 10000000 && Math.random() < 0.02) icon = "skellington";
+
+    if (cookies >= 1000000000) {
+      whole.style.background =
+        `url(kaleigrandma.png) ${Math.floor(ticks * 0.2)}px -${Math.floor(ticks * 0.1)}px`;
+    } else if (Math.random() < intensity) {
+      whole.style.background =
+        `url(${icon}.png) ${Math.floor(Math.random() * 4)}px ${Math.floor(Math.random() * 4)}px`;
+      whole.style.backgroundSize =
+        `${Math.floor(intensity2 * Math.random() * 64 + 64)}px ` +
+        `${Math.floor(intensity2 * Math.random() * 64 + 64)}px`;
     }
   } else {
-    whole.style.background = '#ccc';
+    whole.style.background = "#ccc";
   }
 }
 
-
-/* ----------------------------------------- */
-/* Calculate Prestige level                  */
-/* ----------------------------------------- */
-
 function calculatePrestige() {
-  console.log("Calculating prestige");
-  const prestige = Math.max(
+  return Math.max(
     0,
     Math.floor(
-      (-1 + Math.sqrt(1 + 8 * (Cookies / 100000000))) / 2
+      (-1 + Math.sqrt(1 + 8 * (cookies / 100000000))) / 2
     )
   );
-
-  return prestige;
-}
-
-
-/* ---------------------------------------------------------------- */
-/*  UI toggles                                                       */
-/* ---------------------------------------------------------------- */
-
-function ToggleNumbers() {
-  NumbersOn = !NumbersOn;
-  l('toggleNumbers').innerHTML = NumbersOn ? 'Numbers On' : 'Numbers Off';
-}
-
-function ToggleFlash() {
-  Flashing = !Flashing;
-  l('toggleFlash').innerHTML = Flashing ? 'Flashing On' : 'Flashing Off';
 }
 
 /* ---------------------------------------------------------------- */
-/*  Wire up static buttons (no inline handlers)                      */
+/* UI controls                                                      */
 /* ---------------------------------------------------------------- */
 
-l('cookie').addEventListener('mouseup', ClickCookie);
-l('exportSave').addEventListener('click', exportSave);
-l('importSave').addEventListener('click', importSave);
-l('reset').addEventListener('click', Reset);
-l('toggleNumbers').addEventListener('click', ToggleNumbers);
-l('toggleFlash').addEventListener('click', ToggleFlash);
+function toggleNumbers() {
+  numbersOn = !numbersOn;
+  getElement("toggleNumbers").innerHTML =
+    numbersOn ? "Numbers On" : "Numbers Off";
+}
+
+function toggleFlash() {
+  flashing = !flashing;
+  getElement("toggleFlash").innerHTML =
+    flashing ? "Flashing On" : "Flashing Off";
+}
 
 /* ---------------------------------------------------------------- */
-/*  Go!                                                               */
+/* Initialization                                                   */
 /* ---------------------------------------------------------------- */
 
-Load();
+function initialize() {
+  initializeBuildingPrices();
+
+  getElement("version").innerHTML = "running v." + VERSION;
+
+  const imageNames = [
+    "cursor", "grandma", "mine", "factory", "lab", "shipment",
+    "goldengrandma", "grandmaiconinvert", "grandmaiconlustful",
+    "portal", "skellington", "kaleigrandma", "factorygrandma",
+    "minegrandma", "shipmentgrandma", "portalgrandma",
+    "pledgedgrandma", "timemachine", "timegrandma"
+  ];
+
+  getElement("hiddenLoader").innerHTML =
+    imageNames.map(name => `<img src="${name}.png">`).join("");
+
+  getElement("cookie").addEventListener("mouseup", clickCookie);
+  getElement("exportSave").addEventListener("click", exportSave);
+  getElement("importSave").addEventListener("click", importSave);
+  getElement("reset").addEventListener("click", resetGame);
+  getElement("toggleNumbers").addEventListener("click", toggleNumbers);
+  getElement("toggleFlash").addEventListener("click", toggleFlash);
+
+  document.addEventListener("keydown", event => {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
+      event.preventDefault();
+      saveGame();
+    }
+  });
+
+  loadGame();
+}
+
+window.addEventListener("load", initialize);
 </script>
 </body>
 </html>
