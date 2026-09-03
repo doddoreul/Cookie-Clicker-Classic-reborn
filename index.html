@@ -414,20 +414,40 @@ let Prestige = 0;
 
 let Cursors = 0;
 let CursorsBasePrice = 15;
+
 let Grandmas = 0;
 let GrandmasBasePrice = 100;
-let Factories = 0;
-let FactoriesBasePrice = 500;
+
+let Farms = 0;
+let FarmsBasePrice = 1100;
+
 let Mines = 0;
 let MinesBasePrice = 2000;
+
+let Factories = 0;
+let FactoriesBasePrice = 500;
+
+let Banks = 0;
+let BanksBasePrice = 5000;
+
+let Temples = 0;
+let TemplesBasePrice = 20000;
+
+let WizardTowers = 0;
+let WizardTowersBasePrice = 166666;
+
 let Shipments = 0;
 let ShipmentsBasePrice = 7000;
+
 let Labs = 0;
 let LabsBasePrice = 50000;
+
 let Portals = 0;
 let PortalsBasePrice = 1000000;
+
 let Times = 0;
 let TimesBasePrice = 123456789;
+
 let Pledge = 0;
 let PledgeBasePrice = 6666666;
 
@@ -435,8 +455,12 @@ let PledgeBasePrice = 6666666;
 const Multipliers = {
   Cursor: 1,
   Grandma: 1,
-  Factory: 1,
+  Farm: 1,
   Mine: 1,
+  Factory: 1,
+  Bank: 1,
+  Temple: 1,
+  'Wizard tower': 1,
   Shipment: 1,
   'Alchemy lab': 1,
   Portal: 1,
@@ -463,17 +487,52 @@ function MakeSaveString() {
   return [
     Version,
     parseInt(Cookies),
-    parseInt(Cursors),   parseInt(Buyables['Cursor'].price),
-    parseInt(Grandmas),  parseInt(Buyables['Grandma'].price),
-    parseInt(Factories), parseInt(Buyables['Factory'].price),
-    parseInt(Mines),     parseInt(Buyables['Mine'].price),
-    parseInt(Shipments), parseInt(Buyables['Shipment'].price),
-    parseInt(Labs),      parseInt(Buyables['Alchemy lab'].price),
-    parseInt(Portals),   parseInt(Buyables['Portal'].price),
-    parseInt(Times),     parseInt(Buyables['Time machine'].price),
-    Object.keys(Upgrades).filter(name => Upgrades[name].bought).join(','),
-    parseInt(Pledge),    parseInt(Buyables['Elder Pledge'].price),
+
+    parseInt(Cursors),
+    parseInt(Buyables['Cursor'].price),
+
+    parseInt(Grandmas),
+    parseInt(Buyables['Grandma'].price),
+
+    parseInt(Farms),
+    parseInt(Buyables['Farm'].price),
+
+    parseInt(Mines),
+    parseInt(Buyables['Mine'].price),
+
+    parseInt(Factories),
+    parseInt(Buyables['Factory'].price),
+
+    parseInt(Banks),
+    parseInt(Buyables['Bank'].price),
+
+    parseInt(Temples),
+    parseInt(Buyables['Temple'].price),
+
+    parseInt(WizardTowers),
+    parseInt(Buyables['Wizard tower'].price),
+
+    parseInt(Shipments),
+    parseInt(Buyables['Shipment'].price),
+
+    parseInt(Labs),
+    parseInt(Buyables['Alchemy lab'].price),
+
+    parseInt(Portals),
+    parseInt(Buyables['Portal'].price),
+
+    parseInt(Times),
+    parseInt(Buyables['Time machine'].price),
+
+    Object.keys(Upgrades)
+      .filter(name => Upgrades[name].bought)
+      .join(','),
+
+    parseInt(Pledge),
+    parseInt(Buyables['Elder Pledge'].price),
+
     parseInt(Prestige),
+
   ].join('|');
 }
 
@@ -506,20 +565,56 @@ function ApplySaveString(str) {
 
   Cookies = parseInt(r[2]);
   Pledge = 0;
-  Cursors   = Math.min(1000, parseInt(r[3]));  Buyables['Cursor'].price = parseInt(r[4]);
-  Grandmas  = Math.min(1000, parseInt(r[5]));  Buyables['Grandma'].price = parseInt(r[6]);
-  Factories = Math.min(1000, parseInt(r[7]));  Buyables['Factory'].price = parseInt(r[8]);
-  Mines     = Math.min(1000, parseInt(r[9]));  Buyables['Mine'].price = parseInt(r[10]);
-  Shipments = Math.min(1000, parseInt(r[11])); Buyables['Shipment'].price = parseInt(r[12]);
-  Labs      = Math.min(1000, parseInt(r[13])); Buyables['Alchemy lab'].price = parseInt(r[14]);
+
+  Cursors = Math.min(1000, parseInt(r[3]));
+  Buyables['Cursor'].price = parseInt(r[4]);
+
+  Grandmas = Math.min(1000, parseInt(r[5]));
+  Buyables['Grandma'].price = parseInt(r[6]);
+
+  Farms = Math.min(1000, parseInt(r[7]));
+  Buyables['Farm'].price = parseInt(r[8]);
+
+  Mines = Math.min(1000, parseInt(r[9]));
+  Buyables['Mine'].price = parseInt(r[10]);
+
+  Factories = Math.min(1000, parseInt(r[11]));
+  Buyables['Factory'].price = parseInt(r[12]);
+
+  Banks = Math.min(1000, parseInt(r[13]));
+  Buyables['Bank'].price = parseInt(r[14]);
+
+  Temples = Math.min(1000, parseInt(r[15]));
+  Buyables['Temple'].price = parseInt(r[16]);
+
+  WizardTowers = Math.min(1000, parseInt(r[17]));
+  Buyables['Wizard tower'].price = parseInt(r[18]);
+
+  Shipments = Math.min(1000, parseInt(r[19]));
+  Buyables['Shipment'].price = parseInt(r[20]);
+
+  Labs = Math.min(1000, parseInt(r[21]));
+  Buyables['Alchemy lab'].price = parseInt(r[22]);
+
+  if (r[23]) {
+    Portals = Math.min(1000, parseInt(r[23]));
+    Buyables['Portal'].price = parseInt(r[24]);
+  }
+
+  if (r[25]) {
+    Times = Math.min(1000, parseInt(r[25]));
+    Buyables['Time machine'].price = parseInt(r[26]);
+  }
+
   if (r[15]) { Portals = Math.min(1000, parseInt(r[15])); Buyables['Portal'].price = parseInt(r[16]); }
   if (r[17]) { Times   = Math.min(1000, parseInt(r[17])); Buyables['Time machine'].price = parseInt(r[18]); }
 
   // Reset upgrades then re-apply whichever ones were bought in this save
   for (const name in Upgrades) Upgrades[name].bought = false;
   for (const name in Multipliers) Multipliers[name] = 1;
-  if (r[19]) {
-    r[19].split(',').filter(Boolean).forEach(name => {
+
+  if (r[27]) {
+    r[27].split(',').filter(Boolean).forEach(name => {
       const u = Upgrades[name];
       if (u && !u.bought) {
         u.bought = true;
@@ -530,14 +625,27 @@ function ApplySaveString(str) {
 
   // Elder Pledge: remaining active duration + current (inflated) price.
   // Without this, the price silently reset to 666,666 on every reload.
-  if (r[20]) Pledge = parseInt(r[20]);
-  if (r[21]) Buyables['Elder Pledge'].price = parseInt(r[21]);
+  if (r[28]) Pledge = parseInt(r[20]);
+  if (r[29]) Buyables['Elder Pledge'].price = parseInt(r[21]);
 
-  ['Grandma', 'Factory', 'Mine', 'Shipment', 'Alchemy lab', 'Portal', 'Time machine']
-    .forEach(name => Buyables[name].func(0));
+  [
+    'Grandma',
+    'Farm',
+    'Mine',
+    'Factory',
+    'Bank',
+    'Temple',
+    'Wizard tower',
+    'Shipment',
+    'Alchemy lab',
+    'Portal',
+    'Time machine'
+  ].forEach(name => {
+    Buyables[name].func(0);
+  });
 
   // Prestige
-  if (r[22]) Prestige = parseInt(r[22]);
+  if (r[30]) Prestige = parseInt(r[30]);
 
   StoreToRebuild = true;
   UpgradesToRebuild = true;
@@ -718,8 +826,12 @@ function RebuildStore() {
   const amountFor = {
     Cursor: () => Cursors,
     Grandma: () => Grandmas,
-    Factory: () => Factories,
+    Farm: () => Farms,
     Mine: () => Mines,
+    Factory: () => Factories,
+    Bank: () => Banks,
+    Temple: () => Temples,
+    'Wizard tower': () => WizardTowers,
     Shipment: () => Shipments,
     'Alchemy lab': () => Labs,
     Portal: () => Portals,
@@ -778,17 +890,17 @@ new Buyable('Grandma', 'A nice grandma to bake more cookies.', 'grandmaicon', Gr
   l('grandmas').innerHTML = str;
 });
 
-new Buyable('Factory', 'Produces large quantities of cookies.', 'factoryicon', FactoriesBasePrice, function (buy) {
-  if (buy) Factories++;
-  if (buy && Factories === 1) Buyables['Grandma'].func(0);
-  let str = '';
-  for (let i = 0; i < Factories; i++) {
-    const x = Math.floor(Math.random() * 20 + (i % 10) * 32);
-    const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 24);
-    str += `<div class="factory" style="right:${x}px;top:${y}px;"></div>`;
+new Buyable(
+  'Farm',
+  'Grows cookie plants from cookie seeds.',
+  'farmicon',
+  FarmsBasePrice,
+  function (buy) {
+    if (buy) Farms++;
+
+    // TODO: farm stuff
   }
-  l('factories').innerHTML = str;
-});
+);
 
 new Buyable('Mine', 'Mines out cookie dough and chocolate chips.', 'mineicon', MinesBasePrice, function (buy) {
   if (buy) Mines++;
@@ -801,6 +913,50 @@ new Buyable('Mine', 'Mines out cookie dough and chocolate chips.', 'mineicon', M
   }
   l('mines').innerHTML = str;
 });
+
+new Buyable('Factory', 'Produces large quantities of cookies.', 'factoryicon', FactoriesBasePrice, function (buy) {
+  if (buy) Factories++;
+  if (buy && Factories === 1) Buyables['Grandma'].func(0);
+  let str = '';
+  for (let i = 0; i < Factories; i++) {
+    const x = Math.floor(Math.random() * 20 + (i % 10) * 32);
+    const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 24);
+    str += `<div class="factory" style="right:${x}px;top:${y}px;"></div>`;
+  }
+  l('factories').innerHTML = str;
+});
+
+new Buyable(
+  'Bank',
+  'Generates cookies from interest.',
+  'bankicon',
+  BanksBasePrice,
+  function (buy) {
+    if (buy) Banks++;
+    // TODO: bank stuff
+  }
+);
+
+new Buyable(
+  'Temple',
+  'Full of precious, ancient chocolate.',
+  'templeicon',
+  TemplesBasePrice,
+  function (buy) {
+    if (buy) Temples++;
+    // TODO: temple stuff
+  }
+);
+new Buyable(
+  'Wizard tower',
+  'Summons cookies with magic spells.',
+  'wizardtowericon',
+  WizardTowersBasePrice,
+  function (buy) {
+    if (buy) WizardTowers++;
+    // TODO: WT stuff
+  }
+);
 
 new Buyable('Shipment', 'Brings in fresh cookies from the cookie planet.', 'shipmenticon', ShipmentsBasePrice, function (buy) {
   if (buy) Shipments++;
@@ -855,6 +1011,8 @@ new Buyable(
   }
 );
 
+
+
 new Buyable(
   'Elder Pledge',
   '<span style="font-size:80%;">Puts an end to the Ancients\' wrath, at least for a while.</span>',
@@ -881,8 +1039,12 @@ function BuildingCount(name) {
   switch (name) {
     case 'Cursor': return Cursors;
     case 'Grandma': return Grandmas;
-    case 'Factory': return Factories;
+    case 'Farm': return Farms;
     case 'Mine': return Mines;
+    case 'Factory': return Factories;
+    case 'Bank': return Banks;
+    case 'Temple': return Temples;
+    case 'Wizard tower': return WizardTowers;
     case 'Shipment': return Shipments;
     case 'Alchemy lab': return Labs;
     case 'Portal': return Portals;
@@ -1143,23 +1305,62 @@ function Main() {
   const labGain = 500 * Multipliers['Alchemy lab'];
   const portalGain = 6666 * Multipliers.Portal;
   const timeGain = 123456 * Multipliers['Time machine'];
+  const farmGain = 40 * Multipliers.Farm;
+  const bankGain = 250 * Multipliers.Bank;
+  const templeGain = 390 * Multipliers.Temple;
+  const wizardTowerGain = 2200 * Multipliers['Wizard tower'];
 
-  if (Times     && T % Math.ceil(150 / Times) === 0)     AddCookie(timeGain, 'times');
-  if (Portals   && T % Math.ceil(150 / Portals) === 0)   AddCookie(portalGain, 'portals');
-  if (Labs      && T % Math.ceil(150 / Labs) === 0)      AddCookie(labGain, 'labs');
-  if (Shipments && T % Math.ceil(150 / Shipments) === 0) AddCookie(shipmentGain, 'shipments');
-  if (Mines     && T % Math.ceil(150 / Mines) === 0)     AddCookie(mineGain, 'mines');
-  if (Factories && T % Math.ceil(150 / Factories) === 0) AddCookie(factoryGain, 'factories');
-  if (Grandmas  && T % Math.ceil(150 / Grandmas) === 0)  AddCookie(grandmaGain, 'grandmas');
-  if (Cursors   && T % Math.ceil(150 / Cursors) === 0)   ClickCookie();
+  if (Times && T % Math.ceil(150 / Times) === 0)
+    AddCookie(timeGain, 'times');
+
+  if (Portals && T % Math.ceil(150 / Portals) === 0)
+    AddCookie(portalGain, 'portals');
+
+  if (Labs && T % Math.ceil(150 / Labs) === 0)
+    AddCookie(labGain, 'labs');
+
+  if (Shipments && T % Math.ceil(150 / Shipments) === 0)
+    AddCookie(shipmentGain, 'shipments');
+
+  if (WizardTowers && T % Math.ceil(150 / WizardTowers) === 0)
+    AddCookie(wizardTowerGain, 'wizardtowers');
+
+  if (Temples && T % Math.ceil(150 / Temples) === 0)
+    AddCookie(templeGain, 'temples');
+
+  if (Banks && T % Math.ceil(150 / Banks) === 0)
+    AddCookie(bankGain, 'banks');
+
+  if (Factories && T % Math.ceil(150 / Factories) === 0)
+    AddCookie(factoryGain, 'factories');
+
+  if (Mines && T % Math.ceil(150 / Mines) === 0)
+    AddCookie(mineGain, 'mines');
+
+  if (Farms && T % Math.ceil(150 / Farms) === 0)
+    AddCookie(farmGain, 'farms');
+
+  if (Grandmas && T % Math.ceil(150 / Grandmas) === 0)
+    AddCookie(grandmaGain, 'grandmas');
+
+  if (Cursors && T % Math.ceil(150 / Cursors) === 0)
+    ClickCookie();
 
   let cps = 0;
+
   cps += Times * timeGain / 5;
   cps += Portals * portalGain / 5;
   cps += Labs * labGain / 5;
   cps += Shipments * shipmentGain / 5;
-  cps += Mines * mineGain / 5;
+
+  cps += WizardTowers * wizardTowerGain / 5;
+  cps += Temples * templeGain / 5;
+  cps += Banks * bankGain / 5;
+
   cps += Factories * factoryGain / 5;
+  cps += Mines * mineGain / 5;
+  cps += Farms * farmGain / 5;
+
   cps += Grandmas * grandmaGain / 5;
   cps += Cursors * cursorGain / 5;
 
@@ -1294,8 +1495,6 @@ function calculatePrestige() {
 
   return prestige;
 }
-
-
 
 
 /* ---------------------------------------------------------------- */
