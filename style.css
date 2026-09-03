@@ -1,0 +1,199 @@
+:root { --panel-bg: rgba(255,255,255,.75); }
+
+html, body { margin:0; padding:0; }
+body {
+  font-family:"Courier New", monospace;
+  background:#ccc;
+  overflow-y:auto;
+  -webkit-touch-callout:none;
+  -webkit-user-select:none;
+  user-select:none;
+}
+body::selection { background:transparent; }
+
+#cookie {
+  width:128px; height:128px;
+  background:url(cookie.png);
+  position:absolute; left:-64px;
+  cursor:pointer;
+}
+#cookie:hover { background-position:-128px; }
+#cookie:active { background-position:-256px; }
+
+#cookie .cursor {
+  width:32px; height:32px;
+  position:absolute;
+  background:url(cursor.png);
+}
+
+#pops {
+  position:absolute; left:0; top:0;
+  z-index:10000; pointer-events:none;
+}
+.pop {
+  font-weight:bold; color:#fff;
+  width:200px; height:20px;
+  font-size:20px; text-align:center;
+}
+
+#rightPanel {
+  position:absolute; right:0; top:0; z-index:100000;
+}
+#store_title, #store_upgrades_title {
+  margin-top:15px; font-size:1.1em;
+}
+#store, #store_upgrades { margin-top:15px; }
+
+#store > div, #store_upgrades > div {
+  background:#eee no-repeat;
+  width:256px; height:64px;
+  padding-left:72px;
+  box-sizing:border-box;
+  cursor:pointer;
+  border:#000 2px solid;
+  position:relative;
+}
+#store > div:hover, #store_upgrades > div:hover { background-color:#fff; }
+#store > div:active, #store_upgrades > div:active { background-color:#ccc; }
+#store > div b, #store_upgrades > div b { display:block; }
+#store > div.grayed, #store_upgrades > div.grayed {
+  background-color:#666;
+  color:#f00;
+}
+#store > div .amount {
+  position:absolute; right:8px; top:8px;
+  font-size:48px; color:#000; opacity:.2;
+}
+#store_upgrades > div.bought,
+#store_upgrades > div.hidden { display:none; }
+
+.building-icon-placeholder {
+  position:absolute;
+  left:4px; top:4px;
+  width:64px; height:56px;
+  background:#777;
+  border:1px solid #555;
+  box-sizing:border-box;
+}
+
+#money {
+  background:url(currency.png) no-repeat;
+  background-color:rgba(255,255,255,.75);
+  border-radius:18px;
+  position:absolute; left:0; top:0;
+  margin:16px;
+  height:28px;
+  padding:4px 4px 0 36px;
+  font-weight:bold; font-size:24px;
+  z-index:100;
+}
+#saveMenu {
+  position:absolute; left:0; top:45px;
+  margin:10px 16px; padding:2px 6px;
+  font-weight:bold; font-size:12px;
+  background:var(--panel-bg);
+  border-radius:8px;
+  line-height:125%; z-index:100;
+}
+#saveMenu .button {
+  text-decoration:underline;
+  cursor:pointer; font-size:14px;
+}
+#updateLog {
+  position:fixed; left:0; bottom:20px;
+  margin:16px; padding:6px;
+  font-weight:bold; font-size:12px;
+  color:#666; background:var(--panel-bg);
+  border-radius:8px; line-height:125%;
+  width:250px; height:300px;
+  overflow-y:auto; z-index:100;
+}
+#updateLog b { color:#000; }
+
+moni {
+  background:url(currencysmall.png) no-repeat;
+  width:16px; height:16px;
+  display:inline-block; position:relative;
+  top:4px; margin-right:-8px;
+}
+
+#grandmas { position:absolute; left:100px; width:240px; }
+.grandma { position:absolute; background:url(grandma.png); width:24px; height:48px; }
+.goldengrandma { background:url(goldengrandma.png); }
+.factorygrandma { background:url(factorygrandma.png); }
+.minegrandma { background:url(minegrandma.png); }
+.shipmentgrandma { background:url(shipmentgrandma.png); }
+.portalgrandma { background:url(portalgrandma.png); }
+.pledgedgrandma { background:url(pledgedgrandma.png); }
+.timegrandma { background:url(timegrandma.png); }
+
+#factories { position:absolute; left:-420px; width:320px; }
+.factory { position:absolute; background:url(factory.png); width:32px; height:48px; }
+
+#mines { position:absolute; left:100px; width:160px; top:100px; }
+.mine { position:absolute; background:url(mine.png); width:32px; height:32px; }
+
+#shipments { position:absolute; left:-340px; width:240px; top:100px; }
+.shipment { position:absolute; background:url(shipment.png); width:48px; height:48px; }
+
+#labs { position:absolute; left:-120px; width:240px; top:180px; }
+.lab { position:absolute; background:url(lab.png); width:24px; height:32px; }
+
+#portals { position:absolute; left:-340px; width:240px; top:180px; }
+.portal { position:absolute; background:url(portal.png); width:48px; height:48px; }
+
+#times { position:absolute; left:100px; width:240px; top:180px; }
+.time { position:absolute; background:url(timemachine.png); width:48px; height:48px; }
+
+#comment {
+  position:absolute; left:-200px; top:-115px;
+  width:400px; font-weight:bold; font-size:16px;
+  text-align:center;
+  background-color:rgba(255,255,255,.75);
+  border-radius:18px;
+}
+
+#middle { position:absolute; left:50%; top:150px; width:0; }
+
+#credits {
+  width:100%; height:20px;
+  background:#666; color:#fff;
+  position:fixed; bottom:0; margin:0;
+  font-size:12px; border-top:2px solid #999;
+  z-index:100000;
+}
+#credits span { margin:4px; }
+#credits a { color:#fff; }
+
+#alert {
+  background:#666; color:#fff;
+  border:2px solid #000;
+  position:fixed; right:0; bottom:0;
+  padding:8px; z-index:20000000;
+  visibility:hidden; font-size:14px;
+}
+/* Tooltip container */
+.tooltipStore {
+  position: relative;
+  display: inline-block;
+  border-bottom: 0px dotted black; /* Add dots under the hoverable text */
+  cursor: pointer;
+}
+
+/* Tooltip text */
+.tooltipTextStore {
+  visibility: hidden; /* Hidden by default */
+  width: 130px;
+  background-color: black;
+  color: #ffffff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+  position: absolute;
+  z-index: 1; /* Ensure tooltip is displayed above content */
+}
+
+/* Show the tooltip text on hover */
+.tooltipStore:hover .tooltipTextStore {
+  visibility: visible;
+}
