@@ -827,6 +827,7 @@ const achievements = {
     unlocked: false
   }
 };
+
 /* ---------------------------------------------------------------- */
 /* Building helpers                                                 */
 /* ---------------------------------------------------------------- */
@@ -1180,6 +1181,10 @@ function refreshGrandmas() {
     if (buildings.Shipment.count && Math.random() < 0.2) className = "shipmentgrandma";
     if (buildings.Portal.count && pledge <= 0 && Math.random() < 0.2) className = "portalgrandma";
     if (buildings["Time machine"].count && Math.random() < 0.2) className = "timegrandma";
+    if (buildings["Farm"].count && Math.random() < 0.2) className = "farmgrandma";
+    if (buildings["Bank"].count && Math.random() < 0.2) className = "bankgrandma";
+    if (buildings["Temple"].count && Math.random() < 0.2) className = "templegrandma";
+    if (buildings["Wizard tower"].count && Math.random() < 0.2) className = "wizardtowergrandma";
     if (pledge && Math.random() < 0.2) className = "pledgedgrandma";
 
     output += `<div class="${className ? className + " " : ""}grandma" style="left:${x}px;top:${y}px;"></div>`;
@@ -1260,6 +1265,55 @@ function refreshTimeMachines() {
   getElement("times").innerHTML = output;
 }
 
+function refreshFarms() {
+  let output = "";
+
+  for (let i = 0; i < buildings.Farm.count; i++) {
+    const x = Math.floor(Math.random() * 20 + (i % 10) * 24);
+    const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 24);
+    output += `<div class="farm" style="left:${x}px;top:${y}px;"></div>`;
+  }
+
+  getElement("farms").innerHTML = output;
+}
+
+function refreshBanks() {
+  let output = "";
+  console.log("draw banks");
+  console.log(buildings.Bank.count);
+  for (let i = 0; i < buildings.Bank.count; i++) {
+    const x = Math.floor(Math.random() * 20 + (i % 10) * 24);
+    const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 24);
+    output += `<div class="bank" style="right:${x}px;top:${y}px;"></div>`;
+  }
+  console.log(output)
+  getElement("banks").innerHTML = output;
+}
+
+function refreshTemples() {
+  let output = "";
+
+  for (let i = 0; i < buildings.Temple.count; i++) {
+    const x = Math.floor(Math.random() * 20 + (i % 10) * 24);
+    const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 24);
+    output += `<div class="temple" style="right:${x}px;top:${y}px;"></div>`;
+  }
+
+  getElement("temples").innerHTML = output;
+}
+
+function refreshWizardTowers() {
+  let output = "";
+
+  for (let i = 0; i < buildings["Wizard tower"].count; i++) {
+    const x = Math.floor(Math.random() * 20 + (i % 10) * 24);
+    const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 24);
+    output += `<div class="wizard" style="right:${x}px;top:${y}px;"></div>`;
+  }
+
+  getElement("wizards").innerHTML = output;
+}
+
 function refreshAllBuildingVisuals() {
   refreshGrandmas();
   refreshMines();
@@ -1268,6 +1322,10 @@ function refreshAllBuildingVisuals() {
   refreshLabs();
   refreshPortals();
   refreshTimeMachines();
+  refreshFarms();
+  refreshBanks();
+  refreshTemples();
+  refreshWizardTowers();
 }
 
 function buyBuilding(name) {
@@ -1726,12 +1784,12 @@ function main() {
   produceBuildingCookies("Portal", "portals");
   produceBuildingCookies("Alchemy lab", "labs");
   produceBuildingCookies("Shipment", "shipments");
-  produceBuildingCookies("Wizard tower", "middle");
-  produceBuildingCookies("Temple", "middle");
-  produceBuildingCookies("Bank", "middle");
+  produceBuildingCookies("Wizard tower", "towers");
+  produceBuildingCookies("Temple", "temples");
+  produceBuildingCookies("Bank", "banks");
   produceBuildingCookies("Factory", "factories");
   produceBuildingCookies("Mine", "mines");
-  produceBuildingCookies("Farm", "middle");
+  produceBuildingCookies("Farm", "farms");
   produceBuildingCookies("Grandma", "grandmas");
 
   if (
