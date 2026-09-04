@@ -146,6 +146,18 @@ moni {
 #times { position:absolute; left:100px; width:240px; top:180px; }
 .time { position:absolute; background:url(timemachine.png); width:48px; height:48px; }
 
+#farms   { position: absolute; left: 100px; width: 240px; top: 260px; }
+.farm    { position: absolute; background: url(farm.png); width: 32px; height: 32px; }
+
+#banks   { position: absolute; left: -420px; width: 320px; top: 260px; }
+.bank    { position: absolute; background: url(bank.png); width: 32px; height: 32px; }
+
+#temples { position: absolute; left: 100px; width: 240px; top: 340px; }
+.temple  { position: absolute; background: url(temple.png); width: 48px; height: 48px; }
+
+#wizards { position: absolute; left: -420px; width: 320px; top: 340px; }
+.wizard  { position: absolute; background: url(wizardtower.png); width: 32px; height: 48px; }
+
 #comment {
   position:absolute; left:-200px; top:-115px;
   width:400px; font-weight:bold; font-size:16px;

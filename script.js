@@ -5,7 +5,7 @@
 /* DOM and formatting helpers                                      */
 /* ---------------------------------------------------------------- */
 
-const VERSION = 0.128;
+const VERSION = 0.129;
 const SAVE_KEY = "CookieClickerClassic_Reborn_Save";
 const COOKIE_SAVE_NAME = "CookieClickerSave";
 const SAVE_FORMAT_VERSION = 2;
