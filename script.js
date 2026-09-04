@@ -139,6 +139,91 @@ Object.keys(buildings).forEach(name => multipliers[name] = 1);
 const upgrades = {};
 const pops = [];
 
+const achievementTypes = {
+  cps: {
+    getProgress() {
+      return getCookiesPerSecond();
+    }
+  },
+
+  buildings: {
+    getProgress() {
+      return Object.values(buildings)
+        .reduce((total, building) => total + building.count, 0);
+    }
+  },
+
+  cookies: {
+    getProgress() {
+      return cookies;
+    }
+  },
+
+  grandTotal: {
+    getProgress() {
+      // TODO: implement grandTotal
+      return 0;
+    }
+  },
+
+  resets: {
+    getProgress() {
+      // TODO: implement reset count
+      return 0;
+    }
+  }
+};
+
+const achievements = {
+  "Casual baking": {
+    id: 0,
+    type: "cps",
+    description: "Bake 1 cookie per second.",
+    requirement: 1,
+    unlocked: false
+  },
+
+  "Hardcore baking": {
+    id: 1,
+    type: "cps",
+    description: "Bake 10 cookies per second.",
+    requirement: 10,
+    unlocked: false
+  },
+
+  "Steady tasty stream": {
+    id: 2,
+    type: "cps",
+    description: "Bake 100 cookies per second.",
+    requirement: 100,
+    unlocked: false
+  },
+
+  "Cookie monster": {
+    id: 3,
+    type: "cps",
+    description: "Bake 1,000 cookies per second.",
+    requirement: 1000,
+    unlocked: false
+  },
+
+  "Mass producer": {
+    id: 4,
+    type: "cps",
+    description: "Bake 10,000 cookies per second.",
+    requirement: 10000,
+    unlocked: false
+  },
+
+  "Cookie vortex": {
+    id: 5,
+    type: "cps",
+    description: "Bake 1 million cookies per second.",
+    requirement: 1000000,
+    unlocked: false
+  }
+};
+
 /* ---------------------------------------------------------------- */
 /* Building helpers                                                 */
 /* ---------------------------------------------------------------- */
@@ -200,7 +285,9 @@ function getSaveData() {
     prestige,
     pledge,
     buildings: buildingData,
-    upgrades: Object.keys(upgrades).filter(name => upgrades[name].bought)
+    upgrades: Object.keys(upgrades).filter(name => upgrades[name].bought),
+    achievements: Object.keys(achievements)
+      .filter(name => achievements[name].unlocked)
   };
 }
 
@@ -216,7 +303,9 @@ function resetSaveString() {
     prestige,
     pledge: 0,
     buildings: {},
-    upgrades: []
+    upgrades: [],
+    achievements: Object.keys(achievements)
+      .filter(name => achievements[name].unlocked)
   };
 
   Object.keys(buildings).forEach(name => {
@@ -259,6 +348,10 @@ function applySaveData(data) {
     upgrades[name].bought = false;
   });
 
+  Object.keys(achievements).forEach(name => {
+    achievements[name].unlocked = false;
+  });
+
   Object.keys(multipliers).forEach(name => {
     multipliers[name] = 1;
   });
@@ -269,6 +362,12 @@ function applySaveData(data) {
 
     upgrade.bought = true;
     multipliers[upgrade.building] *= upgrade.multiplier;
+  });
+
+  (data.achievements || []).forEach(name => {
+    if (achievements[name]) {
+      achievements[name].unlocked = true;
+    }
   });
 
   refreshAllBuildingVisuals();
@@ -817,6 +916,45 @@ createUpgrade("Eternal cycle", "Time machines x2.", 700000000000000000000, "Time
 createUpgrade("Recursive causality", "Time machines x2.", 70000000000000000000000, "Time machine", 200);
 
 /* ---------------------------------------------------------------- */
+/* Achievements                                                     */
+/* ---------------------------------------------------------------- */
+
+function getAchievementProgress(achievement) {
+  const type = achievementTypes[achievement.type];
+
+  if (!type) return 0;
+
+  return type.getProgress(achievement);
+}
+
+function unlockAchievement(name) {
+  const achievement = achievements[name];
+
+  if (!achievement || achievement.unlocked) return;
+
+  achievement.unlocked = true;
+
+  new Pop(
+    "credits",
+    "Achievement unlocked: " + name
+  );
+}
+
+function checkAchievements() {
+  Object.keys(achievements).forEach(name => {
+    const achievement = achievements[name];
+
+    if (achievement.unlocked) return;
+
+    const progress = getAchievementProgress(achievement);
+
+    if (progress >= achievement.requirement) {
+      unlockAchievement(name);
+    }
+  });
+}
+
+/* ---------------------------------------------------------------- */
 /* Floating number pops                                             */
 /* ---------------------------------------------------------------- */
 
@@ -1001,6 +1139,7 @@ function main() {
   }
 
   const cps = getCookiesPerSecond();
+  checkAchievements();
   const floater = Math.round(cps * 10 - Math.floor(cps) * 10);
 
   getElement("cps").innerHTML =
