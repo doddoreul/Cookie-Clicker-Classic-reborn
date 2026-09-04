@@ -175,55 +175,658 @@ const achievementTypes = {
 };
 
 const achievements = {
+  // ================================================================
+  // Cookies per second
+  // ================================================================
+
   "Casual baking": {
     id: 0,
     type: "cps",
-    description: "Bake 1 cookie per second.",
     requirement: 1,
+    description: "Bake 1 cookie per second.",
     unlocked: false
   },
 
   "Hardcore baking": {
     id: 1,
     type: "cps",
-    description: "Bake 10 cookies per second.",
     requirement: 10,
+    description: "Bake 10 cookies per second.",
     unlocked: false
   },
 
   "Steady tasty stream": {
     id: 2,
     type: "cps",
-    description: "Bake 100 cookies per second.",
     requirement: 100,
+    description: "Bake 100 cookies per second.",
     unlocked: false
   },
 
   "Cookie monster": {
     id: 3,
     type: "cps",
-    description: "Bake 1,000 cookies per second.",
     requirement: 1000,
+    description: "Bake 1,000 cookies per second.",
     unlocked: false
   },
 
   "Mass producer": {
     id: 4,
     type: "cps",
-    description: "Bake 10,000 cookies per second.",
     requirement: 10000,
+    description: "Bake 10,000 cookies per second.",
     unlocked: false
   },
 
   "Cookie vortex": {
     id: 5,
     type: "cps",
-    description: "Bake 1 million cookies per second.",
     requirement: 1000000,
+    description: "Bake 1 million cookies per second.",
+    unlocked: false
+  },
+
+
+  // ================================================================
+  // Buildings - Cursor
+  // ================================================================
+
+  "One finger": {
+    id: 6,
+    type: "buildings",
+    target: "Cursor",
+    requirement: 1,
+    description: "Have 1 Cursor.",
+    unlocked: false
+  },
+
+  "A handful of fingers": {
+    id: 7,
+    type: "buildings",
+    target: "Cursor",
+    requirement: 5,
+    description: "Have 5 Cursors.",
+    unlocked: false
+  },
+
+  "Ten fingers": {
+    id: 8,
+    type: "buildings",
+    target: "Cursor",
+    requirement: 10,
+    description: "Have 10 Cursors.",
+    unlocked: false
+  },
+
+  "Many fingers": {
+    id: 9,
+    type: "buildings",
+    target: "Cursor",
+    requirement: 20,
+    description: "Have 20 Cursors.",
+    unlocked: false
+  },
+
+  "Finger army": {
+    id: 10,
+    type: "buildings",
+    target: "Cursor",
+    requirement: 50,
+    description: "Have 50 Cursors.",
+    unlocked: false
+  },
+
+
+  // ================================================================
+  // Buildings - Grandma
+  // ================================================================
+
+  "First grandma": {
+    id: 11,
+    type: "buildings",
+    target: "Grandma",
+    requirement: 1,
+    description: "Have 1 Grandma.",
+    unlocked: false
+  },
+
+  "Grandma's kitchen": {
+    id: 12,
+    type: "buildings",
+    target: "Grandma",
+    requirement: 5,
+    description: "Have 5 Grandmas.",
+    unlocked: false
+  },
+
+  "Grandma's house": {
+    id: 13,
+    type: "buildings",
+    target: "Grandma",
+    requirement: 10,
+    description: "Have 10 Grandmas.",
+    unlocked: false
+  },
+
+  "Grandma's village": {
+    id: 14,
+    type: "buildings",
+    target: "Grandma",
+    requirement: 20,
+    description: "Have 20 Grandmas.",
+    unlocked: false
+  },
+
+  "Grandma's empire": {
+    id: 15,
+    type: "buildings",
+    target: "Grandma",
+    requirement: 50,
+    description: "Have 50 Grandmas.",
+    unlocked: false
+  },
+
+
+  // ================================================================
+  // Buildings - Farm
+  // ================================================================
+
+  "First harvest": {
+    id: 16,
+    type: "buildings",
+    target: "Farm",
+    requirement: 1,
+    description: "Have 1 Farm.",
+    unlocked: false
+  },
+
+  "Small farm": {
+    id: 17,
+    type: "buildings",
+    target: "Farm",
+    requirement: 5,
+    description: "Have 5 Farms.",
+    unlocked: false
+  },
+
+  "Growing farm": {
+    id: 18,
+    type: "buildings",
+    target: "Farm",
+    requirement: 10,
+    description: "Have 10 Farms.",
+    unlocked: false
+  },
+
+  "Big farm": {
+    id: 19,
+    type: "buildings",
+    target: "Farm",
+    requirement: 20,
+    description: "Have 20 Farms.",
+    unlocked: false
+  },
+
+  "Cookie plantation": {
+    id: 20,
+    type: "buildings",
+    target: "Farm",
+    requirement: 50,
+    description: "Have 50 Farms.",
+    unlocked: false
+  },
+
+
+  // ================================================================
+  // Buildings - Mine
+  // ================================================================
+
+  "First mine": {
+    id: 21,
+    type: "buildings",
+    target: "Mine",
+    requirement: 1,
+    description: "Have 1 Mine.",
+    unlocked: false
+  },
+
+  "Small operation": {
+    id: 22,
+    type: "buildings",
+    target: "Mine",
+    requirement: 5,
+    description: "Have 5 Mines.",
+    unlocked: false
+  },
+
+  "Ten mines": {
+    id: 23,
+    type: "buildings",
+    target: "Mine",
+    requirement: 10,
+    description: "Have 10 Mines.",
+    unlocked: false
+  },
+
+  "Deep mining": {
+    id: 24,
+    type: "buildings",
+    target: "Mine",
+    requirement: 20,
+    description: "Have 20 Mines.",
+    unlocked: false
+  },
+
+  "Cookie extraction": {
+    id: 25,
+    type: "buildings",
+    target: "Mine",
+    requirement: 50,
+    description: "Have 50 Mines.",
+    unlocked: false
+  },
+
+
+  // ================================================================
+  // Buildings - Factory
+  // ================================================================
+
+  "First factory": {
+    id: 26,
+    type: "buildings",
+    target: "Factory",
+    requirement: 1,
+    description: "Have 1 Factory.",
+    unlocked: false
+  },
+
+  "Small industry": {
+    id: 27,
+    type: "buildings",
+    target: "Factory",
+    requirement: 5,
+    description: "Have 5 Factories.",
+    unlocked: false
+  },
+
+  "Mass production": {
+    id: 28,
+    type: "buildings",
+    target: "Factory",
+    requirement: 10,
+    description: "Have 10 Factories.",
+    unlocked: false
+  },
+
+  "Industrial complex": {
+    id: 29,
+    type: "buildings",
+    target: "Factory",
+    requirement: 20,
+    description: "Have 20 Factories.",
+    unlocked: false
+  },
+
+  "Cookie industry": {
+    id: 30,
+    type: "buildings",
+    target: "Factory",
+    requirement: 50,
+    description: "Have 50 Factories.",
+    unlocked: false
+  },
+
+
+  // ================================================================
+  // Buildings - Bank
+  // ================================================================
+
+  "First investment": {
+    id: 31,
+    type: "buildings",
+    target: "Bank",
+    requirement: 1,
+    description: "Have 1 Bank.",
+    unlocked: false
+  },
+
+  "Small savings": {
+    id: 32,
+    type: "buildings",
+    target: "Bank",
+    requirement: 5,
+    description: "Have 5 Banks.",
+    unlocked: false
+  },
+
+  "Growing fortune": {
+    id: 33,
+    type: "buildings",
+    target: "Bank",
+    requirement: 10,
+    description: "Have 10 Banks.",
+    unlocked: false
+  },
+
+  "Cookie finance": {
+    id: 34,
+    type: "buildings",
+    target: "Bank",
+    requirement: 20,
+    description: "Have 20 Banks.",
+    unlocked: false
+  },
+
+  "Cookie banking empire": {
+    id: 35,
+    type: "buildings",
+    target: "Bank",
+    requirement: 50,
+    description: "Have 50 Banks.",
+    unlocked: false
+  },
+
+
+  // ================================================================
+  // Buildings - Temple
+  // ================================================================
+
+  "First temple": {
+    id: 36,
+    type: "buildings",
+    target: "Temple",
+    requirement: 1,
+    description: "Have 1 Temple.",
+    unlocked: false
+  },
+
+  "Sacred grounds": {
+    id: 37,
+    type: "buildings",
+    target: "Temple",
+    requirement: 5,
+    description: "Have 5 Temples.",
+    unlocked: false
+  },
+
+  "Holy order": {
+    id: 38,
+    type: "buildings",
+    target: "Temple",
+    requirement: 10,
+    description: "Have 10 Temples.",
+    unlocked: false
+  },
+
+  "Grand temple": {
+    id: 39,
+    type: "buildings",
+    target: "Temple",
+    requirement: 20,
+    description: "Have 20 Temples.",
+    unlocked: false
+  },
+
+  "Temple complex": {
+    id: 40,
+    type: "buildings",
+    target: "Temple",
+    requirement: 50,
+    description: "Have 50 Temples.",
+    unlocked: false
+  },
+
+
+  // ================================================================
+  // Buildings - Wizard Tower
+  // ================================================================
+
+  "First spell": {
+    id: 41,
+    type: "buildings",
+    target: "Wizard tower",
+    requirement: 1,
+    description: "Have 1 Wizard Tower.",
+    unlocked: false
+  },
+
+  "Apprentice wizard": {
+    id: 42,
+    type: "buildings",
+    target: "Wizard tower",
+    requirement: 5,
+    description: "Have 5 Wizard Towers.",
+    unlocked: false
+  },
+
+  "Arcane tower": {
+    id: 43,
+    type: "buildings",
+    target: "Wizard tower",
+    requirement: 10,
+    description: "Have 10 Wizard Towers.",
+    unlocked: false
+  },
+
+  "Magical complex": {
+    id: 44,
+    type: "buildings",
+    target: "Wizard tower",
+    requirement: 20,
+    description: "Have 20 Wizard Towers.",
+    unlocked: false
+  },
+
+  "Wizarding citadel": {
+    id: 45,
+    type: "buildings",
+    target: "Wizard tower",
+    requirement: 50,
+    description: "Have 50 Wizard Towers.",
+    unlocked: false
+  },
+
+
+  // ================================================================
+  // Buildings - Shipment
+  // ================================================================
+
+  "First shipment": {
+    id: 46,
+    type: "buildings",
+    target: "Shipment",
+    requirement: 1,
+    description: "Have 1 Shipment.",
+    unlocked: false
+  },
+
+  "Small fleet": {
+    id: 47,
+    type: "buildings",
+    target: "Shipment",
+    requirement: 5,
+    description: "Have 5 Shipments.",
+    unlocked: false
+  },
+
+  "Shipping company": {
+    id: 48,
+    type: "buildings",
+    target: "Shipment",
+    requirement: 10,
+    description: "Have 10 Shipments.",
+    unlocked: false
+  },
+
+  "Trade network": {
+    id: 49,
+    type: "buildings",
+    target: "Shipment",
+    requirement: 20,
+    description: "Have 20 Shipments.",
+    unlocked: false
+  },
+
+  "Cookie trade empire": {
+    id: 50,
+    type: "buildings",
+    target: "Shipment",
+    requirement: 50,
+    description: "Have 50 Shipments.",
+    unlocked: false
+  },
+
+
+  // ================================================================
+  // Buildings - Alchemy Lab
+  // ================================================================
+
+  "First experiment": {
+    id: 51,
+    type: "buildings",
+    target: "Alchemy lab",
+    requirement: 1,
+    description: "Have 1 Alchemy Lab.",
+    unlocked: false
+  },
+
+  "Amateur alchemist": {
+    id: 52,
+    type: "buildings",
+    target: "Alchemy lab",
+    requirement: 5,
+    description: "Have 5 Alchemy Labs.",
+    unlocked: false
+  },
+
+  "Alchemy workshop": {
+    id: 53,
+    type: "buildings",
+    target: "Alchemy lab",
+    requirement: 10,
+    description: "Have 10 Alchemy Labs.",
+    unlocked: false
+  },
+
+  "Master laboratory": {
+    id: 54,
+    type: "buildings",
+    target: "Alchemy lab",
+    requirement: 20,
+    description: "Have 20 Alchemy Labs.",
+    unlocked: false
+  },
+
+  "Alchemy empire": {
+    id: 55,
+    type: "buildings",
+    target: "Alchemy lab",
+    requirement: 50,
+    description: "Have 50 Alchemy Labs.",
+    unlocked: false
+  },
+
+
+  // ================================================================
+  // Buildings - Portal
+  // ================================================================
+
+  "First portal": {
+    id: 56,
+    type: "buildings",
+    target: "Portal",
+    requirement: 1,
+    description: "Have 1 Portal.",
+    unlocked: false
+  },
+
+  "Portal network": {
+    id: 57,
+    type: "buildings",
+    target: "Portal",
+    requirement: 5,
+    description: "Have 5 Portals.",
+    unlocked: false
+  },
+
+  "Dimensional gateway": {
+    id: 58,
+    type: "buildings",
+    target: "Portal",
+    requirement: 10,
+    description: "Have 10 Portals.",
+    unlocked: false
+  },
+
+  "Interdimensional network": {
+    id: 59,
+    type: "buildings",
+    target: "Portal",
+    requirement: 20,
+    description: "Have 20 Portals.",
+    unlocked: false
+  },
+
+  "Cookie multiverse": {
+    id: 60,
+    type: "buildings",
+    target: "Portal",
+    requirement: 50,
+    description: "Have 50 Portals.",
+    unlocked: false
+  },
+
+
+  // ================================================================
+  // Buildings - Time Machine
+  // ================================================================
+
+  "First trip": {
+    id: 61,
+    type: "buildings",
+    target: "Time machine",
+    requirement: 1,
+    description: "Have 1 Time Machine.",
+    unlocked: false
+  },
+
+  "Time traveler": {
+    id: 62,
+    type: "buildings",
+    target: "Time machine",
+    requirement: 5,
+    description: "Have 5 Time Machines.",
+    unlocked: false
+  },
+
+  "Temporal explorer": {
+    id: 63,
+    type: "buildings",
+    target: "Time machine",
+    requirement: 10,
+    description: "Have 10 Time Machines.",
+    unlocked: false
+  },
+
+  "Time network": {
+    id: 64,
+    type: "buildings",
+    target: "Time machine",
+    requirement: 20,
+    description: "Have 20 Time Machines.",
+    unlocked: false
+  },
+
+  "Master of time": {
+    id: 65,
+    type: "buildings",
+    target: "Time machine",
+    requirement: 50,
+    description: "Have 50 Time Machines.",
     unlocked: false
   }
 };
-
 /* ---------------------------------------------------------------- */
 /* Building helpers                                                 */
 /* ---------------------------------------------------------------- */
