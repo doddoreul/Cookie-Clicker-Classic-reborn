@@ -45,6 +45,7 @@ let ticks = 0;
 let prestige = 0;
 let pledge = 0;
 let saveTimer = SAVE_INTERVAL_SECONDS;
+let resetCount = 0;
 
 const buildings = {
   Cursor: {
@@ -889,6 +890,7 @@ function getSaveData() {
     gameVersion: VERSION,
     cookies: Math.floor(cookies),
     prestige,
+    resetCount,
     pledge,
     buildings: buildingData,
     upgrades: Object.keys(upgrades).filter(name => upgrades[name].bought),
@@ -907,6 +909,7 @@ function resetSaveString() {
     gameVersion: VERSION,
     cookies: 0,
     prestige,
+    resetCount,
     pledge: 0,
     buildings: {},
     upgrades: [],
@@ -930,6 +933,7 @@ function applySaveData(data) {
 
   cookies = Number.isFinite(data.cookies) ? data.cookies : 0;
   prestige = Number.isFinite(data.prestige) ? data.prestige : 0;
+  resetCount = Number.isFinite(data.resetCount) ? data.resetCount : 0;
   pledge = Number.isFinite(data.pledge) ? data.pledge : 0;
 
   Object.keys(buildings).forEach(name => {
@@ -1127,7 +1131,7 @@ function resetGame() {
   if (!confirm("Do you REALLY want to start over?")) return;
 
   prestige += calculatePrestige();
-
+  resetCount++;
   localStorage.setItem(SAVE_KEY, resetSaveString());
 
   document.cookie =
@@ -1313,7 +1317,7 @@ function refreshWizardTowers() {
     output += `<div class="wizard" style="right:${x}px;top:${y}px;"></div>`;
   }
 
-  getElement("wizards").innerHTML = output;
+  getElement("towers").innerHTML = output;
 }
 
 function refreshAllBuildingVisuals() {
@@ -1413,7 +1417,7 @@ function buyElderPledge() {
 
   refreshGrandmas();
   storeToRebuild = true;
-  storeToRebuild();
+  rebuildStore();
 
 }
 
@@ -1828,6 +1832,7 @@ function main() {
 
   getElement("prestigeDisplay").innerHTML = prestige;
   getElement("prestigeGainDisplay").innerHTML = calculatePrestige();
+  getElement("resetCounterDisplay").innerHTML = resetCount;
 
   applyFlashEffect();
 
