@@ -64,7 +64,7 @@ const buildings = {
   Farm: {
     count: 0,
     basePrice: 500,
-    gain: 40,
+    gain: 20,
     description: "Grows cookie plants from cookie seeds.",
     icon: "farmicon"
   },
@@ -78,7 +78,7 @@ const buildings = {
   Factory: {
     count: 0,
     basePrice: 7000,
-    gain: 20,
+    gain: 100,
     description: "Produces large quantities of cookies.",
     icon: "factoryicon"
   },
@@ -99,35 +99,35 @@ const buildings = {
   "Wizard tower": {
     count: 0,
     basePrice: 123456789,
-    gain: 2200,
+    gain: 123456,
     description: "Summons cookies with magic spells.",
     icon: "wizardtowericon"
   },
   Shipment: {
     count: 0,
     basePrice: 1000000000,
-    gain: 100,
+    gain: 5000000,
     description: "Brings in fresh cookies from the cookie planet.",
     icon: "shipmenticon"
   },
   "Alchemy lab": {
     count: 0,
-    basePrice: 20000000000,
-    gain: 500,
+    basePrice: 2500000,
+    gain: 25000,
     description: "Turns gold into cookies!",
     icon: "labicon"
   },
   Portal: {
     count: 0,
-    basePrice: 400000000000,
-    gain: 6666,
+    basePrice: 420000000000,
+    gain: 20000000,
     description: "Opens a door to the Cookieverse.",
     icon: "portalicon"
   },
   "Time machine": {
     count: 0,
     basePrice: 8000000000000,
-    gain: 123456,
+    gain: 200000000,
     description: '<span style="font-size:80%;">Brings cookies from the past, before they were even eaten.</span>',
     icon: "timemachineicon"
   }
@@ -866,6 +866,8 @@ function createBuilding(name, options) {
     currentPrice: options.basePrice
   };
   multipliers[name] = 1;
+  storeToRebuild = true;
+  upgradesToRebuild = true;
 }
 
 /* ---------------------------------------------------------------- */
@@ -1079,6 +1081,7 @@ function loadGameFromCookie() {
 }
 
 function saveGame() {
+  console.log("Game saved");
   saveGameToLocalStorage();
   saveGameToCookie();
   new Pop("credits", "Saved");
@@ -1279,8 +1282,7 @@ function refreshFarms() {
 
 function refreshBanks() {
   let output = "";
-  console.log("draw banks");
-  console.log(buildings.Bank.count);
+
   for (let i = 0; i < buildings.Bank.count; i++) {
     const x = Math.floor(Math.random() * 20 + (i % 10) * 24);
     const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 24);
@@ -1330,15 +1332,18 @@ function refreshAllBuildingVisuals() {
 
 function buyBuilding(name) {
   const building = getBuilding(name);
-
+  console.log("Buying "+name);
   if (!building || !loaded || cookies < building.currentPrice) return;
 
   cookies -= building.currentPrice;
   building.count++;
-  updateBuildingPrice(name);
-
-  refreshAllBuildingVisuals();
+  console.log("Rebuild store?: " + storeToRebuild)
   storeToRebuild = true;
+
+  rebuildStore();
+
+  updateBuildingPrice(name);
+  refreshAllBuildingVisuals();
   upgradesToRebuild = true;
 }
 
@@ -1348,6 +1353,7 @@ function buyBuilding(name) {
 
 function rebuildStore() {
   let output = "";
+  console.log("Reduilding store");
 
   Object.keys(buildings).forEach(name => {
     const building = buildings[name];
@@ -1407,6 +1413,8 @@ function buyElderPledge() {
 
   refreshGrandmas();
   storeToRebuild = true;
+  storeToRebuild();
+
 }
 
 /* ---------------------------------------------------------------- */
@@ -1436,6 +1444,7 @@ function buyUpgrade(name) {
 
   upgradesToRebuild = true;
   new Pop("store_upgrades", upgrade.name + " bought!");
+
 }
 
 function rebuildUpgradesStore() {
@@ -1944,6 +1953,7 @@ function initialize() {
     imageNames.map(name => `<img src="${name}.png">`).join("");
 
   getElement("cookie").addEventListener("mouseup", clickCookie);
+  getElement("save").addEventListener("click", saveGame);
   getElement("exportSave").addEventListener("click", exportSave);
   getElement("importSave").addEventListener("click", importSave);
   getElement("reset").addEventListener("click", resetGame);
