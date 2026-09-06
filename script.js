@@ -113,7 +113,7 @@ const buildings = {
   },
   "Alchemy lab": {
     count: 0,
-    basePrice: 2500000,
+    basePrice: 2500000000,
     gain: 25000,
     description: "Turns gold into cookies!",
     icon: "labicon"
