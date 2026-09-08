@@ -46,6 +46,9 @@ let prestige = 0;
 let pledge = 0;
 let saveTimer = SAVE_INTERVAL_SECONDS;
 let resetCount = 0;
+let goldenCookieVisible = false;
+let goldenCookieTimer = null;
+let goldenCookieTimeout = null;
 
 const buildings = {
   Cursor: {
@@ -841,11 +844,6 @@ function getBuildingCount(name) {
   return getBuilding(name)?.count || 0;
 }
 
-function getBuildingPrice(name) {
-  const building = getBuilding(name);
-  return building.currentPrice;
-}
-
 function updateBuildingPrice(name) {
   const building = getBuilding(name);
   building.currentPrice = Math.ceil(
@@ -855,20 +853,6 @@ function updateBuildingPrice(name) {
 
 function initializeBuildingPrices() {
   Object.keys(buildings).forEach(updateBuildingPrice);
-}
-
-function createBuilding(name, options) {
-  buildings[name] = {
-    count: 0,
-    basePrice: options.basePrice,
-    gain: options.gain,
-    description: options.description,
-    icon: options.icon,
-    currentPrice: options.basePrice
-  };
-  multipliers[name] = 1;
-  storeToRebuild = true;
-  upgradesToRebuild = true;
 }
 
 /* ---------------------------------------------------------------- */
@@ -1342,13 +1326,110 @@ function buyBuilding(name) {
   cookies -= building.currentPrice;
   building.count++;
   console.log("Rebuild store?: " + storeToRebuild)
-  storeToRebuild = true;
-
   rebuildStore();
 
   updateBuildingPrice(name);
   refreshAllBuildingVisuals();
   upgradesToRebuild = true;
+}
+
+/* ---------------------------------------------------------------- */
+/* Store                                                             */
+/* ---------------------------------------------------------------- */
+
+function randomGoldenCookieDelay() {
+    // Entre 5 et 15 minutes, en millisecondes
+    return (5 * 60 * 1000) + Math.random() * (10 * 60 * 1000);
+}
+
+function scheduleGoldenCookie() {
+    // Le système n'est actif que si l'upgrade est achetée
+    if (!upgrades["Golden cookies"]?.bought) return;
+
+    // Ne jamais programmer un nouveau GC s'il y en a déjà un
+    if (goldenCookieVisible || goldenCookieTimer) return;
+
+    const delay = randomGoldenCookieDelay();
+
+    goldenCookieTimer = setTimeout(() => {
+        goldenCookieTimer = null;
+        spawnGoldenCookie();
+    }, delay);
+}
+
+function spawnGoldenCookie() {
+    // Sécurité : pas deux GC à la fois
+    if (goldenCookieVisible) return;
+
+    goldenCookieVisible = true;
+
+    const cookie = document.createElement("img");
+
+    cookie.id = "goldenCookie";
+    cookie.src = "goldencookie.png";
+    cookie.alt = "Golden Cookie";
+
+    cookie.style.position = "absolute";
+    cookie.style.width = "128px";
+    cookie.style.height = "128px";
+    cookie.style.cursor = "pointer";
+    cookie.style.zIndex = "1000";
+    cookie.style.opacity = "0";
+    cookie.style.transition = "opacity 0.5s ease";
+
+    // Position aléatoire dans la zone de jeu
+    const game = document.getElementById("game");
+
+    if (!game) {
+        goldenCookieVisible = false;
+        scheduleGoldenCookie();
+        return;
+    }
+
+    const maxX = Math.max(0, game.clientWidth - 128);
+    const maxY = Math.max(0, game.clientHeight - 128);
+
+    cookie.style.left = `${Math.random() * maxX}px`;
+    cookie.style.top = `${Math.random() * maxY}px`;
+
+    cookie.addEventListener("click", () => {
+        clickGoldenCookie(cookie);
+    });
+
+    game.appendChild(cookie);
+    requestAnimationFrame(() => {
+        cookie.style.opacity = "1";
+    });
+    // Le GC disparaît après 13 secondes
+    goldenCookieTimeout = setTimeout(() => {
+        removeGoldenCookie(cookie);
+    }, 13 * 1500);
+}
+
+function clickGoldenCookie(cookie) {
+    console.log("Golden cookie clicked");
+    removeGoldenCookie(cookie);
+}
+
+function removeGoldenCookie(cookie) {
+    if (!cookie || !cookie.parentNode) {
+        goldenCookieVisible = false;
+        scheduleGoldenCookie();
+        return;
+    }
+
+    cookie.style.opacity = "0";
+
+    setTimeout(() => {
+        if (cookie.parentNode) {
+            cookie.parentNode.removeChild(cookie);
+        }
+
+        goldenCookieVisible = false;
+        goldenCookieTimeout = null;
+
+        scheduleGoldenCookie();
+    }, 1500);
 }
 
 /* ---------------------------------------------------------------- */
@@ -1361,11 +1442,10 @@ function rebuildStore() {
 
   Object.keys(buildings).forEach(name => {
     const building = buildings[name];
-    const hidden = "";
     const smallFont = "font-size:90%;";
 
     output += `
-      <div id="buy${name}" data-buy="${name}" style="${hidden}background-image:url(${building.icon}.png);">
+      <div id="buy${name}" data-buy="${name}" style="background-image:url(${building.icon}.png);">
         <div class="tooltipStore">
           <div class="building-icon"></div>
           <b>${name}</b>
@@ -1416,7 +1496,6 @@ function buyElderPledge() {
   pledge += 30 * 60 * 10;
 
   refreshGrandmas();
-  storeToRebuild = true;
   rebuildStore();
 
 }
@@ -1425,7 +1504,7 @@ function buyElderPledge() {
 /* Upgrades                                                         */
 /* ---------------------------------------------------------------- */
 
-function createUpgrade(name, description, price, building, requiredCount, multiplier = 2) {
+function createUpgrade(name, description, price, building = null, requiredCount = 1, multiplier = 2) {
   upgrades[name] = {
     name,
     description,
@@ -1454,29 +1533,41 @@ function buyUpgrade(name) {
 function rebuildUpgradesStore() {
   let output = "";
   let visibleCount = 0;
+  const smallFont = "font-size:80%;";
 
-  Object.keys(upgrades).forEach(name => {
-    const upgrade = upgrades[name];
-    const buyable = getBuildingCount(upgrade.building) >= upgrade.requiredCount;
-    const smallFont = "font-size:80%;";
+  Object.entries(upgrades)
+    .sort(([, a], [, b]) => a.requiredCount - b.requiredCount)
+    .forEach(([name, upgrade]) => {
 
-    if (upgrade.bought || !buyable) return;
+      let buyable = false;
 
-    const classes = visibleCount < MAX_VISIBLE_UPGRADES ? "" : "hidden";
-    visibleCount++;
+      // Upgrade condition
+      if (upgrade.building != null) {
+        upgrade.icon = upgrade.building+"icon.png";
+        buyable = getBuildingCount(upgrade.building) >= upgrade.requiredCount;
+      } else {
+        upgrade.icon = upgrade.building+"icon.png";
+        buyable = true;
+      }
 
-    output += `
-      <div id="upgrade${name}" data-upgrade="${name}" class="${classes}" style="${smallFont}background-image:url(${upgrade.building}icon.png);">
-        <div class="tooltipStore">
-          <div class="building-icon"></div>
-          <b>${upgrade.name}</b>
-          <moni></moni> ${beautify(upgrade.price)}
-          <span class="tooltipTextStore">${upgrade.description}</span>
+      if (upgrade.bought || !buyable) return;
+
+      const classes = visibleCount < MAX_VISIBLE_UPGRADES ? "" : "hidden";
+      visibleCount++;
+
+
+
+      output += `
+        <div id="upgrade${name}" data-upgrade="${name}" class="${classes}" style="${smallFont}background-image:url(${upgrade.icon});">
+          <div class="tooltipStore">
+            <div class="building-icon"></div>
+            <b>${upgrade.name}</b>
+            <moni></moni> ${beautify(upgrade.price)}
+            <span class="tooltipTextStore">${upgrade.description}</span>
+          </div>
         </div>
-      </div>
-    `;
-  });
-
+      `;
+    });
   getElement("store_upgrades").innerHTML = output;
 
   getElement("store_upgrades").querySelectorAll("[data-upgrade]").forEach(element => {
@@ -1589,6 +1680,9 @@ createUpgrade("Golden verse", "Time machines x2.", 7000000000000000000, "Time ma
 createUpgrade("Eternal cycle", "Time machines x2.", 700000000000000000000, "Time machine", 150);
 createUpgrade("Recursive causality", "Time machines x2.", 70000000000000000000000, "Time machine", 200);
 
+/* Golden Cookies Upgrades */
+createUpgrade("Golden Cookies", "Randomly spawns a Golden Cookie", 100000, null, 1, 1);
+
 /* ---------------------------------------------------------------- */
 /* Achievements                                                     */
 /* ---------------------------------------------------------------- */
@@ -1644,18 +1738,6 @@ function Pop(elementId, text) {
 /* ---------------------------------------------------------------- */
 /* Game loop                                                        */
 /* ---------------------------------------------------------------- */
-
-function getGrandmaGain() {
-  return Math.ceil(
-    4
-    + (buildings.Factory.count ? 1 : 0)
-    + (buildings.Mine.count ? 2 : 0)
-    + (buildings.Shipment.count ? 3 : 0)
-    + (buildings["Alchemy lab"].count ? 4 : 0)
-    + (buildings.Portal.count ? (pledge ? 5 + buildings.Portal.count * 0.5 : 5) : 0)
-    + (buildings["Time machine"].count ? 6 : 0)
-  ) * multipliers.Grandma;
-}
 
 function getBuildingGain(name) {
   return buildings[name].gain * multipliers[name];

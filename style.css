@@ -155,8 +155,8 @@ moni {
 #temples { position: absolute; left: 100px; width: 240px; top: 340px; }
 .temple  { position: absolute; background: url(temple.png); width: 48px; height: 48px; }
 
-#wizards { position: absolute; left: -420px; width: 320px; top: 340px; }
-.wizard  { position: absolute; background: url(wizardtower.png); width: 32px; height: 48px; }
+#towers { position: absolute; left: -420px; width: 320px; top: 340px; }
+.tower  { position: absolute; background: url(wizardtower.png); width: 32px; height: 48px; }
 
 #comment {
   position:absolute; left:-200px; top:-115px;
