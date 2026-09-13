@@ -52,6 +52,8 @@ let goldenCookieTimer = null;
 let goldenCookieTimeout = null;
 let goldenCookieSpawnMultiplier = 1;
 let goldenCookieDurationMultiplier = 1;
+let goldenCookieCpsMultiplier = 1;
+let goldenCookieFrenzyTimer = 0;
 
 const buildings = {
   Cursor: {
@@ -1401,6 +1403,16 @@ function clickGoldenCookie(cookie) {
 
     goldenCookieVisible = false;
 
+    const roll = Math.random();
+
+    if (roll < 0.40) {
+        goldenCookieLucky();
+    } else if (roll < 0.80) {
+        goldenCookieFrenzy();
+    } else {
+        goldenCookieClot();
+    }
+
     scheduleGoldenCookie();
 }
 
@@ -1470,6 +1482,30 @@ function updateGoldenCookieModifiers() {
     if (upgrades["Get Lucky"]?.bought) {
         goldenCookieSpawnMultiplier *= 2;
     }
+}
+
+function goldenCookieLucky() {
+    const bankedCookies = cookies * 0.15 + 13;
+    const fifteenMinutes = getCookiesPerSecond() * 900 + 13;
+
+    const reward = Math.min(bankedCookies, fifteenMinutes);
+
+    cookies += reward;
+    console.log("Lucky!");
+    new Pop("credits", `Lucky! +${Math.floor(reward)} cookies`);
+}
+
+function goldenCookieFrenzy() {
+    goldenCookieCpsMultiplier = 7;
+    goldenCookieFrenzyTimer = 77 * TICKS_PER_SECOND;
+
+    console.log("Frenzy!");
+    new Pop("credits", "Frenzy!");
+}
+
+function goldenCookieClot() {
+    console.log("Clot!");
+    new Pop("credits", "Clot");
 }
 
 /* ---------------------------------------------------------------- */
@@ -1872,7 +1908,7 @@ function getCookiesPerSecond() {
     cps += buildings[name].count * getBuildingGain(name) / 5;
   });
 
-  return cps * (prestige + 1);
+  return cps * (prestige + 1) * goldenCookieCpsMultiplier;
 }
 
 function updateStoreAffordability() {
@@ -1943,6 +1979,15 @@ function main() {
     ticks % Math.max(1, Math.ceil(150 / buildings.Cursor.count)) === 0
   ) {
     clickCookie();
+  }
+
+  if (goldenCookieFrenzyTimer > 0) {
+      goldenCookieFrenzyTimer--;
+
+      if (goldenCookieFrenzyTimer <= 0) {
+          goldenCookieFrenzyTimer = 0;
+          goldenCookieCpsMultiplier = 1;
+      }
   }
 
   const cps = getCookiesPerSecond();
