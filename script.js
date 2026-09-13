@@ -46,9 +46,12 @@ let prestige = 0;
 let pledge = 0;
 let saveTimer = SAVE_INTERVAL_SECONDS;
 let resetCount = 0;
+
 let goldenCookieVisible = false;
 let goldenCookieTimer = null;
 let goldenCookieTimeout = null;
+let goldenCookieSpawnMultiplier = 1;
+let goldenCookieDurationMultiplier = 1;
 
 const buildings = {
   Cursor: {
@@ -964,6 +967,9 @@ function applySaveData(data) {
     }
   });
 
+  updateGoldenCookieModifiers();
+  scheduleGoldenCookie();
+
   refreshAllBuildingVisuals();
   storeToRebuild = true;
   upgradesToRebuild = true;
@@ -1077,10 +1083,6 @@ function saveGame() {
 
 function loadGame() {
   const loadedFromLocalStorage = loadGameFromLocalStorage();
-
-  if (!loadedFromLocalStorage) {
-    loadGameFromCookie();
-  }
 
   loaded = true;
   getElement("comment").innerHTML = "Ready.";
@@ -1378,16 +1380,11 @@ function spawnGoldenCookie() {
     setTimeout(() => {
         cookie.style.opacity = "1";
     }, 0);
-    /*
-    // Déclenche le fade-in
-    requestAnimationFrame(() => {
-        cookie.style.opacity = "1";
-    });*/
 
-    // Le GC commence à disparaître après 13 secondes
+    // Makes GC disappearing
     goldenCookieTimeout = setTimeout(() => {
         removeGoldenCookie(cookie);
-    }, 13 * 1000);
+    }, 13 * 1000 * goldenCookieDurationMultiplier);
 }
 
 function clickGoldenCookie(cookie) {
@@ -1427,6 +1424,54 @@ function removeGoldenCookie(cookie) {
         scheduleGoldenCookie();
     }, 3000);
 }
+
+function randomGoldenCookieDelay() {
+    const minDelay = 5 * 60 * 1000;
+    const maxDelay = 15 * 60 * 1000;
+
+    const delay = (
+        minDelay + Math.random() * (maxDelay - minDelay)
+    ) / goldenCookieSpawnMultiplier;
+
+    console.log(`Prochain Golden Cookie dans ${(delay / 1000).toFixed(1)} secondes`);
+
+    return delay;
+}
+
+function scheduleGoldenCookie() {
+    // Le système n'est actif que si l'upgrade est achetée
+    if (!upgrades["Golden cookies"]?.bought) return;
+
+    // Ne jamais programmer un nouveau GC s'il y en a déjà un
+    if (goldenCookieVisible || goldenCookieTimer) return;
+
+    const delay = randomGoldenCookieDelay();
+
+    goldenCookieTimer = setTimeout(() => {
+        goldenCookieTimer = null;
+        spawnGoldenCookie();
+    }, delay);
+}
+
+function updateGoldenCookieModifiers() {
+    goldenCookieSpawnMultiplier = 1;
+    goldenCookieDurationMultiplier = 1;
+
+    if (upgrades["Lucky day"]?.bought) {
+        goldenCookieSpawnMultiplier *= 2;
+        goldenCookieDurationMultiplier *= 2;
+    }
+
+    if (upgrades["Serendipity"]?.bought) {
+        goldenCookieSpawnMultiplier *= 2;
+        goldenCookieDurationMultiplier *= 2;
+    }
+
+    if (upgrades["Get lucky"]?.bought) {
+        goldenCookieSpawnMultiplier *= 2;
+    }
+}
+
 /* ---------------------------------------------------------------- */
 /* Store                                                             */
 /* ---------------------------------------------------------------- */
@@ -1521,6 +1566,7 @@ function buyUpgrade(name) {
   multipliers[upgrade.building] *= upgrade.multiplier;
 
   upgradesToRebuild = true;
+  updateGoldenCookieModifiers();
   new Pop("store_upgrades", upgrade.name + " bought!");
 
 }
@@ -1536,21 +1582,20 @@ function rebuildUpgradesStore() {
 
       let buyable = false;
 
-      // Upgrade condition
-      if (upgrade.building != null) {
-        upgrade.icon = upgrade.building+"icon.png";
-        buyable = getBuildingCount(upgrade.building) >= upgrade.requiredCount;
-      } else {
+      // Upgrade filtering
+
+      if (upgrade.building == "GC"){
         upgrade.icon = upgrade.building+"icon.png";
         buyable = true;
+      } else {
+        upgrade.icon = upgrade.building+"icon.png";
+        buyable = getBuildingCount(upgrade.building) >= upgrade.requiredCount;
       }
 
       if (upgrade.bought || !buyable) return;
 
       const classes = visibleCount < MAX_VISIBLE_UPGRADES ? "" : "hidden";
       visibleCount++;
-
-
 
       output += `
         <div id="upgrade${name}" data-upgrade="${name}" class="${classes}" style="${smallFont}background-image:url(${upgrade.icon});">
@@ -1676,7 +1721,10 @@ createUpgrade("Eternal cycle", "Time machines x2.", 700000000000000000000, "Time
 createUpgrade("Recursive causality", "Time machines x2.", 70000000000000000000000, "Time machine", 200);
 
 /* Golden Cookies Upgrades */
-createUpgrade("Golden Cookies", "Randomly spawns a Golden Cookie", 100000, null, 1, 1);
+createUpgrade("Golden Cookies", "Randomly spawns a Golden Cookie", 100000, "GC", 1, 1);
+createUpgrade("Lucky Day", "GC appears twice as often and stay twice as long", 10000000, "GC", 1, 1);
+createUpgrade("Serendipity", "GC appears twice as often and stay twice as long", 1000000000, "GC", 1, 1);
+createUpgrade("Get Lucky", "GC appears twice as often", 100000000000, "GC", 1, 1);
 
 /* ---------------------------------------------------------------- */
 /* Achievements                                                     */
@@ -1912,6 +1960,9 @@ function main() {
   getElement("resetCounterDisplay").innerHTML = resetCount;
 
   applyFlashEffect();
+
+    updateGoldenCookieModifiers();
+    scheduleGoldenCookie();
 
   if (ticks % 30 === 0 && loaded) {
     document.title = beautify(cookies) + " cookies - Cookie Clicker";
