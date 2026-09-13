@@ -54,6 +54,8 @@ let goldenCookieSpawnMultiplier = 1;
 let goldenCookieDurationMultiplier = 1;
 let goldenCookieCpsMultiplier = 1;
 let goldenCookieFrenzyTimer = 0;
+let goldenCookieClickMultiplier = 1;
+let goldenCookieClickFrenzyTimer = 0;
 
 const buildings = {
   Cursor: {
@@ -1141,6 +1143,8 @@ function getCursorGain() {
 function clickCookie() {
   let amount = getCursorGain();
   amount *= prestige + 1;
+  amount *= goldenCookieClickMultiplier;
+
   cookies += amount;
 
   if (pops.length < 260 && numbersOn) {
@@ -1409,6 +1413,8 @@ function clickGoldenCookie(cookie) {
         goldenCookieLucky();
     } else if (roll < 0.80) {
         goldenCookieFrenzy();
+    } else if (roll < 0.837) {
+        goldenCookieClickFrenzy();
     } else {
         goldenCookieClot();
     }
@@ -1501,6 +1507,14 @@ function goldenCookieFrenzy() {
 
     console.log("Frenzy!");
     new Pop("credits", "Frenzy!");
+}
+
+function goldenCookieClickFrenzy() {
+    goldenCookieClickMultiplier = 777;
+    goldenCookieClickFrenzyTimer = 13 * TICKS_PER_SECOND;
+
+    console.log("Click Frenzy!")
+    new Pop("credits", "Click Frenzy!");
 }
 
 function goldenCookieClot() {
@@ -1981,12 +1995,21 @@ function main() {
     clickCookie();
   }
 
+  /* GC Timers */
   if (goldenCookieFrenzyTimer > 0) {
       goldenCookieFrenzyTimer--;
 
       if (goldenCookieFrenzyTimer <= 0) {
           goldenCookieFrenzyTimer = 0;
           goldenCookieCpsMultiplier = 1;
+      }
+  }
+  if (goldenCookieClickFrenzyTimer > 0) {
+      goldenCookieClickFrenzyTimer--;
+
+      if (goldenCookieClickFrenzyTimer <= 0) {
+          goldenCookieClickFrenzyTimer = 0;
+          goldenCookieClickMultiplier = 1;
       }
   }
 
