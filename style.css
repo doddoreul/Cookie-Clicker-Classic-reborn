@@ -205,3 +205,34 @@ moni {
 #store_upgrades>div:hover .tooltipTextStore {
   visibility: visible;
 }
+
+#goldenCookie {
+    position: absolute;
+    width: 128px;
+    height: 128px;
+    cursor: pointer;
+    z-index: 1000;
+    animation: goldenCookieFadeIn 3s ease forwards;
+}
+
+#goldenCookie.fadingOut {
+    animation: goldenCookieFadeOut 3s ease forwards;
+}
+
+@keyframes goldenCookieFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes goldenCookieFadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}

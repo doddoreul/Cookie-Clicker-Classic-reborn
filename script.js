@@ -1334,29 +1334,8 @@ function buyBuilding(name) {
 }
 
 /* ---------------------------------------------------------------- */
-/* Store                                                             */
+/* GC                                                             */
 /* ---------------------------------------------------------------- */
-
-function randomGoldenCookieDelay() {
-    // Entre 5 et 15 minutes, en millisecondes
-    return (5 * 60 * 1000) + Math.random() * (10 * 60 * 1000);
-}
-
-function scheduleGoldenCookie() {
-    // Le système n'est actif que si l'upgrade est achetée
-    if (!upgrades["Golden cookies"]?.bought) return;
-
-    // Ne jamais programmer un nouveau GC s'il y en a déjà un
-    if (goldenCookieVisible || goldenCookieTimer) return;
-
-    const delay = randomGoldenCookieDelay();
-
-    goldenCookieTimer = setTimeout(() => {
-        goldenCookieTimer = null;
-        spawnGoldenCookie();
-    }, delay);
-}
-
 function spawnGoldenCookie() {
     // Sécurité : pas deux GC à la fois
     if (goldenCookieVisible) return;
@@ -1374,10 +1353,8 @@ function spawnGoldenCookie() {
     cookie.style.height = "128px";
     cookie.style.cursor = "pointer";
     cookie.style.zIndex = "1000";
-    cookie.style.opacity = "0";
-    cookie.style.transition = "opacity 0.5s ease";
 
-    // Position aléatoire dans la zone de jeu
+
     const game = document.getElementById("game");
 
     if (!game) {
@@ -1397,18 +1374,37 @@ function spawnGoldenCookie() {
     });
 
     game.appendChild(cookie);
+
+    setTimeout(() => {
+        cookie.style.opacity = "1";
+    }, 0);
+    /*
+    // Déclenche le fade-in
     requestAnimationFrame(() => {
         cookie.style.opacity = "1";
-    });
-    // Le GC disparaît après 13 secondes
+    });*/
+
+    // Le GC commence à disparaître après 13 secondes
     goldenCookieTimeout = setTimeout(() => {
         removeGoldenCookie(cookie);
-    }, 13 * 1500);
+    }, 13 * 1000);
 }
 
 function clickGoldenCookie(cookie) {
     console.log("Golden cookie clicked");
-    removeGoldenCookie(cookie);
+
+    if (goldenCookieTimeout) {
+        clearTimeout(goldenCookieTimeout);
+        goldenCookieTimeout = null;
+    }
+
+    if (cookie.parentNode) {
+        cookie.parentNode.removeChild(cookie);
+    }
+
+    goldenCookieVisible = false;
+
+    scheduleGoldenCookie();
 }
 
 function removeGoldenCookie(cookie) {
@@ -1418,7 +1414,7 @@ function removeGoldenCookie(cookie) {
         return;
     }
 
-    cookie.style.opacity = "0";
+    cookie.classList.add("fadingOut");
 
     setTimeout(() => {
         if (cookie.parentNode) {
@@ -1429,9 +1425,8 @@ function removeGoldenCookie(cookie) {
         goldenCookieTimeout = null;
 
         scheduleGoldenCookie();
-    }, 1500);
+    }, 3000);
 }
-
 /* ---------------------------------------------------------------- */
 /* Store                                                             */
 /* ---------------------------------------------------------------- */
