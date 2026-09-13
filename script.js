@@ -1440,7 +1440,7 @@ function randomGoldenCookieDelay() {
 
 function scheduleGoldenCookie() {
     // Le système n'est actif que si l'upgrade est achetée
-    if (!upgrades["Golden cookies"]?.bought) return;
+    if (!upgrades["Golden Cookies"]?.bought) return;
 
     // Ne jamais programmer un nouveau GC s'il y en a déjà un
     if (goldenCookieVisible || goldenCookieTimer) return;
@@ -1457,7 +1457,7 @@ function updateGoldenCookieModifiers() {
     goldenCookieSpawnMultiplier = 1;
     goldenCookieDurationMultiplier = 1;
 
-    if (upgrades["Lucky day"]?.bought) {
+    if (upgrades["Lucky Day"]?.bought) {
         goldenCookieSpawnMultiplier *= 2;
         goldenCookieDurationMultiplier *= 2;
     }
@@ -1467,7 +1467,7 @@ function updateGoldenCookieModifiers() {
         goldenCookieDurationMultiplier *= 2;
     }
 
-    if (upgrades["Get lucky"]?.bought) {
+    if (upgrades["Get Lucky"]?.bought) {
         goldenCookieSpawnMultiplier *= 2;
     }
 }
@@ -1563,10 +1563,18 @@ function buyUpgrade(name) {
 
   cookies -= upgrade.price;
   upgrade.bought = true;
-  multipliers[upgrade.building] *= upgrade.multiplier;
+
+  if (upgrade.building !== "GC") {
+    multipliers[upgrade.building] *= upgrade.multiplier;
+  }
+
+  if (name === "Golden Cookies") {
+    scheduleGoldenCookie();
+  }
 
   upgradesToRebuild = true;
   updateGoldenCookieModifiers();
+
   new Pop("store_upgrades", upgrade.name + " bought!");
 
 }
@@ -1960,9 +1968,6 @@ function main() {
   getElement("resetCounterDisplay").innerHTML = resetCount;
 
   applyFlashEffect();
-
-    updateGoldenCookieModifiers();
-    scheduleGoldenCookie();
 
   if (ticks % 30 === 0 && loaded) {
     document.title = beautify(cookies) + " cookies - Cookie Clicker";
