@@ -432,7 +432,9 @@ function getSaveData() {
     buildings: buildingData,
     upgrades: Object.keys(upgrades).filter(name => upgrades[name].bought),
     achievements: Object.keys(achievements)
-      .filter(name => achievements[name].unlocked)
+      .filter(name => achievements[name].unlocked),
+    goldenCookieClickFrenzyTimer: goldenCookieClickFrenzyTimer,
+    goldenCookieFrenzyTimer: goldenCookieFrenzyTimer,
   };
 }
 
@@ -472,6 +474,20 @@ function applySaveData(data) {
   prestige = Number.isFinite(data.prestige) ? data.prestige : 0;
   resetCount = Number.isFinite(data.resetCount) ? data.resetCount : 0;
   pledge = Number.isFinite(data.pledge) ? data.pledge : 0;
+
+  goldenCookieClickFrenzyTimer = Number.isFinite(data.goldenCookieClickFrenzyTimer)
+    ? Math.max(0, data.goldenCookieClickFrenzyTimer)
+    : 0;
+
+  goldenCookieFrenzyTimer = Number.isFinite(data.goldenCookieFrenzyTimer)
+    ? Math.max(0, data.goldenCookieFrenzyTimer)
+    : 0;
+
+  goldenCookieClickMultiplier =
+    goldenCookieClickFrenzyTimer > 0 ? 777 : 1;
+
+  goldenCookieCpsMultiplier =
+    goldenCookieFrenzyTimer > 0 ? 7 : 1;
 
   Object.keys(buildings).forEach(name => {
     const saved = data.buildings?.[name];
@@ -770,7 +786,7 @@ function refreshWizardTowers() {
   for (let i = 0; i < buildings["Wizard tower"].count; i++) {
     const x = Math.floor(Math.random() * 20 + (i % 10) * 24);
     const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 24);
-    output += `<div class="wizard" style="right:${x}px;top:${y}px;"></div>`;
+    output += `<div class="tower" style="right:${x}px;top:${y}px;"></div>`;
   }
 
   getElement("towers").innerHTML = output;

@@ -47,7 +47,7 @@ body::selection { background:transparent; }
 #store > div, #store_upgrades > div {
   background:#eee no-repeat;
   background-size: contain;
-  width:256px;
+  width:225px;
   height:56px;
   padding-left:72px;
   cursor:pointer;
@@ -156,7 +156,7 @@ moni {
 .temple  { position: absolute; background: url(temple.png); width: 48px; height: 48px; }
 
 #towers { position: absolute; left: -420px; width: 320px; top: 340px; }
-.tower  { position: absolute; background: url(wizardtower.png); width: 32px; height: 48px; }
+.tower  { position: absolute; background: url(wizardtower.png); width: 32px; height: 32px; }
 
 #comment {
   position:absolute; left:-200px; top:-115px;
