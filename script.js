@@ -1144,7 +1144,6 @@ function clickCookie() {
   let amount = getCursorGain();
   amount *= prestige + 1;
   amount *= goldenCookieClickMultiplier;
-
   cookies += amount;
 
   if (pops.length < 260 && numbersOn) {
@@ -1154,6 +1153,7 @@ function clickCookie() {
 
 function addCookies(amount, elementId) {
   amount *= prestige + 1;
+  amount *= goldenCookieClickMultiplier;
   cookies += amount;
 
   if (elementId && pops.length < 250 && numbersOn) {
