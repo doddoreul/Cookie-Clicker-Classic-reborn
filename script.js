@@ -1,4 +1,3 @@
-
 "use strict";
 
 /* ---------------------------------------------------------------- */
@@ -7,7 +6,6 @@
 
 const VERSION = 0.130;
 const SAVE_KEY = "CookieClickerClassic_Reborn_Save";
-const COOKIE_SAVE_NAME = "CookieClickerSave";
 const SAVE_FORMAT_VERSION = 2;
 const TICKS_PER_SECOND = 30;
 const SAVE_INTERVAL_SECONDS = 30 * 60;
@@ -59,6 +57,7 @@ let goldenCookieClickFrenzyTimer = 0;
 
 const buildings = {
   Cursor: {
+    id: 0,
     count: 0,
     basePrice: 15,
     gain: 1,
@@ -66,6 +65,7 @@ const buildings = {
     icon: "cursoricon"
   },
   Grandma: {
+    id: 1,
     count: 0,
     basePrice: 100,
     gain: 4,
@@ -73,6 +73,7 @@ const buildings = {
     icon: "grandmaicon"
   },
   Farm: {
+    id: 2,
     count: 0,
     basePrice: 500,
     gain: 20,
@@ -80,6 +81,7 @@ const buildings = {
     icon: "farmicon"
   },
   Mine: {
+    id: 3,
     count: 0,
     basePrice: 2000,
     gain: 50,
@@ -87,6 +89,7 @@ const buildings = {
     icon: "mineicon"
   },
   Factory: {
+    id: 4,
     count: 0,
     basePrice: 7000,
     gain: 100,
@@ -94,6 +97,7 @@ const buildings = {
     icon: "factoryicon"
   },
   Bank: {
+    id: 5,
     count: 0,
     basePrice: 50000,
     gain: 250,
@@ -101,6 +105,7 @@ const buildings = {
     icon: "bankicon"
   },
   Temple: {
+    id: 6,
     count: 0,
     basePrice: 1000000,
     gain: 390,
@@ -108,6 +113,7 @@ const buildings = {
     icon: "templeicon"
   },
   "Wizard tower": {
+    id: 7,
     count: 0,
     basePrice: 123456789,
     gain: 123456,
@@ -115,6 +121,7 @@ const buildings = {
     icon: "wizardtowericon"
   },
   Shipment: {
+    id: 8,
     count: 0,
     basePrice: 1000000000,
     gain: 5000000,
@@ -122,6 +129,7 @@ const buildings = {
     icon: "shipmenticon"
   },
   "Alchemy lab": {
+    id: 9,
     count: 0,
     basePrice: 2500000000,
     gain: 25000,
@@ -129,6 +137,7 @@ const buildings = {
     icon: "labicon"
   },
   Portal: {
+    id: 10,
     count: 0,
     basePrice: 420000000000,
     gain: 20000000,
@@ -136,6 +145,7 @@ const buildings = {
     icon: "portalicon"
   },
   "Time machine": {
+    id: 11,
     count: 0,
     basePrice: 8000000000000,
     gain: 200000000,
@@ -147,7 +157,6 @@ const buildings = {
 const multipliers = {};
 Object.keys(buildings).forEach(name => multipliers[name] = 1);
 
-const upgrades = {};
 const pops = [];
 
 const achievementTypes = {
@@ -186,657 +195,84 @@ const achievementTypes = {
 };
 
 const achievements = {
-  // ================================================================
-  // Cookies per second
-  // ================================================================
-
-  "Casual baking": {
-    id: 0,
-    type: "cps",
-    requirement: 1,
-    description: "Bake 1 cookie per second.",
-    unlocked: false
-  },
-
-  "Hardcore baking": {
-    id: 1,
-    type: "cps",
-    requirement: 10,
-    description: "Bake 10 cookies per second.",
-    unlocked: false
-  },
-
-  "Steady tasty stream": {
-    id: 2,
-    type: "cps",
-    requirement: 100,
-    description: "Bake 100 cookies per second.",
-    unlocked: false
-  },
-
-  "Cookie monster": {
-    id: 3,
-    type: "cps",
-    requirement: 1000,
-    description: "Bake 1,000 cookies per second.",
-    unlocked: false
-  },
-
-  "Mass producer": {
-    id: 4,
-    type: "cps",
-    requirement: 10000,
-    description: "Bake 10,000 cookies per second.",
-    unlocked: false
-  },
-
-  "Cookie vortex": {
-    id: 5,
-    type: "cps",
-    requirement: 1000000,
-    description: "Bake 1 million cookies per second.",
-    unlocked: false
-  },
-
-
-  // ================================================================
-  // Buildings - Cursor
-  // ================================================================
-
-  "One finger": {
-    id: 6,
-    type: "buildings",
-    target: "Cursor",
-    requirement: 1,
-    description: "Have 1 Cursor.",
-    unlocked: false
-  },
-
-  "A handful of fingers": {
-    id: 7,
-    type: "buildings",
-    target: "Cursor",
-    requirement: 5,
-    description: "Have 5 Cursors.",
-    unlocked: false
-  },
-
-  "Ten fingers": {
-    id: 8,
-    type: "buildings",
-    target: "Cursor",
-    requirement: 10,
-    description: "Have 10 Cursors.",
-    unlocked: false
-  },
-
-  "Many fingers": {
-    id: 9,
-    type: "buildings",
-    target: "Cursor",
-    requirement: 20,
-    description: "Have 20 Cursors.",
-    unlocked: false
-  },
-
-  "Finger army": {
-    id: 10,
-    type: "buildings",
-    target: "Cursor",
-    requirement: 50,
-    description: "Have 50 Cursors.",
-    unlocked: false
-  },
-
-
-  // ================================================================
-  // Buildings - Grandma
-  // ================================================================
-
-  "First grandma": {
-    id: 11,
-    type: "buildings",
-    target: "Grandma",
-    requirement: 1,
-    description: "Have 1 Grandma.",
-    unlocked: false
-  },
-
-  "Grandma's kitchen": {
-    id: 12,
-    type: "buildings",
-    target: "Grandma",
-    requirement: 5,
-    description: "Have 5 Grandmas.",
-    unlocked: false
-  },
-
-  "Grandma's house": {
-    id: 13,
-    type: "buildings",
-    target: "Grandma",
-    requirement: 10,
-    description: "Have 10 Grandmas.",
-    unlocked: false
-  },
-
-  "Grandma's village": {
-    id: 14,
-    type: "buildings",
-    target: "Grandma",
-    requirement: 20,
-    description: "Have 20 Grandmas.",
-    unlocked: false
-  },
-
-  "Grandma's empire": {
-    id: 15,
-    type: "buildings",
-    target: "Grandma",
-    requirement: 50,
-    description: "Have 50 Grandmas.",
-    unlocked: false
-  },
-
-
-  // ================================================================
-  // Buildings - Farm
-  // ================================================================
-
-  "First harvest": {
-    id: 16,
-    type: "buildings",
-    target: "Farm",
-    requirement: 1,
-    description: "Have 1 Farm.",
-    unlocked: false
-  },
-
-  "Small farm": {
-    id: 17,
-    type: "buildings",
-    target: "Farm",
-    requirement: 5,
-    description: "Have 5 Farms.",
-    unlocked: false
-  },
-
-  "Growing farm": {
-    id: 18,
-    type: "buildings",
-    target: "Farm",
-    requirement: 10,
-    description: "Have 10 Farms.",
-    unlocked: false
-  },
-
-  "Big farm": {
-    id: 19,
-    type: "buildings",
-    target: "Farm",
-    requirement: 20,
-    description: "Have 20 Farms.",
-    unlocked: false
-  },
-
-  "Cookie plantation": {
-    id: 20,
-    type: "buildings",
-    target: "Farm",
-    requirement: 50,
-    description: "Have 50 Farms.",
-    unlocked: false
-  },
-
-
-  // ================================================================
-  // Buildings - Mine
-  // ================================================================
-
-  "First mine": {
-    id: 21,
-    type: "buildings",
-    target: "Mine",
-    requirement: 1,
-    description: "Have 1 Mine.",
-    unlocked: false
-  },
-
-  "Small operation": {
-    id: 22,
-    type: "buildings",
-    target: "Mine",
-    requirement: 5,
-    description: "Have 5 Mines.",
-    unlocked: false
-  },
-
-  "Ten mines": {
-    id: 23,
-    type: "buildings",
-    target: "Mine",
-    requirement: 10,
-    description: "Have 10 Mines.",
-    unlocked: false
-  },
-
-  "Deep mining": {
-    id: 24,
-    type: "buildings",
-    target: "Mine",
-    requirement: 20,
-    description: "Have 20 Mines.",
-    unlocked: false
-  },
-
-  "Cookie extraction": {
-    id: 25,
-    type: "buildings",
-    target: "Mine",
-    requirement: 50,
-    description: "Have 50 Mines.",
-    unlocked: false
-  },
-
-
-  // ================================================================
-  // Buildings - Factory
-  // ================================================================
-
-  "First factory": {
-    id: 26,
-    type: "buildings",
-    target: "Factory",
-    requirement: 1,
-    description: "Have 1 Factory.",
-    unlocked: false
-  },
-
-  "Small industry": {
-    id: 27,
-    type: "buildings",
-    target: "Factory",
-    requirement: 5,
-    description: "Have 5 Factories.",
-    unlocked: false
-  },
-
-  "Mass production": {
-    id: 28,
-    type: "buildings",
-    target: "Factory",
-    requirement: 10,
-    description: "Have 10 Factories.",
-    unlocked: false
-  },
-
-  "Industrial complex": {
-    id: 29,
-    type: "buildings",
-    target: "Factory",
-    requirement: 20,
-    description: "Have 20 Factories.",
-    unlocked: false
-  },
-
-  "Cookie industry": {
-    id: 30,
-    type: "buildings",
-    target: "Factory",
-    requirement: 50,
-    description: "Have 50 Factories.",
-    unlocked: false
-  },
-
-
-  // ================================================================
-  // Buildings - Bank
-  // ================================================================
-
-  "First investment": {
-    id: 31,
-    type: "buildings",
-    target: "Bank",
-    requirement: 1,
-    description: "Have 1 Bank.",
-    unlocked: false
-  },
-
-  "Small savings": {
-    id: 32,
-    type: "buildings",
-    target: "Bank",
-    requirement: 5,
-    description: "Have 5 Banks.",
-    unlocked: false
-  },
-
-  "Growing fortune": {
-    id: 33,
-    type: "buildings",
-    target: "Bank",
-    requirement: 10,
-    description: "Have 10 Banks.",
-    unlocked: false
-  },
-
-  "Cookie finance": {
-    id: 34,
-    type: "buildings",
-    target: "Bank",
-    requirement: 20,
-    description: "Have 20 Banks.",
-    unlocked: false
-  },
-
-  "Cookie banking empire": {
-    id: 35,
-    type: "buildings",
-    target: "Bank",
-    requirement: 50,
-    description: "Have 50 Banks.",
-    unlocked: false
-  },
-
-
-  // ================================================================
-  // Buildings - Temple
-  // ================================================================
-
-  "First temple": {
-    id: 36,
-    type: "buildings",
-    target: "Temple",
-    requirement: 1,
-    description: "Have 1 Temple.",
-    unlocked: false
-  },
-
-  "Sacred grounds": {
-    id: 37,
-    type: "buildings",
-    target: "Temple",
-    requirement: 5,
-    description: "Have 5 Temples.",
-    unlocked: false
-  },
-
-  "Holy order": {
-    id: 38,
-    type: "buildings",
-    target: "Temple",
-    requirement: 10,
-    description: "Have 10 Temples.",
-    unlocked: false
-  },
-
-  "Grand temple": {
-    id: 39,
-    type: "buildings",
-    target: "Temple",
-    requirement: 20,
-    description: "Have 20 Temples.",
-    unlocked: false
-  },
-
-  "Temple complex": {
-    id: 40,
-    type: "buildings",
-    target: "Temple",
-    requirement: 50,
-    description: "Have 50 Temples.",
-    unlocked: false
-  },
-
-
-  // ================================================================
-  // Buildings - Wizard Tower
-  // ================================================================
-
-  "First spell": {
-    id: 41,
-    type: "buildings",
-    target: "Wizard tower",
-    requirement: 1,
-    description: "Have 1 Wizard Tower.",
-    unlocked: false
-  },
-
-  "Apprentice wizard": {
-    id: 42,
-    type: "buildings",
-    target: "Wizard tower",
-    requirement: 5,
-    description: "Have 5 Wizard Towers.",
-    unlocked: false
-  },
-
-  "Arcane tower": {
-    id: 43,
-    type: "buildings",
-    target: "Wizard tower",
-    requirement: 10,
-    description: "Have 10 Wizard Towers.",
-    unlocked: false
-  },
-
-  "Magical complex": {
-    id: 44,
-    type: "buildings",
-    target: "Wizard tower",
-    requirement: 20,
-    description: "Have 20 Wizard Towers.",
-    unlocked: false
-  },
-
-  "Wizarding citadel": {
-    id: 45,
-    type: "buildings",
-    target: "Wizard tower",
-    requirement: 50,
-    description: "Have 50 Wizard Towers.",
-    unlocked: false
-  },
-
-
-  // ================================================================
-  // Buildings - Shipment
-  // ================================================================
-
-  "First shipment": {
-    id: 46,
-    type: "buildings",
-    target: "Shipment",
-    requirement: 1,
-    description: "Have 1 Shipment.",
-    unlocked: false
-  },
-
-  "Small fleet": {
-    id: 47,
-    type: "buildings",
-    target: "Shipment",
-    requirement: 5,
-    description: "Have 5 Shipments.",
-    unlocked: false
-  },
-
-  "Shipping company": {
-    id: 48,
-    type: "buildings",
-    target: "Shipment",
-    requirement: 10,
-    description: "Have 10 Shipments.",
-    unlocked: false
-  },
-
-  "Trade network": {
-    id: 49,
-    type: "buildings",
-    target: "Shipment",
-    requirement: 20,
-    description: "Have 20 Shipments.",
-    unlocked: false
-  },
-
-  "Cookie trade empire": {
-    id: 50,
-    type: "buildings",
-    target: "Shipment",
-    requirement: 50,
-    description: "Have 50 Shipments.",
-    unlocked: false
-  },
-
-
-  // ================================================================
-  // Buildings - Alchemy Lab
-  // ================================================================
-
-  "First experiment": {
-    id: 51,
-    type: "buildings",
-    target: "Alchemy lab",
-    requirement: 1,
-    description: "Have 1 Alchemy Lab.",
-    unlocked: false
-  },
-
-  "Amateur alchemist": {
-    id: 52,
-    type: "buildings",
-    target: "Alchemy lab",
-    requirement: 5,
-    description: "Have 5 Alchemy Labs.",
-    unlocked: false
-  },
-
-  "Alchemy workshop": {
-    id: 53,
-    type: "buildings",
-    target: "Alchemy lab",
-    requirement: 10,
-    description: "Have 10 Alchemy Labs.",
-    unlocked: false
-  },
-
-  "Master laboratory": {
-    id: 54,
-    type: "buildings",
-    target: "Alchemy lab",
-    requirement: 20,
-    description: "Have 20 Alchemy Labs.",
-    unlocked: false
-  },
-
-  "Alchemy empire": {
-    id: 55,
-    type: "buildings",
-    target: "Alchemy lab",
-    requirement: 50,
-    description: "Have 50 Alchemy Labs.",
-    unlocked: false
-  },
-
-
-  // ================================================================
-  // Buildings - Portal
-  // ================================================================
-
-  "First portal": {
-    id: 56,
-    type: "buildings",
-    target: "Portal",
-    requirement: 1,
-    description: "Have 1 Portal.",
-    unlocked: false
-  },
-
-  "Portal network": {
-    id: 57,
-    type: "buildings",
-    target: "Portal",
-    requirement: 5,
-    description: "Have 5 Portals.",
-    unlocked: false
-  },
-
-  "Dimensional gateway": {
-    id: 58,
-    type: "buildings",
-    target: "Portal",
-    requirement: 10,
-    description: "Have 10 Portals.",
-    unlocked: false
-  },
-
-  "Interdimensional network": {
-    id: 59,
-    type: "buildings",
-    target: "Portal",
-    requirement: 20,
-    description: "Have 20 Portals.",
-    unlocked: false
-  },
-
-  "Cookie multiverse": {
-    id: 60,
-    type: "buildings",
-    target: "Portal",
-    requirement: 50,
-    description: "Have 50 Portals.",
-    unlocked: false
-  },
-
-
-  // ================================================================
-  // Buildings - Time Machine
-  // ================================================================
-
-  "First trip": {
-    id: 61,
-    type: "buildings",
-    target: "Time machine",
-    requirement: 1,
-    description: "Have 1 Time Machine.",
-    unlocked: false
-  },
-
-  "Time traveler": {
-    id: 62,
-    type: "buildings",
-    target: "Time machine",
-    requirement: 5,
-    description: "Have 5 Time Machines.",
-    unlocked: false
-  },
-
-  "Temporal explorer": {
-    id: 63,
-    type: "buildings",
-    target: "Time machine",
-    requirement: 10,
-    description: "Have 10 Time Machines.",
-    unlocked: false
-  },
-
-  "Time network": {
-    id: 64,
-    type: "buildings",
-    target: "Time machine",
-    requirement: 20,
-    description: "Have 20 Time Machines.",
-    unlocked: false
-  },
-
-  "Master of time": {
-    id: 65,
-    type: "buildings",
-    target: "Time machine",
-    requirement: 50,
-    description: "Have 50 Time Machines.",
-    unlocked: false
-  }
+  "Casual baking": { id: 0, type: "cps", requirement: 1, description: "Bake 1 cookie per second.", unlocked: false },
+  "Hardcore baking": { id: 1, type: "cps", requirement: 10, description: "Bake 10 cookies per second.", unlocked: false },
+  "Steady tasty stream": { id: 2, type: "cps", requirement: 100, description: "Bake 100 cookies per second.", unlocked: false },
+  "Cookie monster": { id: 3, type: "cps", requirement: 1000, description: "Bake 1,000 cookies per second.", unlocked: false },
+  "Mass producer": { id: 4, type: "cps", requirement: 10000, description: "Bake 10,000 cookies per second.", unlocked: false },
+  "Cookie vortex": { id: 5, type: "cps", requirement: 1000000, description: "Bake 1 million cookies per second.", unlocked: false },
+
+  "One finger": { id: 6, type: "buildings", target: "Cursor", requirement: 1, description: "Have 1 Cursor.", unlocked: false },
+  "A handful of fingers": { id: 7, type: "buildings", target: "Cursor", requirement: 5, description: "Have 5 Cursors.", unlocked: false },
+  "Ten fingers": { id: 8, type: "buildings", target: "Cursor", requirement: 10, description: "Have 10 Cursors.", unlocked: false },
+  "Many fingers": { id: 9, type: "buildings", target: "Cursor", requirement: 20, description: "Have 20 Cursors.", unlocked: false },
+  "Finger army": { id: 10, type: "buildings", target: "Cursor", requirement: 50, description: "Have 50 Cursors.", unlocked: false },
+
+  "First grandma": { id: 11, type: "buildings", target: "Grandma", requirement: 1, description: "Have 1 Grandma.", unlocked: false },
+  "Grandma's kitchen": { id: 12, type: "buildings", target: "Grandma", requirement: 5, description: "Have 5 Grandmas.", unlocked: false },
+  "Grandma's house": { id: 13, type: "buildings", target: "Grandma", requirement: 10, description: "Have 10 Grandmas.", unlocked: false },
+  "Grandma's village": { id: 14, type: "buildings", target: "Grandma", requirement: 20, description: "Have 20 Grandmas.", unlocked: false },
+  "Grandma's empire": { id: 15, type: "buildings", target: "Grandma", requirement: 50, description: "Have 50 Grandmas.", unlocked: false },
+
+  "First harvest": { id: 16, type: "buildings", target: "Farm", requirement: 1, description: "Have 1 Farm.", unlocked: false },
+  "Small farm": { id: 17, type: "buildings", target: "Farm", requirement: 5, description: "Have 5 Farms.", unlocked: false },
+  "Growing farm": { id: 18, type: "buildings", target: "Farm", requirement: 10, description: "Have 10 Farms.", unlocked: false },
+  "Big farm": { id: 19, type: "buildings", target: "Farm", requirement: 20, description: "Have 20 Farms.", unlocked: false },
+  "Cookie plantation": { id: 20, type: "buildings", target: "Farm", requirement: 50, description: "Have 50 Farms.", unlocked: false },
+
+  "First mine": { id: 21, type: "buildings", target: "Mine", requirement: 1, description: "Have 1 Mine.", unlocked: false },
+  "Small operation": { id: 22, type: "buildings", target: "Mine", requirement: 5, description: "Have 5 Mines.", unlocked: false },
+  "Ten mines": { id: 23, type: "buildings", target: "Mine", requirement: 10, description: "Have 10 Mines.", unlocked: false },
+  "Deep mining": { id: 24, type: "buildings", target: "Mine", requirement: 20, description: "Have 20 Mines.", unlocked: false },
+  "Cookie extraction": { id: 25, type: "buildings", target: "Mine", requirement: 50, description: "Have 50 Mines.", unlocked: false },
+
+  "First factory": { id: 26, type: "buildings", target: "Factory", requirement: 1, description: "Have 1 Factory.", unlocked: false },
+  "Small industry": { id: 27, type: "buildings", target: "Factory", requirement: 5, description: "Have 5 Factories.", unlocked: false },
+  "Mass production": { id: 28, type: "buildings", target: "Factory", requirement: 10, description: "Have 10 Factories.", unlocked: false },
+  "Industrial complex": { id: 29, type: "buildings", target: "Factory", requirement: 20, description: "Have 20 Factories.", unlocked: false },
+  "Cookie industry": { id: 30, type: "buildings", target: "Factory", requirement: 50, description: "Have 50 Factories.", unlocked: false },
+
+  "First investment": { id: 31, type: "buildings", target: "Bank", requirement: 1, description: "Have 1 Bank.", unlocked: false },
+  "Small savings": { id: 32, type: "buildings", target: "Bank", requirement: 5, description: "Have 5 Banks.", unlocked: false },
+  "Growing fortune": { id: 33, type: "buildings", target: "Bank", requirement: 10, description: "Have 10 Banks.", unlocked: false },
+  "Cookie finance": { id: 34, type: "buildings", target: "Bank", requirement: 20, description: "Have 20 Banks.", unlocked: false },
+  "Cookie banking empire": { id: 35, type: "buildings", target: "Bank", requirement: 50, description: "Have 50 Banks.", unlocked: false },
+
+  "First temple": { id: 36, type: "buildings", target: "Temple", requirement: 1, description: "Have 1 Temple.", unlocked: false },
+  "Sacred grounds": { id: 37, type: "buildings", target: "Temple", requirement: 5, description: "Have 5 Temples.", unlocked: false },
+  "Holy order": { id: 38, type: "buildings", target: "Temple", requirement: 10, description: "Have 10 Temples.", unlocked: false },
+  "Grand temple": { id: 39, type: "buildings", target: "Temple", requirement: 20, description: "Have 20 Temples.", unlocked: false },
+  "Temple complex": { id: 40, type: "buildings", target: "Temple", requirement: 50, description: "Have 50 Temples.", unlocked: false },
+
+  "First spell": { id: 41, type: "buildings", target: "Wizard tower", requirement: 1, description: "Have 1 Wizard Tower.", unlocked: false },
+  "Apprentice wizard": { id: 42, type: "buildings", target: "Wizard tower", requirement: 5, description: "Have 5 Wizard Towers.", unlocked: false },
+  "Arcane tower": { id: 43, type: "buildings", target: "Wizard tower", requirement: 10, description: "Have 10 Wizard Towers.", unlocked: false },
+  "Magical complex": { id: 44, type: "buildings", target: "Wizard tower", requirement: 20, description: "Have 20 Wizard Towers.", unlocked: false },
+  "Wizarding citadel": { id: 45, type: "buildings", target: "Wizard tower", requirement: 50, description: "Have 50 Wizard Towers.", unlocked: false },
+
+  "First shipment": { id: 46, type: "buildings", target: "Shipment", requirement: 1, description: "Have 1 Shipment.", unlocked: false },
+  "Small fleet": { id: 47, type: "buildings", target: "Shipment", requirement: 5, description: "Have 5 Shipments.", unlocked: false },
+  "Shipping company": { id: 48, type: "buildings", target: "Shipment", requirement: 10, description: "Have 10 Shipments.", unlocked: false },
+  "Trade network": { id: 49, type: "buildings", target: "Shipment", requirement: 20, description: "Have 20 Shipments.", unlocked: false },
+  "Cookie trade empire": { id: 50, type: "buildings", target: "Shipment", requirement: 50, description: "Have 50 Shipments.", unlocked: false },
+
+  "First experiment": { id: 51, type: "buildings", target: "Alchemy lab", requirement: 1, description: "Have 1 Alchemy Lab.", unlocked: false },
+  "Amateur alchemist": { id: 52, type: "buildings", target: "Alchemy lab", requirement: 5, description: "Have 5 Alchemy Labs.", unlocked: false },
+  "Alchemy workshop": { id: 53, type: "buildings", target: "Alchemy lab", requirement: 10, description: "Have 10 Alchemy Labs.", unlocked: false },
+  "Master laboratory": { id: 54, type: "buildings", target: "Alchemy lab", requirement: 20, description: "Have 20 Alchemy Labs.", unlocked: false },
+  "Alchemy empire": { id: 55, type: "buildings", target: "Alchemy lab", requirement: 50, description: "Have 50 Alchemy Labs.", unlocked: false },
+
+  "First portal": { id: 56, type: "buildings", target: "Portal", requirement: 1, description: "Have 1 Portal.", unlocked: false },
+  "Portal network": { id: 57, type: "buildings", target: "Portal", requirement: 5, description: "Have 5 Portals.", unlocked: false },
+  "Dimensional gateway": { id: 58, type: "buildings", target: "Portal", requirement: 10, description: "Have 10 Portals.", unlocked: false },
+  "Interdimensional network": { id: 59, type: "buildings", target: "Portal", requirement: 20, description: "Have 20 Portals.", unlocked: false },
+  "Cookie multiverse": { id: 60, type: "buildings", target: "Portal", requirement: 50, description: "Have 50 Portals.", unlocked: false },
+
+  "First trip": { id: 61, type: "buildings", target: "Time machine", requirement: 1, description: "Have 1 Time Machine.", unlocked: false },
+  "Time traveler": { id: 62, type: "buildings", target: "Time machine", requirement: 5, description: "Have 5 Time Machines.", unlocked: false },
+  "Temporal explorer": { id: 63, type: "buildings", target: "Time machine", requirement: 10, description: "Have 10 Time Machines.", unlocked: false },
+  "Time network": { id: 64, type: "buildings", target: "Time machine", requirement: 20, description: "Have 20 Time Machines.", unlocked: false },
+  "Master of time": { id: 65, type: "buildings", target: "Time machine", requirement: 50, description: "Have 50 Time Machines.", unlocked: false }
 };
 
 /* ---------------------------------------------------------------- */
@@ -980,58 +416,6 @@ function applySaveData(data) {
   return true;
 }
 
-function applyLegacySaveString(str) {
-  const values = str.split("|");
-  if (!str || values[0] !== "1") return false;
-
-  const readInt = index => {
-    const value = Number.parseInt(values[index], 10);
-    return Number.isFinite(value) ? value : 0;
-  };
-
-  cookies = readInt(2);
-
-  const legacyOrder = [
-    "Cursor", "Grandma", "Farm", "Mine", "Factory", "Bank",
-    "Temple", "Wizard tower", "Shipment", "Alchemy lab",
-    "Portal", "Time machine"
-  ];
-
-  let index = 3;
-
-  legacyOrder.forEach(name => {
-    const building = buildings[name];
-    building.count = Math.min(MAX_BUILDING_COUNT, Math.max(0, readInt(index)));
-    building.currentPrice = Math.max(
-      building.basePrice,
-      readInt(index + 1) || building.basePrice
-    );
-    index += 2;
-  });
-
-  const upgradeNames = values[index] ? values[index].split(",").filter(Boolean) : [];
-  index++;
-
-  Object.keys(upgrades).forEach(name => upgrades[name].bought = false);
-  Object.keys(multipliers).forEach(name => multipliers[name] = 1);
-
-  upgradeNames.forEach(name => {
-    const upgrade = upgrades[name];
-    if (!upgrade) return;
-    upgrade.bought = true;
-    multipliers[upgrade.building] *= upgrade.multiplier;
-  });
-
-  index++;
-  index++;
-  prestige = readInt(index);
-
-  refreshAllBuildingVisuals();
-  storeToRebuild = true;
-  upgradesToRebuild = true;
-  return true;
-}
-
 function applySaveString(str) {
   if (!str || str === "0") return false;
 
@@ -1039,7 +423,7 @@ function applySaveString(str) {
     const data = JSON.parse(str);
     return applySaveData(data);
   } catch {
-    return applyLegacySaveString(str);
+    return false;
   }
 }
 
@@ -1053,35 +437,9 @@ function loadGameFromLocalStorage() {
   return applySaveString(savedData);
 }
 
-function saveGameToCookie() {
-  const saveString = makeSaveString();
-  const expiry = new Date();
-  expiry.setFullYear(expiry.getFullYear() + 5);
-
-  document.cookie =
-    `${COOKIE_SAVE_NAME}=${encodeURIComponent(saveString)}; expires=${expiry.toUTCString()}; path=/;`;
-
-  saveTimer = SAVE_INTERVAL_SECONDS;
-}
-
-function loadGameFromCookie() {
-  const match = document.cookie.match(
-    new RegExp(`(?:^|; )${COOKIE_SAVE_NAME}=([^;]*)`)
-  );
-
-  if (!match) return false;
-
-  try {
-    return applySaveString(decodeURIComponent(match[1]));
-  } catch {
-    return false;
-  }
-}
-
 function saveGame() {
-  console.log("Game saved");
   saveGameToLocalStorage();
-  saveGameToCookie();
+  saveTimer = SAVE_INTERVAL_SECONDS;
   new Pop("credits", "Saved");
 }
 
@@ -1110,7 +468,6 @@ function importSave() {
 
   if (applySaveString(save)) {
     saveGameToLocalStorage();
-    saveGameToCookie();
     new Pop("credits", "Imported.");
   } else {
     new Pop("credits", "Invalid save.");
@@ -1123,9 +480,6 @@ function resetGame() {
   prestige += calculatePrestige();
   resetCount++;
   localStorage.setItem(SAVE_KEY, resetSaveString());
-
-  document.cookie =
-    `${COOKIE_SAVE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
 
   location.reload();
 }
@@ -1144,6 +498,7 @@ function clickCookie() {
   let amount = getCursorGain();
   amount *= prestige + 1;
   amount *= goldenCookieClickMultiplier;
+
   cookies += amount;
 
   if (pops.length < 260 && numbersOn) {
@@ -1153,7 +508,6 @@ function clickCookie() {
 
 function addCookies(amount, elementId) {
   amount *= prestige + 1;
-  amount *= goldenCookieClickMultiplier;
   cookies += amount;
 
   if (elementId && pops.length < 250 && numbersOn) {
@@ -1175,10 +529,10 @@ function refreshGrandmas() {
     let className = "";
 
     if (buildings["Alchemy lab"].count && Math.random() < 0.2) className = "goldengrandma";
-    if (buildings.Factory.count && Math.random() < 0.2) className = "factorygrandma";
-    if (buildings.Mine.count && Math.random() < 0.2) className = "minegrandma";
-    if (buildings.Shipment.count && Math.random() < 0.2) className = "shipmentgrandma";
-    if (buildings.Portal.count && pledge <= 0 && Math.random() < 0.2) className = "portalgrandma";
+    if (buildings["Factory"].count && Math.random() < 0.2) className = "factorygrandma";
+    if (buildings["Mine"].count && Math.random() < 0.2) className = "minegrandma";
+    if (buildings["Shipment"].count && Math.random() < 0.2) className = "shipmentgrandma";
+    if (buildings["Portal"].count && pledge <= 0 && Math.random() < 0.2) className = "portalgrandma";
     if (buildings["Time machine"].count && Math.random() < 0.2) className = "timegrandma";
     if (buildings["Farm"].count && Math.random() < 0.2) className = "farmgrandma";
     if (buildings["Bank"].count && Math.random() < 0.2) className = "bankgrandma";
@@ -1284,7 +638,7 @@ function refreshBanks() {
     const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 24);
     output += `<div class="bank" style="right:${x}px;top:${y}px;"></div>`;
   }
-  console.log(output)
+
   getElement("banks").innerHTML = output;
 }
 
@@ -1328,12 +682,10 @@ function refreshAllBuildingVisuals() {
 
 function buyBuilding(name) {
   const building = getBuilding(name);
-  console.log("Buying "+name);
   if (!building || !loaded || cookies < building.currentPrice) return;
 
   cookies -= building.currentPrice;
   building.count++;
-  console.log("Rebuild store?: " + storeToRebuild)
   rebuildStore();
 
   updateBuildingPrice(name);
@@ -1394,8 +746,6 @@ function spawnGoldenCookie() {
 }
 
 function clickGoldenCookie(cookie) {
-    console.log("Golden cookie clicked");
-
     if (goldenCookieTimeout) {
         clearTimeout(goldenCookieTimeout);
         goldenCookieTimeout = null;
@@ -1451,8 +801,6 @@ function randomGoldenCookieDelay() {
         minDelay + Math.random() * (maxDelay - minDelay)
     ) / goldenCookieSpawnMultiplier;
 
-    console.log(`Prochain Golden Cookie dans ${(delay / 1000).toFixed(1)} secondes`);
-
     return delay;
 }
 
@@ -1497,7 +845,6 @@ function goldenCookieLucky() {
     const reward = Math.min(bankedCookies, fifteenMinutes);
 
     cookies += reward;
-    console.log("Lucky!");
     new Pop("credits", `Lucky! +${Math.floor(reward)} cookies`);
 }
 
@@ -1505,7 +852,6 @@ function goldenCookieFrenzy() {
     goldenCookieCpsMultiplier = 7;
     goldenCookieFrenzyTimer = 77 * TICKS_PER_SECOND;
 
-    console.log("Frenzy!");
     new Pop("credits", "Frenzy!");
 }
 
@@ -1513,12 +859,10 @@ function goldenCookieClickFrenzy() {
     goldenCookieClickMultiplier = 777;
     goldenCookieClickFrenzyTimer = 13 * TICKS_PER_SECOND;
 
-    console.log("Click Frenzy!")
     new Pop("credits", "Click Frenzy!");
 }
 
 function goldenCookieClot() {
-    console.log("Clot!");
     new Pop("credits", "Clot");
 }
 
@@ -1528,11 +872,9 @@ function goldenCookieClot() {
 
 function rebuildStore() {
   let output = "";
-  console.log("Reduilding store");
 
   Object.keys(buildings).forEach(name => {
     const building = buildings[name];
-    const smallFont = "font-size:90%;";
 
     output += `
       <div id="buy${name}" data-buy="${name}" style="background-image:url(${building.icon}.png);">
@@ -1594,18 +936,6 @@ function buyElderPledge() {
 /* Upgrades                                                         */
 /* ---------------------------------------------------------------- */
 
-function createUpgrade(name, description, price, building = null, requiredCount = 1, multiplier = 2) {
-  upgrades[name] = {
-    name,
-    description,
-    price,
-    building,
-    requiredCount,
-    multiplier,
-    bought: false
-  };
-}
-
 function buyUpgrade(name) {
   const upgrade = upgrades[name];
 
@@ -1625,7 +955,7 @@ function buyUpgrade(name) {
   upgradesToRebuild = true;
   updateGoldenCookieModifiers();
 
-  new Pop("store_upgrades", upgrade.name + " bought!");
+  new Pop("store_upgrades", name + " bought!");
 
 }
 
@@ -1659,7 +989,7 @@ function rebuildUpgradesStore() {
         <div id="upgrade${name}" data-upgrade="${name}" class="${classes}" style="${smallFont}background-image:url(${upgrade.icon});">
           <div class="tooltipStore">
             <div class="building-icon"></div>
-            <b>${upgrade.name}</b>
+            <b>${name}</b>
             <moni></moni> ${beautify(upgrade.price)}
             <span class="tooltipTextStore">${upgrade.description}</span>
           </div>
@@ -1675,114 +1005,120 @@ function rebuildUpgradesStore() {
   upgradesToRebuild = false;
 }
 
-/* Cursor upgrades */
-createUpgrade("Reinforced index finger", "Cursors x2.", 100, "Cursor", 1);
-createUpgrade("Carpal tunnel prevention cream", "Cursors x2.", 500, "Cursor", 1);
-createUpgrade("Ambidextrous", "Cursors x2.", 10000, "Cursor", 10);
+/* ---------------------------------------------------------------- */
+/* Upgrade definitions                                              */
+/* ---------------------------------------------------------------- */
 
-/* Grandma upgrades */
-createUpgrade("Forwards from grandma", "Grandmas x2.", 1000, "Grandma", 1);
-createUpgrade("Steel-plated rolling pins", "Grandmas x2.", 5000, "Grandma", 5);
-createUpgrade("Lubricated dentures", "Grandmas x2.", 50000, "Grandma", 25);
-createUpgrade("Prune juice", "Grandmas x2.", 5000000, "Grandma", 50);
-createUpgrade("Double-thick glasses", "Grandmas x2.", 500000000, "Grandma", 100);
-createUpgrade("Aging agents", "Grandmas x2.", 50000000000, "Grandma", 150);
-createUpgrade("Xtreme walkers", "Grandmas x2.", 50000000000000, "Grandma", 200);
+const upgrades = {
+  // Cursor upgrades
+  "Reinforced index finger": { id: 0, description: "Cursors x2.", price: 100, building: "Cursor", requiredCount: 1, multiplier: 2, bought: false },
+  "Carpal tunnel prevention cream": { id: 1, description: "Cursors x2.", price: 500, building: "Cursor", requiredCount: 1, multiplier: 2, bought: false },
+  "Ambidextrous": { id: 2, description: "Cursors x2.", price: 10000, building: "Cursor", requiredCount: 10, multiplier: 2, bought: false },
 
-/* Farm upgrades */
-createUpgrade("Cheap hoes", "Farms x2.", 11000, "Farm", 1);
-createUpgrade("Fertilizer", "Farms x2.", 55000, "Farm", 5);
-createUpgrade("Cookie trees", "Farms x2.", 550000, "Farm", 25);
-createUpgrade("Genetically-modified cookies", "Farms x2.", 55000000, "Farm", 50);
-createUpgrade("Gingerbread scarecrows", "Farms x2.", 5500000000, "Farm", 100);
-createUpgrade("Pulsar sprinklers", "Farms x2.", 550000000000, "Farm", 150);
-createUpgrade("Fudge fungus", "Farms x2.", 550000000000000, "Farm", 200);
+  // Grandma upgrades
+  "Forwards from grandma": { id: 3, description: "Grandmas x2.", price: 1000, building: "Grandma", requiredCount: 1, multiplier: 2, bought: false },
+  "Steel-plated rolling pins": { id: 4, description: "Grandmas x2.", price: 5000, building: "Grandma", requiredCount: 5, multiplier: 2, bought: false },
+  "Lubricated dentures": { id: 5, description: "Grandmas x2.", price: 50000, building: "Grandma", requiredCount: 25, multiplier: 2, bought: false },
+  "Prune juice": { id: 6, description: "Grandmas x2.", price: 5000000, building: "Grandma", requiredCount: 50, multiplier: 2, bought: false },
+  "Double-thick glasses": { id: 7, description: "Grandmas x2.", price: 500000000, building: "Grandma", requiredCount: 100, multiplier: 2, bought: false },
+  "Aging agents": { id: 8, description: "Grandmas x2.", price: 50000000000, building: "Grandma", requiredCount: 150, multiplier: 2, bought: false },
+  "Xtreme walkers": { id: 9, description: "Grandmas x2.", price: 50000000000000, building: "Grandma", requiredCount: 200, multiplier: 2, bought: false },
 
-/* Mine upgrades */
-createUpgrade("Sugar gas", "Mines x2.", 120000, "Mine", 1);
-createUpgrade("Megadrill", "Mines x2.", 600000, "Mine", 5);
-createUpgrade("Ultradrill", "Mines x2.", 6000000, "Mine", 25);
-createUpgrade("Ultimadrill", "Mines x2.", 600000000, "Mine", 50);
-createUpgrade("H-bomb mining", "Mines x2.", 60000000000, "Mine", 100);
-createUpgrade("Coreforge", "Mines x2.", 6000000000000, "Mine", 150);
-createUpgrade("Planetsplitters", "Mines x2.", 6000000000000000, "Mine", 200);
+  // Farm upgrades
+  "Cheap hoes": { id: 10, description: "Farms x2.", price: 11000, building: "Farm", requiredCount: 1, multiplier: 2, bought: false },
+  "Fertilizer": { id: 11, description: "Farms x2.", price: 55000, building: "Farm", requiredCount: 5, multiplier: 2, bought: false },
+  "Cookie trees": { id: 12, description: "Farms x2.", price: 550000, building: "Farm", requiredCount: 25, multiplier: 2, bought: false },
+  "Genetically-modified cookies": { id: 13, description: "Farms x2.", price: 55000000, building: "Farm", requiredCount: 50, multiplier: 2, bought: false },
+  "Gingerbread scarecrows": { id: 14, description: "Farms x2.", price: 5500000000, building: "Farm", requiredCount: 100, multiplier: 2, bought: false },
+  "Pulsar sprinklers": { id: 15, description: "Farms x2.", price: 550000000000, building: "Farm", requiredCount: 150, multiplier: 2, bought: false },
+  "Fudge fungus": { id: 16, description: "Farms x2.", price: 550000000000000, building: "Farm", requiredCount: 200, multiplier: 2, bought: false },
 
-/* Factory upgrades */
-createUpgrade("Sturdier conveyor belts", "Factories x2.", 1300000, "Factory", 1);
-createUpgrade("Child labor", "Factories x2.", 6500000, "Factory", 5);
-createUpgrade("Sweatshop", "Factories x2.", 65000000, "Factory", 25);
-createUpgrade("Radium reactors", "Factories x2.", 6500000000, "Factory", 50);
-createUpgrade("Recombobulators", "Factories x2.", 650000000000, "Factory", 100);
-createUpgrade("Deep-bake process", "Factories x2.", 65000000000000, "Factory", 150);
-createUpgrade("Cyborg workforce", "Factories x2.", 65000000000000000, "Factory", 200);
+  // Mine upgrades
+  "Sugar gas": { id: 17, description: "Mines x2.", price: 120000, building: "Mine", requiredCount: 1, multiplier: 2, bought: false },
+  "Megadrill": { id: 18, description: "Mines x2.", price: 600000, building: "Mine", requiredCount: 5, multiplier: 2, bought: false },
+  "Ultradrill": { id: 19, description: "Mines x2.", price: 6000000, building: "Mine", requiredCount: 25, multiplier: 2, bought: false },
+  "Ultimadrill": { id: 20, description: "Mines x2.", price: 600000000, building: "Mine", requiredCount: 50, multiplier: 2, bought: false },
+  "H-bomb mining": { id: 21, description: "Mines x2.", price: 60000000000, building: "Mine", requiredCount: 100, multiplier: 2, bought: false },
+  "Coreforge": { id: 22, description: "Mines x2.", price: 6000000000000, building: "Mine", requiredCount: 150, multiplier: 2, bought: false },
+  "Planetsplitters": { id: 23, description: "Mines x2.", price: 6000000000000000, building: "Mine", requiredCount: 200, multiplier: 2, bought: false },
 
-/* Bank upgrades */
-createUpgrade("Dizzy miss lizzy", "Banks x2.", 14000000, "Bank", 1);
-createUpgrade("A very special dude", "Banks x2.", 70000000, "Bank", 5);
-createUpgrade("Acid-proof vaults", "Banks x2.", 700000000, "Bank", 25);
-createUpgrade("Chocolate coins", "Banks x2.", 70000000000, "Bank", 50);
-createUpgrade("Taller vaults", "Banks x2.", 7000000000000, "Bank", 100);
-createUpgrade("Sugar gas bank", "Banks x2.", 700000000000000, "Bank", 150);
-createUpgrade("Snack production", "Banks x2.", 700000000000000000, "Bank", 200);
+  // Factory upgrades
+  "Sturdier conveyor belts": { id: 24, description: "Factories x2.", price: 1300000, building: "Factory", requiredCount: 1, multiplier: 2, bought: false },
+  "Child labor": { id: 25, description: "Factories x2.", price: 6500000, building: "Factory", requiredCount: 5, multiplier: 2, bought: false },
+  "Sweatshop": { id: 26, description: "Factories x2.", price: 65000000, building: "Factory", requiredCount: 25, multiplier: 2, bought: false },
+  "Radium reactors": { id: 27, description: "Factories x2.", price: 6500000000, building: "Factory", requiredCount: 50, multiplier: 2, bought: false },
+  "Recombobulators": { id: 28, description: "Factories x2.", price: 650000000000, building: "Factory", requiredCount: 100, multiplier: 2, bought: false },
+  "Deep-bake process": { id: 29, description: "Factories x2.", price: 65000000000000, building: "Factory", requiredCount: 150, multiplier: 2, bought: false },
+  "Cyborg workforce": { id: 30, description: "Factories x2.", price: 65000000000000000, building: "Factory", requiredCount: 200, multiplier: 2, bought: false },
 
-/* Temple upgrades */
-createUpgrade("Golden idols", "Temples x2.", 200000000, "Temple", 1);
-createUpgrade("Sacrificial rolling pins", "Temples x2.", 1000000000, "Temple", 5);
-createUpgrade("Fierce glow", "Temples x2.", 10000000000, "Temple", 25);
-createUpgrade("Slaughterhouse", "Temples x2.", 1000000000000, "Temple", 50);
-createUpgrade("Theoretic chocolate", "Temples x2.", 100000000000000, "Temple", 100);
-createUpgrade("Temple kneading", "Temples x2.", 10000000000000000, "Temple", 150);
-createUpgrade("Patience abolished", "Temples x2.", 1000000000000000000, "Temple", 200);
+  // Bank upgrades
+  "Dizzy miss lizzy": { id: 31, description: "Banks x2.", price: 14000000, building: "Bank", requiredCount: 1, multiplier: 2, bought: false },
+  "A very special dude": { id: 32, description: "Banks x2.", price: 70000000, building: "Bank", requiredCount: 5, multiplier: 2, bought: false },
+  "Acid-proof vaults": { id: 33, description: "Banks x2.", price: 700000000, building: "Bank", requiredCount: 25, multiplier: 2, bought: false },
+  "Chocolate coins": { id: 34, description: "Banks x2.", price: 70000000000, building: "Bank", requiredCount: 50, multiplier: 2, bought: false },
+  "Taller vaults": { id: 35, description: "Banks x2.", price: 7000000000000, building: "Bank", requiredCount: 100, multiplier: 2, bought: false },
+  "Sugar gas bank": { id: 36, description: "Banks x2.", price: 700000000000000, building: "Bank", requiredCount: 150, multiplier: 2, bought: false },
+  "Snack production": { id: 37, description: "Banks x2.", price: 700000000000000000, building: "Bank", requiredCount: 200, multiplier: 2, bought: false },
 
-/* Wizard Tower upgrades */
-createUpgrade("Pointier hats", "Wizard towers x2.", 3300000000, "Wizard tower", 1);
-createUpgrade("Beardier beards", "Wizard towers x2.", 16500000000, "Wizard tower", 5);
-createUpgrade("Ancient grimoires", "Wizard towers x2.", 165000000000, "Wizard tower", 25);
-createUpgrade("Kitchen curses", "Wizard towers x2.", 16500000000000, "Wizard tower", 50);
-createUpgrade("School of sorcery", "Wizard towers x2.", 1650000000000000, "Wizard tower", 100);
-createUpgrade("Dark magic", "Wizard towers x2.", 165000000000000000, "Wizard tower", 150);
-createUpgrade("Primal chocolate", "Wizard towers x2.", 16500000000000000000, "Wizard tower", 200);
+  // Temple upgrades
+  "Golden idols": { id: 38, description: "Temples x2.", price: 200000000, building: "Temple", requiredCount: 1, multiplier: 2, bought: false },
+  "Sacrificial rolling pins": { id: 39, description: "Temples x2.", price: 1000000000, building: "Temple", requiredCount: 5, multiplier: 2, bought: false },
+  "Fierce glow": { id: 40, description: "Temples x2.", price: 10000000000, building: "Temple", requiredCount: 25, multiplier: 2, bought: false },
+  "Slaughterhouse": { id: 41, description: "Temples x2.", price: 1000000000000, building: "Temple", requiredCount: 50, multiplier: 2, bought: false },
+  "Theoretic chocolate": { id: 42, description: "Temples x2.", price: 100000000000000, building: "Temple", requiredCount: 100, multiplier: 2, bought: false },
+  "Temple kneading": { id: 43, description: "Temples x2.", price: 10000000000000000, building: "Temple", requiredCount: 150, multiplier: 2, bought: false },
+  "Patience abolished": { id: 44, description: "Temples x2.", price: 1000000000000000000, building: "Temple", requiredCount: 200, multiplier: 2, bought: false },
 
-/* Shipment upgrades */
-createUpgrade("Vanilla nebulae", "Shipments x2.", 51000000000, "Shipment", 1);
-createUpgrade("Wormholes", "Shipments x2.", 255000000000, "Shipment", 5);
-createUpgrade("Frequent flyer", "Shipments x2.", 2550000000000, "Shipment", 25);
-createUpgrade("Warp drive", "Shipments x2.", 255000000000000, "Shipment", 50);
-createUpgrade("Chocolate monoliths", "Shipments x2.", 25500000000000000, "Shipment", 100);
-createUpgrade("Generation ship", "Shipments x2.", 2550000000000000000, "Shipment", 150);
-createUpgrade("Dyson sphere", "Shipments x2.", 255000000000000000000, "Shipment", 200);
+  // Wizard Tower upgrades
+  "Pointier hats": { id: 45, description: "Wizard towers x2.", price: 3300000000, building: "Wizard tower", requiredCount: 1, multiplier: 2, bought: false },
+  "Beardier beards": { id: 46, description: "Wizard towers x2.", price: 16500000000, building: "Wizard tower", requiredCount: 5, multiplier: 2, bought: false },
+  "Ancient grimoires": { id: 47, description: "Wizard towers x2.", price: 165000000000, building: "Wizard tower", requiredCount: 25, multiplier: 2, bought: false },
+  "Kitchen curses": { id: 48, description: "Wizard towers x2.", price: 16500000000000, building: "Wizard tower", requiredCount: 50, multiplier: 2, bought: false },
+  "School of sorcery": { id: 49, description: "Wizard towers x2.", price: 1650000000000000, building: "Wizard tower", requiredCount: 100, multiplier: 2, bought: false },
+  "Dark magic": { id: 50, description: "Wizard towers x2.", price: 165000000000000000, building: "Wizard tower", requiredCount: 150, multiplier: 2, bought: false },
+  "Primal chocolate": { id: 51, description: "Wizard towers x2.", price: 16500000000000000000, building: "Wizard tower", requiredCount: 200, multiplier: 2, bought: false },
 
-/* Alchemy Lab upgrades */
-createUpgrade("Antimony", "Alchemy labs x2.", 750000000000, "Alchemy lab", 1);
-createUpgrade("Essence of dough", "Alchemy labs x2.", 3750000000000, "Alchemy lab", 5);
-createUpgrade("True chocolate", "Alchemy labs x2.", 37500000000000, "Alchemy lab", 25);
-createUpgrade("Ambrosia", "Alchemy labs x2.", 3750000000000000, "Alchemy lab", 50);
-createUpgrade("Aqua crustulae", "Alchemy labs x2.", 375000000000000000, "Alchemy lab", 100);
-createUpgrade("Origin crucible", "Alchemy labs x2.", 3750000000000000000000, "Alchemy lab", 200);
+  // Shipment upgrades
+  "Vanilla nebulae": { id: 52, description: "Shipments x2.", price: 51000000000, building: "Shipment", requiredCount: 1, multiplier: 2, bought: false },
+  "Wormholes": { id: 53, description: "Shipments x2.", price: 255000000000, building: "Shipment", requiredCount: 5, multiplier: 2, bought: false },
+  "Frequent flyer": { id: 54, description: "Shipments x2.", price: 2550000000000, building: "Shipment", requiredCount: 25, multiplier: 2, bought: false },
+  "Warp drive": { id: 55, description: "Shipments x2.", price: 255000000000000, building: "Shipment", requiredCount: 50, multiplier: 2, bought: false },
+  "Chocolate monoliths": { id: 56, description: "Shipments x2.", price: 25500000000000000, building: "Shipment", requiredCount: 100, multiplier: 2, bought: false },
+  "Generation ship": { id: 57, description: "Shipments x2.", price: 2550000000000000000, building: "Shipment", requiredCount: 150, multiplier: 2, bought: false },
+  "Dyson sphere": { id: 58, description: "Shipments x2.", price: 255000000000000000000, building: "Shipment", requiredCount: 200, multiplier: 2, bought: false },
 
-/* Portal upgrades */
-createUpgrade("Elder pact", "Portals x2.", 1000000000000, "Portal", 1);
-createUpgrade("Labyrinth", "Portals x2.", 5000000000000, "Portal", 5);
-createUpgrade("Neverclick", "Portals x2.", 50000000000000, "Portal", 25);
-createUpgrade("Heavenly chip secret", "Portals x2.", 5000000000000000, "Portal", 50);
-createUpgrade("Arcane aura", "Portals x2.", 500000000000000000, "Portal", 100);
-createUpgrade("The final frontier", "Portals x2.", 50000000000000000000, "Portal", 150);
-createUpgrade("Cookie dimensionality", "Portals x2.", 5000000000000000000000, "Portal", 200);
+  // Alchemy Lab upgrades
+  "Antimony": { id: 59, description: "Alchemy labs x2.", price: 750000000000, building: "Alchemy lab", requiredCount: 1, multiplier: 2, bought: false },
+  "Essence of dough": { id: 60, description: "Alchemy labs x2.", price: 3750000000000, building: "Alchemy lab", requiredCount: 5, multiplier: 2, bought: false },
+  "True chocolate": { id: 61, description: "Alchemy labs x2.", price: 37500000000000, building: "Alchemy lab", requiredCount: 25, multiplier: 2, bought: false },
+  "Ambrosia": { id: 62, description: "Alchemy labs x2.", price: 3750000000000000, building: "Alchemy lab", requiredCount: 50, multiplier: 2, bought: false },
+  "Aqua crustulae": { id: 63, description: "Alchemy labs x2.", price: 375000000000000000, building: "Alchemy lab", requiredCount: 100, multiplier: 2, bought: false },
+  "Origin crucible": { id: 64, description: "Alchemy labs x2.", price: 3750000000000000000000, building: "Alchemy lab", requiredCount: 200, multiplier: 2, bought: false },
 
-/* Time Machine upgrades */
-createUpgrade("Flux capacitor", "Time machines x2.", 14000000000000, "Time machine", 1);
-createUpgrade("Time paradox resolver", "Time machines x2.", 70000000000000, "Time machine", 5);
-createUpgrade("Quantum chocolatification", "Time machines x2.", 700000000000000, "Time machine", 25);
-createUpgrade("Causality enforcer", "Time machines x2.", 70000000000000000, "Time machine", 50);
-createUpgrade("Golden verse", "Time machines x2.", 7000000000000000000, "Time machine", 100);
-createUpgrade("Eternal cycle", "Time machines x2.", 700000000000000000000, "Time machine", 150);
-createUpgrade("Recursive causality", "Time machines x2.", 70000000000000000000000, "Time machine", 200);
+  // Portal upgrades
+  "Elder pact": { id: 65, description: "Portals x2.", price: 1000000000000, building: "Portal", requiredCount: 1, multiplier: 2, bought: false },
+  "Labyrinth": { id: 66, description: "Portals x2.", price: 5000000000000, building: "Portal", requiredCount: 5, multiplier: 2, bought: false },
+  "Neverclick": { id: 67, description: "Portals x2.", price: 50000000000000, building: "Portal", requiredCount: 25, multiplier: 2, bought: false },
+  "Heavenly chip secret": { id: 68, description: "Portals x2.", price: 5000000000000000, building: "Portal", requiredCount: 50, multiplier: 2, bought: false },
+  "Arcane aura": { id: 69, description: "Portals x2.", price: 500000000000000000, building: "Portal", requiredCount: 100, multiplier: 2, bought: false },
+  "The final frontier": { id: 70, description: "Portals x2.", price: 50000000000000000000, building: "Portal", requiredCount: 150, multiplier: 2, bought: false },
+  "Cookie dimensionality": { id: 71, description: "Portals x2.", price: 5000000000000000000000, building: "Portal", requiredCount: 200, multiplier: 2, bought: false },
 
-/* Golden Cookies Upgrades */
-createUpgrade("Golden Cookies", "Randomly spawns a Golden Cookie", 100000, "GC", 1, 1);
-createUpgrade("Lucky Day", "GC appears twice as often and stay twice as long", 10000000, "GC", 1, 1);
-createUpgrade("Serendipity", "GC appears twice as often and stay twice as long", 1000000000, "GC", 1, 1);
-createUpgrade("Get Lucky", "GC appears twice as often", 100000000000, "GC", 1, 1);
+  // Time Machine upgrades
+  "Flux capacitor": { id: 72, description: "Time machines x2.", price: 14000000000000, building: "Time machine", requiredCount: 1, multiplier: 2, bought: false },
+  "Time paradox resolver": { id: 73, description: "Time machines x2.", price: 70000000000000, building: "Time machine", requiredCount: 5, multiplier: 2, bought: false },
+  "Quantum chocolatification": { id: 74, description: "Time machines x2.", price: 700000000000000, building: "Time machine", requiredCount: 25, multiplier: 2, bought: false },
+  "Causality enforcer": { id: 75, description: "Time machines x2.", price: 70000000000000000, building: "Time machine", requiredCount: 50, multiplier: 2, bought: false },
+  "Golden verse": { id: 76, description: "Time machines x2.", price: 7000000000000000000, building: "Time machine", requiredCount: 100, multiplier: 2, bought: false },
+  "Eternal cycle": { id: 77, description: "Time machines x2.", price: 700000000000000000000, building: "Time machine", requiredCount: 150, multiplier: 2, bought: false },
+  "Recursive causality": { id: 78, description: "Time machines x2.", price: 70000000000000000000000, building: "Time machine", requiredCount: 200, multiplier: 2, bought: false },
+
+  // Golden Cookies upgrades
+  "Golden Cookies": { id: 79, description: "Randomly spawns a Golden Cookie", price: 100000, building: "GC", requiredCount: 1, multiplier: 1, bought: false },
+  "Lucky Day": { id: 80, description: "GC appears twice as often and stay twice as long", price: 10000000, building: "GC", requiredCount: 1, multiplier: 1, bought: false },
+  "Serendipity": { id: 81, description: "GC appears twice as often and stay twice as long", price: 1000000000, building: "GC", requiredCount: 1, multiplier: 1, bought: false },
+  "Get Lucky": { id: 82, description: "GC appears twice as often", price: 100000000000, building: "GC", requiredCount: 1, multiplier: 1, bought: false },
+};
 
 /* ---------------------------------------------------------------- */
 /* Achievements                                                     */
@@ -1841,7 +1177,7 @@ function Pop(elementId, text) {
 /* ---------------------------------------------------------------- */
 
 function getBuildingGain(name) {
-  return buildings[name].gain * multipliers[name];
+  return buildings[name].gain * multipliers[name] * goldenCookieCpsMultiplier;
 }
 
 function renderPops() {
@@ -1922,7 +1258,7 @@ function getCookiesPerSecond() {
     cps += buildings[name].count * getBuildingGain(name) / 5;
   });
 
-  return cps * (prestige + 1) * goldenCookieCpsMultiplier;
+  return cps * (prestige + 1);
 }
 
 function updateStoreAffordability() {
