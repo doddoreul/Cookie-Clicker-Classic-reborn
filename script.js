@@ -1085,7 +1085,7 @@ function rebuildUpgradesStore() {
         upgrade.icon = upgrade.building+"icon.png";
         buyable = true;
       } else {
-        upgrade.icon = upgrade.building+"icon.png";
+        upgrade.icon = upgrade.building.replace(/\s/g, "").toLowerCase()+"icon.png";
         buyable = getBuildingCount(upgrade.building) >= upgrade.requiredCount;
       }
 

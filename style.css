@@ -163,7 +163,7 @@ moni {
   width:400px; font-weight:bold; font-size:16px;
   text-align:center;
   background-color:rgba(255,255,255,.75);
-  border-radius:18px;
+  border-radius:8px;
 }
 
 #middle { position:absolute; left:50%; top:150px; width:0; }
@@ -247,7 +247,8 @@ moni {
 
 #overlay {
   position:relative; width:480px; max-width:90vw; max-height:80vh;
-  background:#eee; border:#000 2px solid; border-radius:12px;
+  background:#eee;
+  border-radius:8px;
   font-family:"Courier New", monospace;
   display:flex; flex-direction:column; overflow:hidden;
 }
