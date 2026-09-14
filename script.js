@@ -838,7 +838,7 @@ function spawnGoldenCookie() {
     cookie.style.width = "128px";
     cookie.style.height = "128px";
     cookie.style.cursor = "pointer";
-    cookie.style.zIndex = "1000";
+    cookie.style.zIndex = "100001";
 
     const game = document.getElementById("game");
 
@@ -976,19 +976,109 @@ function goldenCookieLucky() {
 function goldenCookieFrenzy() {
     goldenCookieCpsMultiplier = 7;
     goldenCookieFrenzyTimer = 77 * TICKS_PER_SECOND;
-
     new Pop("credits", "Frenzy!");
 }
 
 function goldenCookieClickFrenzy() {
     goldenCookieClickMultiplier = 777;
     goldenCookieClickFrenzyTimer = 13 * TICKS_PER_SECOND;
-
     new Pop("credits", "Click Frenzy!");
 }
 
 function goldenCookieClot() {
     new Pop("credits", "Clot");
+}
+
+function createBuffDisplay() {
+  if (getElement("buffs")) return;
+
+  const saveMenu = getElement("saveMenu");
+  if (!saveMenu) return;
+
+  const buffs = document.createElement("div");
+  buffs.id = "buffs";
+
+  saveMenu.insertAdjacentElement("afterend", buffs);
+}
+
+function updateBuffDisplay() {
+  const container = getElement("buffs");
+  if (!container) return;
+
+  const activeBuffs = getActiveBuffs();
+
+  const activeIds = activeBuffs.map(buff => buff.id).join(",");
+
+  if (container.dataset.active !== activeIds) {
+    container.innerHTML = activeBuffs.map(buff => `
+      <div class="activeBuff" data-buff="${buff.id}">
+        <img src="${buff.icon}">
+        <div class="buffTimer"></div>
+        <span class="buffTooltip">
+          <b>${buff.name}</b><br>
+          ${buff.description}
+        </span>
+      </div>
+    `).join("");
+
+    container.dataset.active = activeIds;
+  }
+
+  activeBuffs.forEach(buff => {
+    const element = container.querySelector(
+      `[data-buff="${buff.id}"]`
+    );
+
+    if (!element) return;
+
+    const seconds = Math.ceil(buff.timer / TICKS_PER_SECOND);
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+
+    const timerText =
+      minutes > 0
+        ? `${minutes}:${String(remainingSeconds).padStart(2, "0")}`
+        : `${remainingSeconds}s`;
+
+    element.querySelector(".buffTimer").textContent = timerText;
+  });
+}
+
+function updateFrenzyHalo() {
+  const comment = getElement("comment");
+  if (!comment) return;
+
+  const frenzyActive =
+    goldenCookieFrenzyTimer > 0 ||
+    goldenCookieClickFrenzyTimer > 0;
+
+  comment.classList.toggle("goldenFrenzy", frenzyActive);
+}
+
+function getActiveBuffs() {
+  const buffs = [];
+
+  if (goldenCookieFrenzyTimer > 0) {
+    buffs.push({
+      id: "frenzy",
+      name: "Frenzy",
+      icon: "frenzyicon.png",
+      description: "Cookie production x7.",
+      timer: goldenCookieFrenzyTimer
+    });
+  }
+
+  if (goldenCookieClickFrenzyTimer > 0) {
+    buffs.push({
+      id: "clickFrenzy",
+      name: "Click Frenzy",
+      icon: "clickfrenzyicon.png",
+      description: "Cookie clicking x777.",
+      timer: goldenCookieClickFrenzyTimer
+    });
+  }
+
+  return buffs;
 }
 
 /* ---------------------------------------------------------------- */
@@ -1349,6 +1439,7 @@ function main() {
       if (goldenCookieFrenzyTimer <= 0) {
           goldenCookieFrenzyTimer = 0;
           goldenCookieCpsMultiplier = 1;
+          document.getElementById("game").classList.remove("goldenFrenzy");
       }
   }
   if (goldenCookieClickFrenzyTimer > 0) {
@@ -1357,11 +1448,16 @@ function main() {
       if (goldenCookieClickFrenzyTimer <= 0) {
           goldenCookieClickFrenzyTimer = 0;
           goldenCookieClickMultiplier = 1;
+          document.getElementById("game").classList.remove("goldenFrenzy");
       }
   }
 
+  updateFrenzyHalo();
+  updateBuffDisplay();
+
   const cps = getCookiesPerSecond();
   checkAchievements();
+
   const floater = Math.round(cps * 10 - Math.floor(cps) * 10);
 
   getElement("cps").innerHTML =
@@ -1607,6 +1703,7 @@ function initialize() {
   });
 
   initOverlay();
+  createBuffDisplay();
   loadGame();
 }
 

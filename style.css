@@ -211,7 +211,7 @@ moni {
     width: 128px;
     height: 128px;
     cursor: pointer;
-    z-index: 1000;
+    z-index: 100001;
     animation: goldenCookieFadeIn 3s ease forwards;
 }
 
@@ -305,4 +305,104 @@ moni {
   transform:translateX(-50%);
   margin-bottom:6px;
   width:200px;
+}
+#comment.goldenFrenzy {
+  box-shadow:
+    0 0 8px rgba(255, 215, 0, 0.9),
+    0 0 20px rgba(255, 200, 0, 0.8),
+    0 0 35px rgba(255, 180, 0, 0.6);
+
+  animation: goldenFrenzyCommentGlow 1s ease-in-out infinite alternate;
+}
+
+@keyframes goldenFrenzyCommentGlow {
+  from {
+    box-shadow:
+      0 0 6px rgba(255, 215, 0, 0.7),
+      0 0 15px rgba(255, 200, 0, 0.5),
+      0 0 25px rgba(255, 180, 0, 0.4);
+  }
+
+  to {
+    box-shadow:
+      0 0 12px rgba(255, 235, 80, 1),
+      0 0 28px rgba(255, 215, 0, 0.9),
+      0 0 45px rgba(255, 180, 0, 0.7);
+  }
+}
+
+#buffs {
+  position: absolute;
+  left: 0;
+  top: 225px;
+
+  margin: 10px 16px;
+
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+
+  z-index: 100;
+}
+
+.activeBuff {
+  position: relative;
+
+  width: 48px;
+  height: 48px;
+
+  background: #eee;
+  border-radius: 8px;
+  box-sizing: border-box;
+
+  cursor: default;
+}
+
+.activeBuff img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.activeBuff .buffTimer {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+
+  padding: 1px 3px;
+
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+
+  font-size: 11px;
+  font-weight: bold;
+  line-height: 13px;
+}
+
+.buffTooltip {
+  visibility: hidden;
+
+  position: absolute;
+  left: 50%;
+  top: 100%;
+
+  transform: translateX(-50%);
+
+  width: 180px;
+
+  margin-top: 6px;
+  padding: 6px;
+
+  background: #000;
+  color: #fff;
+
+  font-size: 12px;
+  line-height: 125%;
+  text-align: center;
+
+  z-index: 1000000;
+}
+
+.activeBuff:hover .buffTooltip {
+  visibility: visible;
 }
