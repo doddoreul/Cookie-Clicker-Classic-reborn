@@ -22,31 +22,6 @@
 </div>
 
 <div id="game">
-  <div id="updateLog">
-    <b>04/09/2026</b><br>
-    <b>0.130</b><br>
-    -adding Golden Cookies<br>
-    <b>0.129</b><br>
-    -adding achievements<br>
-    <b>0.128</b><br>
-    -refactored naming and comments<br>
-    -refactored building state<br>
-    -cleaned up save handling<br>
-    <b>0.127</b><br>
-    -standalone, cleaned-up build<br>
-    <b>0.126</b><br>
-    -technical fixes<br>
-    -better servers!<br>
-    <b>0.125</b><br>
-    -added a new object<br>
-    -added option to disable flashing<br>
-    <b>0.124</b><br>
-    -elder pledge is cheaper and now buffs grandmas and clicking while active<br>
-    -page title now displays cookies<br>
-    <b>0.123</b><br>
-    -added cookies per second<br>
-    -reworked grandmas
-  </div>
 
   <div id="money"></div>
 
@@ -56,15 +31,10 @@
     <div id="prestige">Prestige <span id="prestigeDisplay">0</span></div>
     <div id="prestigeGain">Prestige gain <span id="prestigeGainDisplay">0</span></div>
     <br>
-    <div class="button" id="save">Save</div>
-    <div class="button" id="exportSave">Export save</div>
-    <div class="button" id="importSave">Import save</div>
-    <br>
     <div class="button" id="reset">Reset</div>
     <div id="resetCounter">Resets <span id="resetCounterDisplay">0</span></div>
     <br>
-    <div class="button" id="toggleNumbers">Numbers On</div>
-    <div class="button" id="toggleFlash">Flashing On</div>
+    <div class="button" id="openOverlayBtn" title="Menu">Menu</div>
     <br>
     <div id="version"></div>
   </div>
@@ -93,6 +63,39 @@
   </div>
 
   <div id="pops"></div>
+</div>
+
+<div id="overlayBackdrop">
+  <div id="overlay">
+    <div id="overlayClose">&times;</div>
+
+    <div id="overlayTabs">
+      <div class="overlayTab active" data-tab="settings">Settings</div>
+      <div class="overlayTab" data-tab="upgrades">Upgrades</div>
+      <div class="overlayTab" data-tab="achievements">Achievements</div>
+    </div>
+
+    <div id="overlayContent">
+      <div class="overlayPane active" data-pane="settings">
+        <button id="save" class="overlayButton">Save</button>
+        <button id="exportSave" class="overlayButton">Export save</button>
+        <button id="importSave" class="overlayButton">Import save</button>
+        <br><br>
+        <button id="toggleNumbers" class="overlayButton">Numbers On</button>
+        <button id="toggleFlash" class="overlayButton">Flashing On</button>
+        <br><br>
+        <div id="overlayChangelog"></div>
+      </div>
+
+      <div class="overlayPane" data-pane="upgrades">
+        <div id="overlayUpgradesList"></div>
+      </div>
+
+      <div class="overlayPane" data-pane="achievements">
+        <div id="overlayAchievementsList"></div>
+      </div>
+    </div>
+  </div>
 </div>
  <script src="script.js"></script>
 </body>

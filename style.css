@@ -236,3 +236,72 @@ moni {
         opacity: 0;
     }
 }
+
+
+#overlayBackdrop {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,.5); z-index:5000000;
+  align-items:center; justify-content:center;
+}
+#overlayBackdrop.visible { display:flex; }
+
+#overlay {
+  position:relative; width:480px; max-width:90vw; max-height:80vh;
+  background:#eee; border:#000 2px solid; border-radius:12px;
+  font-family:"Courier New", monospace;
+  display:flex; flex-direction:column; overflow:hidden;
+}
+
+#overlayClose {
+  position:absolute; right:10px; top:4px;
+  font-size:24px; font-weight:bold; cursor:pointer; color:#000;
+}
+#overlayClose:hover { color:#f00; }
+
+#overlayTabs { display:flex; border-bottom:#000 2px solid; }
+.overlayTab {
+  flex:1; text-align:center; padding:10px 0;
+  cursor:pointer; font-weight:bold;
+  background:#ccc; border-right:#000 2px solid;
+}
+.overlayTab:last-child { border-right:none; }
+.overlayTab:hover { background:#fff; }
+.overlayTab.active { background:#eee; }
+
+#overlayContent { padding:16px; overflow-y:auto; }
+.overlayPane { display:none; }
+.overlayPane.active { display:block; }
+
+.overlayButton {
+  font-family:"Courier New", monospace; font-weight:bold;
+  border:#000 2px solid; background:#eee;
+  padding:6px 12px; margin-right:8px; cursor:pointer;
+}
+.overlayButton:hover { background:#fff; }
+.overlayButton:active { background:#ccc; }
+
+.overlayUpgradeRow {
+  display:flex; justify-content:space-between; align-items:center;
+  border:#000 2px solid; background:#eee;
+  padding:6px 10px; margin-bottom:6px;
+}
+.overlayUpgradeRow.bought { background:#dfd; }
+.overlayUpgradeRow.locked { color:#999; }
+
+.overlayUpgradeRow {
+  position:relative; /* nécessaire pour ancrer .tooltipTextStore */
+}
+.overlayUpgradeRow:hover .tooltipTextStore {
+  visibility: visible;
+}
+
+/* Positionnement spécifique : au-dessus de la ligne plutôt qu'à gauche */
+.overlayUpgradeRow .tooltipTextStore {
+  right:auto;
+  left:50%;
+  top:auto;
+  bottom:100%;
+  transform:translateX(-50%);
+  margin-bottom:6px;
+  width:200px;
+}
