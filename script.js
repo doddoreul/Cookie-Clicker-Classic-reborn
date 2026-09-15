@@ -385,9 +385,9 @@ const upgrades = {
 
   // Golden Cookies upgrades
   "Golden Cookies": { id: 79, description: "Randomly spawns a Golden Cookie", price: 100000, building: "GC", requiredCount: 1, multiplier: 1, bought: false },
-  "Lucky Day": { id: 80, description: "GC appears twice as often and stay twice as long", price: 10000000, building: "GC", requiredCount: 1, multiplier: 1, bought: false },
-  "Serendipity": { id: 81, description: "GC appears twice as often and stay twice as long", price: 1000000000, building: "GC", requiredCount: 1, multiplier: 1, bought: false },
-  "Get Lucky": { id: 82, description: "GC appears twice as often", price: 100000000000, building: "GC", requiredCount: 1, multiplier: 1, bought: false },
+  "Lucky Day": { id: 80, description: "GC appears twice as often and stay twice as long", price: 10000000, building: "GC", requiredCount: 1, multiplier: 1, bought: false, requires: 79 },
+  "Serendipity": { id: 81, description: "GC appears twice as often and stay twice as long", price: 1000000000, building: "GC", requiredCount: 1, multiplier: 1, bought: false, requires: 80 },
+  "Get Lucky": { id: 82, description: "GC appears twice as often", price: 100000000000, building: "GC", requiredCount: 1, multiplier: 1, bought: false, requires: 81 },
 };
 
 /* ---------------------------------------------------------------- */
@@ -1099,11 +1099,37 @@ function buyElderPledge() {
 /* ---------------------------------------------------------------- */
 /* Upgrades                                                         */
 /* ---------------------------------------------------------------- */
+function isUpgradeAvailable(upgrade) {
+  if (upgrade.bought) return false;
+
+  if (upgrade.requires !== undefined) {
+    const requiredUpgrade = Object.values(upgrades).find(
+      u => u.id === upgrade.requires
+    );
+
+    if (!requiredUpgrade || !requiredUpgrade.bought) {
+      return false;
+    }
+  }
+
+  if (
+    upgrade.building !== "GC" &&
+    upgrade.requiredCount !== undefined
+  ) {
+    const building = buildings[upgrade.building];
+
+    if (!building || building.count < upgrade.requiredCount) {
+      return false;
+    }
+  }
+
+  return true;
+}
 
 function buyUpgrade(name) {
   const upgrade = upgrades[name];
 
-  if (!upgrade || upgrade.bought || !loaded || cookies < upgrade.price) return;
+  if (!upgrade || !isUpgradeAvailable(upgrade) || upgrade.bought || !loaded || cookies < upgrade.price) return;
 
   cookies -= upgrade.price;
   upgrade.bought = true;
@@ -1132,19 +1158,15 @@ function rebuildUpgradesStore() {
     .sort(([, a], [, b]) => a.requiredCount - b.requiredCount)
     .forEach(([name, upgrade]) => {
 
-      let buyable = false;
-
       // Upgrade filtering
-
-      if (upgrade.building == "GC"){
-        upgrade.icon = upgrade.building+"icon.png";
-        buyable = true;
+      if (upgrade.building === "GC") {
+        upgrade.icon = upgrade.building + "icon.png";
       } else {
-        upgrade.icon = upgrade.building.replace(/\s/g, "").toLowerCase()+"icon.png";
-        buyable = getBuildingCount(upgrade.building) >= upgrade.requiredCount;
+        upgrade.icon =
+          upgrade.building.replace(/\s/g, "").toLowerCase() + "icon.png";
       }
 
-      if (upgrade.bought || !buyable) return;
+      if (!isUpgradeAvailable(upgrade)) return;
 
       const classes = visibleCount < MAX_VISIBLE_UPGRADES ? "" : "hidden";
       visibleCount++;
@@ -1444,23 +1466,32 @@ function main() {
 
 function getComment(totalCookies) {
   const milestones = [
-    [5, "You feel like making cookies.<br>But nobody wants to eat your cookies."],
-    [25, "Your cookies are popular<br>with your dog."],
-    [50, "Your cookies are popular<br>with your family."],
-    [100, "Your cookies are popular<br>in the neighborhood."],
-    [500, "Your cookies are renowned<br>in the whole town!"],
-    [2000, "Your cookies are worth<br>a lot of money."],
-    [5000, "Your cookies bring<br>all the boys to the yard."],
-    [10000, "People come from very far away<br>to get a taste of your cookies."],
-    [17000, "Kings and queens from all over the world<br>are enjoying your cookies."],
-    [30000, "Your cookies have been named<br>a part of the world wonders."],
-    [60000, "Your cookies have been placed<br>under government surveillance."],
-    [100000, "The whole planet is<br>enjoying your cookies!"],
-    [150000, "Creatures from neighboring planets<br>wish to try your cookies."],
-    [250000, "Elder gods from the whole cosmos<br>have awoken to taste your cookies."],
-    [400000, "Your cookies have achieved sentience."],
-    [1000000, "The universe has now turned into<br>cookie dough, to the molecular level."],
-    [1000000000, 'A local news station runs<br>a 10-minute segment about your cookies. Success!<br><span style="font-size:50%;">(you win a cookie)</span>']
+    [5, "Your first batch goes in the trash.<br>The neighborhood raccoon barely touches it."],
+    [50, "Your family accepts to try some of your cookies."],
+    [100, "Your cookies are popular in the neighborhood."],
+    [500, "People are starting to talk about your cookies."],
+    [1000, "Your cookies are talked about for miles around."],
+    [5000, "Your cookies are renowned in the whole town!"],
+    [10000, "Your cookies bring all the boys to the yard."],
+    [50000, "Your cookies now have their own website!"],
+    [100000, "Your cookies are worth a lot of money."],
+    [500000, "Your cookies sell very well in distant countries."],
+    [1000000, "People come from very far away to get a taste of your cookies."],
+    [5000000, "Kings and queens from all over the world are enjoying your cookies."],
+    [10000000, "There are now museums dedicated to your cookies."],
+    [50000000, "A national day has been created in honor of your cookies."],
+    [100000000, "Your cookies have been named a part of the world wonders."],
+    [500000000, "History books now include a whole chapter about your cookies."],
+    [1000000000, "Your cookies have been placed under government surveillance."],
+    [5000000000, "The whole planet is enjoying your cookies!"],
+    [10000000000, "Strange creatures from neighboring planets wish to try your cookies."],
+    [250000, "Elder gods from the whole cosmos have awoken to taste your cookies."],
+    [100000000000, "Beings from other dimensions lapse into existence just to get a taste of your cookies."],
+    [500000000000, "Your cookies have achieved sentience."],
+    [1000000000000, "The universe has now turned into cookie dough, to the molecular level."],
+    [5000000000000, "Your cookies are rewriting the fundamental laws of the universe."],
+    [10000000000000, "It's time to stop playing."],
+    [100000000000000, "A local news station runs a 10-minute segment about your cookies. Success!<br><span style=\"font-size:50%;\">(you win a cookie)</span>"]
   ];
 
   for (const [threshold, text] of milestones) {
@@ -1564,7 +1595,7 @@ function renderChangelog() {
 
 function renderOverlayUpgrades() {
   getElement("overlayUpgradesList").innerHTML = Object.entries(upgrades).map(([name, upgrade]) => {
-    const unlocked = upgrade.building === "GC" || getBuildingCount(upgrade.building) >= upgrade.requiredCount;
+    const unlocked = isUpgradeAvailable(upgrade) || upgrade.bought;
     const status = upgrade.bought ? "bought" : unlocked ? "" : "locked";
     const label = upgrade.bought ? "Bought" : unlocked ? beautify(upgrade.price) : "Locked";
 

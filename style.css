@@ -1,6 +1,12 @@
 :root { --panel-bg: rgba(255,255,255,.75); }
 
-html, body { margin:0; padding:0; }
+html, body {
+  margin:0;
+  padding:0;
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
   font-family:"Courier New", monospace;
   background:#ccc;
@@ -37,8 +43,15 @@ body::selection { background:transparent; }
 }
 
 #rightPanel {
-  position:absolute; right:0; top:0; z-index:100000;
+  position:absolute;
+    right:0;
+    top:0;
+  z-index:100000;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
+
 #store_title, #store_upgrades_title {
   margin-top:15px; font-size:1.1em;
 }
@@ -58,7 +71,7 @@ body::selection { background:transparent; }
 #store > div:active, #store_upgrades > div:active { background-color:#ccc; }
 #store > div b, #store_upgrades > div b { display:block; }
 #store > div.grayed, #store_upgrades > div.grayed {
-  background-color:#666;
+  background-color:#888;
   /*color:#f00;*/
 }
 #store > div .amount {
