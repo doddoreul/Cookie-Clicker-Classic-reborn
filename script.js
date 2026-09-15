@@ -440,7 +440,7 @@ function getSaveData() {
       .filter(name => achievements[name].unlocked),
     goldenCookieClickFrenzyTimer: goldenCookieClickFrenzyTimer,
     goldenCookieFrenzyTimer: goldenCookieFrenzyTimer,
-    $elderPledgeCount: elderPledge.count,
+    elderPledgeCount: elderPledge.count,
   };
 }
 
@@ -533,7 +533,10 @@ function applySaveData(data) {
     if (!upgrade) return;
 
     upgrade.bought = true;
-    multipliers[upgrade.building] *= upgrade.multiplier;
+    if (upgrade.building !== "GC") {
+      multipliers[upgrade.building] *= upgrade.multiplier;
+    }
+
   });
 
   (data.achievements || []).forEach(name => {
@@ -626,19 +629,66 @@ function resetGame() {
 function getCursorGain() {
   const cursor = buildings.Cursor;
   const base = pledge > 0 ? Math.ceil(cursor.count * 1.5) : 1;
+
   return base * multipliers.Cursor;
 }
 
+function getCursorClickGain() {
+  return getCursorGain()
+    * (prestige + 1)
+    * goldenCookieClickMultiplier;
+}
+
+function getCursorAutoClickGain() {
+  return getCursorGain()
+    * (prestige + 1)
+    * goldenCookieCpsMultiplier;
+}
+
 function clickCookie() {
-  let amount = getCursorGain();
-  amount *= prestige + 1;
-  amount *= goldenCookieClickMultiplier;
+  const amount = getCursorClickGain();
 
   cookies += amount;
 
   if (pops.length < 260 && numbersOn) {
     new Pop("cookie", "+" + amount);
   }
+}
+
+function produceCursorCookies() {
+  const count = buildings.Cursor.count;
+  if (!count) return;
+
+  const interval = Math.max(1, Math.ceil(150 / count));
+
+  if (ticks % interval === 0) {
+    addCookies(getCursorAutoClickGain(), "cookie");
+  }
+}
+
+
+function getCursorCps() {
+  const count = buildings.Cursor.count;
+
+  if (!count) return 0;
+
+  const interval = Math.max(1, Math.ceil(150 / count));
+  const clicksPerSecond = TICKS_PER_SECOND / interval;
+
+  return getCursorAutoClickGain() * clicksPerSecond;
+}
+
+function getCookiesPerSecond() {
+  let cps = getCursorCps();
+
+  Object.keys(buildings).forEach(name => {
+    if (name === "Cursor") return;
+
+    const count = buildings[name].count;
+    cps += count * getBuildingGain(name) / 5;
+  });
+
+  return cps;
 }
 
 function addCookies(amount, elementId) {
@@ -771,8 +821,8 @@ function spawnGoldenCookie() {
         return;
     }
 
-    const maxX = Math.max(0, game.innertWidth - 128);
-    const maxY = Math.max(0, game.innertHeight - 128);
+    const maxX = Math.max(0, game.innerWidth - 128);
+    const maxY = Math.max(0, game.innerHeight - 128);
 
     cookie.style.left = `${Math.random() * maxX}px`;
     cookie.style.top = `${Math.random() * maxY}px`;
@@ -1273,15 +1323,6 @@ function produceBuildingCookies(name, elementId) {
   }
 }
 
-function getCookiesPerSecond() {
-  let cps = 0;
-
-  Object.keys(buildings).forEach(name => {
-    cps += buildings[name].count * getBuildingGain(name) / 5;
-  });
-
-  return cps * (prestige + 1);
-}
 
 function updateStoreAffordability() {
   Object.keys(buildings).forEach(name => {
@@ -1305,9 +1346,9 @@ function updateUpgradeAffordability() {
     element.classList.toggle("grayed", cookies < upgrade.price);
   });
 
-  const pledgeElement = getElement("buyElder Pledge");
+  const pledgeElement = getElement("buyElderPledge");
   if (pledgeElement) {
-    pledgeElement.classList.toggle("grayed", pledge > 0 || cookies < 6666666);
+    pledgeElement.classList.toggle("grayed", pledge > 0 || cookies < elderPledge.currentPrice);
   }
 }
 
@@ -1345,13 +1386,8 @@ function main() {
   produceBuildingCookies("Mine", "mines");
   produceBuildingCookies("Farm", "farms");
   produceBuildingCookies("Grandma", "grandmas");
+  produceCursorCookies();
 
-  if (
-    buildings.Cursor.count &&
-    ticks % Math.max(1, Math.ceil(150 / buildings.Cursor.count)) === 0
-  ) {
-    clickCookie();
-  }
 
   /* GC Timers */
   if (goldenCookieFrenzyTimer > 0) {
@@ -1360,7 +1396,6 @@ function main() {
       if (goldenCookieFrenzyTimer <= 0) {
           goldenCookieFrenzyTimer = 0;
           goldenCookieCpsMultiplier = 1;
-          document.getElementById("game").classList.remove("goldenFrenzy");
       }
   }
   if (goldenCookieClickFrenzyTimer > 0) {
@@ -1369,7 +1404,6 @@ function main() {
       if (goldenCookieClickFrenzyTimer <= 0) {
           goldenCookieClickFrenzyTimer = 0;
           goldenCookieClickMultiplier = 1;
-          document.getElementById("game").classList.remove("goldenFrenzy");
       }
   }
 
