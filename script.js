@@ -9,8 +9,13 @@ const SAVE_KEY = "CookieClickerClassic_Reborn_Save";
 const SAVE_FORMAT_VERSION = 2;
 const TICKS_PER_SECOND = 30;
 const SAVE_INTERVAL_SECONDS = 30 * 60;
-const MAX_BUILDING_COUNT = 1000;
 const MAX_VISIBLE_UPGRADES = 5;
+
+const elderPledge = {
+  basePrice: 6666666,
+  currentPrice: 6666666,
+  count: 0
+};
 
 function getElement(id) {
   return document.getElementById(id);
@@ -435,6 +440,7 @@ function getSaveData() {
       .filter(name => achievements[name].unlocked),
     goldenCookieClickFrenzyTimer: goldenCookieClickFrenzyTimer,
     goldenCookieFrenzyTimer: goldenCookieFrenzyTimer,
+    $elderPledgeCount: elderPledge.count,
   };
 }
 
@@ -453,7 +459,8 @@ function resetSaveString() {
     buildings: {},
     upgrades: [],
     achievements: Object.keys(achievements)
-      .filter(name => achievements[name].unlocked)
+      .filter(name => achievements[name].unlocked),
+    elderPledgeCount: 0,
   };
 
   Object.keys(buildings).forEach(name => {
@@ -489,14 +496,16 @@ function applySaveData(data) {
   goldenCookieCpsMultiplier =
     goldenCookieFrenzyTimer > 0 ? 7 : 1;
 
+  elderPledge.count = Number.isFinite(data.elderPledgeCount)
+    ? Math.max(0, data.elderPledgeCount)
+    : 0;
+  elderPledge.currentPrice = Math.ceil(elderPledge.basePrice * Math.pow(1.1, elderPledge.count));
+
   Object.keys(buildings).forEach(name => {
     const saved = data.buildings?.[name];
     const building = buildings[name];
 
-    building.count = Math.min(
-      MAX_BUILDING_COUNT,
-      Math.max(0, Number.parseInt(saved?.count ?? 0, 10))
-    );
+    building.count = Math.max(0, Number.parseInt(saved?.count ?? 0, 10));
 
     building.currentPrice = Number.isFinite(saved?.price)
       ? saved.price
@@ -645,6 +654,27 @@ function addCookies(amount, elementId) {
 /* Building rendering                                               */
 /* ---------------------------------------------------------------- */
 
+function refreshBuildingVisuals(name, elementId, className, side, spacingX = 24, spacingY = 24) {
+  const count = buildings[name].count;
+  let output = "";
+
+  for (let i = 0; i < count; i++) {
+    const x = Math.floor(Math.random() * 20 + (i % 10) * spacingX);
+    const y = Math.floor(
+      Math.random() * 20 + Math.floor(i / 10) * spacingY
+    );
+
+    output += `
+      <div class="${className}"
+        style="${side}:${x}px;top:${y}px;">
+      </div>
+    `;
+  }
+
+  getElement(elementId).innerHTML = output;
+}
+
+
 function refreshGrandmas() {
   const count = buildings.Grandma.count;
   let output = "";
@@ -666,145 +696,38 @@ function refreshGrandmas() {
     if (buildings["Wizard tower"].count && Math.random() < 0.2) className = "wizardtowergrandma";
     if (pledge && Math.random() < 0.2) className = "pledgedgrandma";
 
-    output += `<div class="${className ? className + " " : ""}grandma" style="left:${x}px;top:${y}px;"></div>`;
+    output += `
+      <div class="${className ? className + " " : ""}grandma"
+        style="left:${x}px;top:${y}px;">
+      </div>
+    `;
   }
 
   getElement("grandmas").innerHTML = output;
 }
 
-function refreshMines() {
-  let output = "";
-
-  for (let i = 0; i < buildings.Mine.count; i++) {
-    const x = Math.floor(Math.random() * 20 + (i % 10) * 16);
-    const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 16);
-    output += `<div class="mine" style="left:${x}px;top:${y}px;"></div>`;
-  }
-
-  getElement("mines").innerHTML = output;
-}
-
-function refreshFactories() {
-  let output = "";
-
-  for (let i = 0; i < buildings.Factory.count; i++) {
-    const x = Math.floor(Math.random() * 20 + (i % 10) * 32);
-    const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 24);
-    output += `<div class="factory" style="right:${x}px;top:${y}px;"></div>`;
-  }
-
-  getElement("factories").innerHTML = output;
-}
-
-function refreshShipments() {
-  let output = "";
-
-  for (let i = 0; i < buildings.Shipment.count; i++) {
-    const x = Math.floor(Math.random() * 20 + (i % 10) * 24);
-    const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 24);
-    output += `<div class="shipment" style="right:${x}px;top:${y}px;"></div>`;
-  }
-
-  getElement("shipments").innerHTML = output;
-}
-
-function refreshLabs() {
-  let output = "";
-
-  for (let i = 0; i < buildings["Alchemy lab"].count; i++) {
-    const x = Math.floor(Math.random() * 20 + (i % 10) * 24);
-    const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 16);
-    output += `<div class="lab" style="right:${x}px;top:${y}px;"></div>`;
-  }
-
-  getElement("labs").innerHTML = output;
-}
-
-function refreshPortals() {
-  let output = "";
-
-  for (let i = 0; i < buildings.Portal.count; i++) {
-    const x = Math.floor(Math.random() * 20 + (i % 10) * 24);
-    const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 24);
-    output += `<div class="portal" style="right:${x}px;top:${y}px;"></div>`;
-  }
-
-  getElement("portals").innerHTML = output;
-}
-
-function refreshTimeMachines() {
-  let output = "";
-
-  for (let i = 0; i < buildings["Time machine"].count; i++) {
-    const x = Math.floor(Math.random() * 20 + (i % 10) * 24);
-    const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 24);
-    output += `<div class="time" style="right:${x}px;top:${y}px;"></div>`;
-  }
-
-  getElement("times").innerHTML = output;
-}
-
-function refreshFarms() {
-  let output = "";
-
-  for (let i = 0; i < buildings.Farm.count; i++) {
-    const x = Math.floor(Math.random() * 20 + (i % 10) * 24);
-    const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 24);
-    output += `<div class="farm" style="left:${x}px;top:${y}px;"></div>`;
-  }
-
-  getElement("farms").innerHTML = output;
-}
-
-function refreshBanks() {
-  let output = "";
-
-  for (let i = 0; i < buildings.Bank.count; i++) {
-    const x = Math.floor(Math.random() * 20 + (i % 10) * 24);
-    const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 24);
-    output += `<div class="bank" style="right:${x}px;top:${y}px;"></div>`;
-  }
-
-  getElement("banks").innerHTML = output;
-}
-
-function refreshTemples() {
-  let output = "";
-
-  for (let i = 0; i < buildings.Temple.count; i++) {
-    const x = Math.floor(Math.random() * 20 + (i % 10) * 24);
-    const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 24);
-    output += `<div class="temple" style="right:${x}px;top:${y}px;"></div>`;
-  }
-
-  getElement("temples").innerHTML = output;
-}
-
-function refreshWizardTowers() {
-  let output = "";
-
-  for (let i = 0; i < buildings["Wizard tower"].count; i++) {
-    const x = Math.floor(Math.random() * 20 + (i % 10) * 24);
-    const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 24);
-    output += `<div class="tower" style="right:${x}px;top:${y}px;"></div>`;
-  }
-
-  getElement("towers").innerHTML = output;
-}
 
 function refreshAllBuildingVisuals() {
   refreshGrandmas();
-  refreshMines();
-  refreshFactories();
-  refreshShipments();
-  refreshLabs();
-  refreshPortals();
-  refreshTimeMachines();
-  refreshFarms();
-  refreshBanks();
-  refreshTemples();
-  refreshWizardTowers();
+
+  const buildingsToRefresh = [
+    ["Mine", "mines", "mine", "left", 16, 16],
+    ["Factory", "factories", "factory", "right", 32, 24],
+    ["Shipment", "shipments", "shipment", "right", 24, 24],
+    ["Alchemy lab", "labs", "lab", "right", 24, 16],
+    ["Portal", "portals", "portal", "right", 24, 24],
+    ["Time machine", "times", "time", "right", 24, 24],
+    ["Farm", "farms", "farm", "left", 24, 24],
+    ["Bank", "banks", "bank", "right", 24, 24],
+    ["Temple", "temples", "temple", "right", 24, 24],
+    ["Wizard tower", "towers", "tower", "right", 24, 24]
+  ];
+
+  buildingsToRefresh.forEach(config => {
+    refreshBuildingVisuals(...config);
+  });
 }
+
 
 function buyBuilding(name) {
   const building = getBuilding(name);
@@ -834,7 +757,7 @@ function spawnGoldenCookie() {
     cookie.src = "goldencookie.png";
     cookie.alt = "Golden Cookie";
 
-    cookie.style.position = "absolute";
+    cookie.style.position = "fixed";
     cookie.style.width = "128px";
     cookie.style.height = "128px";
     cookie.style.cursor = "pointer";
@@ -848,8 +771,8 @@ function spawnGoldenCookie() {
         return;
     }
 
-    const maxX = Math.max(0, game.clientWidth - 128);
-    const maxY = Math.max(0, game.clientHeight - 128);
+    const maxX = Math.max(0, game.innertWidth - 128);
+    const maxY = Math.max(0, game.innertHeight - 128);
 
     cookie.style.left = `${Math.random() * maxX}px`;
     cookie.style.top = `${Math.random() * maxY}px`;
@@ -1104,27 +1027,11 @@ function rebuildStore() {
     `;
   });
 
-  output += `
-    <div id="buyElder Pledge" data-buy="Elder Pledge" style="display:none;background-image:url(pledgeicon.png);">
-      <div class="tooltipStore">
-        <div class="building-icon"></div>
-        <b>Elder Pledge</b>
-        <moni></moni> ${beautify(6666666)}
-        <span class="tooltipTextStore">Puts an end to the Ancients' wrath, at least for a while.</span>
-      </div>
-    </div>
-  `;
 
   getElement("store").innerHTML = output;
 
   getElement("store").querySelectorAll("[data-buy]").forEach(element => {
-    element.addEventListener("click", () => {
-      if (element.dataset.buy === "Elder Pledge") {
-        buyElderPledge();
-      } else {
-        buyBuilding(element.dataset.buy);
-      }
-    });
+    element.addEventListener("click", () => buyBuilding(element.dataset.buy));
   });
 
   storeToRebuild = false;
@@ -1135,16 +1042,16 @@ function rebuildStore() {
 /* ---------------------------------------------------------------- */
 
 function buyElderPledge() {
-  const price = 6666666;
+  if (!loaded || pledge > 0 || cookies < elderPledge.currentPrice) return;
 
-  if (!loaded || pledge > 0 || cookies < price) return;
+  cookies -= elderPledge.currentPrice;
+  elderPledge.count++;
+  elderPledge.currentPrice = Math.ceil(elderPledge.basePrice * Math.pow(1.1, elderPledge.count));
 
-  cookies -= price;
   pledge += 30 * 60 * 10;
 
   refreshGrandmas();
-  rebuildStore();
-
+  upgradesToRebuild = true;
 }
 
 /* ---------------------------------------------------------------- */
@@ -1211,11 +1118,25 @@ function rebuildUpgradesStore() {
         </div>
       `;
     });
+
+  output += `
+    <div id="buyElderPledge" style="${smallFont}background-image:url(pledgeicon.png);">
+      <div class="tooltipStore">
+        <div class="building-icon"></div>
+        <b>Elder Pledge</b>
+        <moni></moni> ${beautify(elderPledge.currentPrice)}
+        <span class="tooltipTextStore">Puts an end to the Ancients' wrath, at least for a while.</span>
+      </div>
+    </div>
+  `;
+
   getElement("store_upgrades").innerHTML = output;
 
   getElement("store_upgrades").querySelectorAll("[data-upgrade]").forEach(element => {
     element.addEventListener("click", () => buyUpgrade(element.dataset.upgrade));
   });
+
+  getElement("buyElderPledge").addEventListener("click", buyElderPledge);
 
   upgradesToRebuild = false;
 }
@@ -1372,11 +1293,6 @@ function updateStoreAffordability() {
       cookies < buildings[name].currentPrice
     );
   });
-
-  const pledgeElement = getElement("buyElder Pledge");
-  if (pledgeElement) {
-    pledgeElement.classList.toggle("grayed", cookies < 6666666);
-  }
 }
 
 function updateUpgradeAffordability() {
@@ -1388,6 +1304,11 @@ function updateUpgradeAffordability() {
 
     element.classList.toggle("grayed", cookies < upgrade.price);
   });
+
+  const pledgeElement = getElement("buyElder Pledge");
+  if (pledgeElement) {
+    pledgeElement.classList.toggle("grayed", pledge > 0 || cookies < 6666666);
+  }
 }
 
 function updatePledgeTimer() {
@@ -1532,9 +1453,6 @@ function applyFlashEffect() {
     let icon = "grandmaicon";
 
     if (cookies >= 2000000) {
-      const pledgeButton = getElement("buyElder Pledge");
-      if (pledgeButton) pledgeButton.style.display = "block";
-
       if (Math.random() < 0.02) icon = "grandmaiconinvert";
       else if (Math.random() < 0.02) icon = "grandmaiconlustful";
     }
