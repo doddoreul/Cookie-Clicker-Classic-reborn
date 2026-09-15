@@ -813,16 +813,8 @@ function spawnGoldenCookie() {
     cookie.style.cursor = "pointer";
     cookie.style.zIndex = "100001";
 
-    const game = document.getElementById("game");
-
-    if (!game) {
-        goldenCookieVisible = false;
-        scheduleGoldenCookie();
-        return;
-    }
-
-    const maxX = Math.max(0, game.innerWidth - 128);
-    const maxY = Math.max(0, game.innerHeight - 128);
+    const maxX = Math.max(0, window.innerWidth - 128);
+    const maxY = Math.max(0, window.innerHeight - 128);
 
     cookie.style.left = `${Math.random() * maxX}px`;
     cookie.style.top = `${Math.random() * maxY}px`;
@@ -831,7 +823,7 @@ function spawnGoldenCookie() {
         clickGoldenCookie(cookie);
     });
 
-    game.appendChild(cookie);
+    document.body.appendChild(cookie);
 
     setTimeout(() => {
         cookie.style.opacity = "1";

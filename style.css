@@ -207,7 +207,7 @@ moni {
 }
 
 #goldenCookie {
-    position: absolute;
+    position: fixed;
     width: 128px;
     height: 128px;
     cursor: pointer;
