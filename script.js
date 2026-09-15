@@ -4,7 +4,7 @@
 /* DOM and formatting helpers                                      */
 /* ---------------------------------------------------------------- */
 
-const VERSION = 0.130;
+const VERSION = 0.131;
 const SAVE_KEY = "CookieClickerClassic_Reborn_Save";
 const SAVE_FORMAT_VERSION = 2;
 const TICKS_PER_SECOND = 30;
@@ -1517,7 +1517,8 @@ function initOverlay() {
 
 function renderChangelog() {
   const entries = [
-    { version: "0.130", date: "14/09/2026", notes: ["adding Golden Cookies"] },
+    { version: "0.131", date: "15/09/2026", notes: ["adding icons, minor beug fixes"] },
+    { version: "0.130", notes: ["adding Golden Cookies"] },
     { version: "0.129", notes: ["adding achievements"] },
     { version: "0.128", notes: ["refactored naming and comments", "refactored building state", "cleaned up save handling"] },
     { version: "0.127", notes: ["standalone, cleaned-up build"] },
