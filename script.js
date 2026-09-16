@@ -4,7 +4,7 @@
 /* DOM and formatting helpers                                      */
 /* ---------------------------------------------------------------- */
 
-const VERSION = 0.131;
+const VERSION = "0.131a";
 const SAVE_KEY = "CookieClickerClassic_Reborn_Save";
 const SAVE_FORMAT_VERSION = 2;
 const TICKS_PER_SECOND = 30;
@@ -43,6 +43,7 @@ let flashing = true;
 let storeToRebuild = true;
 let upgradesToRebuild = true;
 let cookies = 0;
+let cookiesBakedAllTime = 0;
 let cookiesDisplay = 0;
 let ticks = 0;
 let prestige = 0;
@@ -441,6 +442,7 @@ function getSaveData() {
     goldenCookieClickFrenzyTimer: goldenCookieClickFrenzyTimer,
     goldenCookieFrenzyTimer: goldenCookieFrenzyTimer,
     elderPledgeCount: elderPledge.count,
+    cookiesBakedAllTime,
   };
 }
 
@@ -456,6 +458,7 @@ function resetSaveString() {
     prestige,
     resetCount,
     pledge: 0,
+    cookiesBakedAllTime,
     buildings: {},
     upgrades: [],
     achievements: Object.keys(achievements)
@@ -481,6 +484,7 @@ function applySaveData(data) {
   prestige = Number.isFinite(data.prestige) ? data.prestige : 0;
   resetCount = Number.isFinite(data.resetCount) ? data.resetCount : 0;
   pledge = Number.isFinite(data.pledge) ? data.pledge : 0;
+  cookiesBakedAllTime = Number.isFinite(data.cookiesBakedAllTime) ? data.cookiesBakedAllTime : 0;
 
   goldenCookieClickFrenzyTimer = Number.isFinite(data.goldenCookieClickFrenzyTimer)
     ? Math.max(0, data.goldenCookieClickFrenzyTimer)
@@ -649,6 +653,7 @@ function clickCookie() {
   const amount = getCursorClickGain();
 
   cookies += amount;
+  cookiesBakedAllTime += amount;
 
   if (pops.length < 260 && numbersOn) {
     new Pop("cookie", "+" + amount);
@@ -694,6 +699,7 @@ function getCookiesPerSecond() {
 function addCookies(amount, elementId) {
   amount *= prestige + 1;
   cookies += amount;
+  cookiesBakedAllTime += amount;
 
   if (elementId && pops.length < 250 && numbersOn) {
     new Pop(elementId, "+" + amount);
@@ -785,10 +791,11 @@ function buyBuilding(name) {
 
   cookies -= building.currentPrice;
   building.count++;
-  rebuildStore();
 
   updateBuildingPrice(name);
+  rebuildStore();
   refreshAllBuildingVisuals();
+
   upgradesToRebuild = true;
 }
 
@@ -935,6 +942,8 @@ function goldenCookieLucky() {
     const reward = Math.min(bankedCookies, fifteenMinutes);
 
     cookies += reward;
+    cookiesBakedAllTime += reward;
+
     new Pop("credits", `Lucky! +${Math.floor(reward)} cookies`);
 }
 
@@ -1552,6 +1561,8 @@ function initOverlay() {
     backdrop.classList.remove("visible");
   });
 
+  getElement("overlayAllTimeCookies").innerHTML = "Cookies baked (all time): " + beautify(cookiesBakedAllTime);
+
   backdrop.addEventListener("click", event => {
     if (event.target === backdrop) backdrop.classList.remove("visible");
   });
@@ -1574,7 +1585,7 @@ function initOverlay() {
 
 function renderChangelog() {
   const entries = [
-    { version: "0.131", date: "15/09/2026", notes: ["adding icons, minor beug fixes"] },
+    { version: "0.131a", date: "15/09/2026", notes: ["adding icons, minor bug fixes"] },
     { version: "0.130", notes: ["adding Golden Cookies"] },
     { version: "0.129", notes: ["adding achievements"] },
     { version: "0.128", notes: ["refactored naming and comments", "refactored building state", "cleaned up save handling"] },
