@@ -4,7 +4,7 @@
 /* Constants                                                        */
 /* ---------------------------------------------------------------- */
 
-const VERSION = "0.131f";
+const VERSION = "0.132";
 const SAVE_KEY = "CookieClickerClassic_Reborn_Save";
 const SETTINGS_KEY = "CookieClickerClassic_Reborn_Settings";
 const SAVE_FORMAT_VERSION = 2;
@@ -1708,7 +1708,8 @@ function initOverlay() {
 
 function renderChangelog() {
   const entries = [
-    { version: "0.131f", date: "17/09/2026", notes: ["I'm bored"] },
+    { version: "0.132", date: "17/09/2026", notes: ["adding achievements and cleaning code"] },
+    { version: "0.131f", notes: ["I'm bored"] },
     { version: "0.131e", notes: ["fixing prestige, adding kittens"] },
     { version: "0.131b", notes: ["adding icons, minor bug fixes, idling tests"] },
     { version: "0.130", notes: ["adding Golden Cookies"] },
