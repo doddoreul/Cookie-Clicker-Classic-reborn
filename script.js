@@ -1,7 +1,7 @@
 "use strict";
 
 /* ---------------------------------------------------------------- */
-/* DOM and formatting helpers                                      */
+/* Constants                                                        */
 /* ---------------------------------------------------------------- */
 
 const VERSION = "0.131f";
@@ -11,12 +11,11 @@ const SAVE_FORMAT_VERSION = 2;
 const TICKS_PER_SECOND = 30;
 const SAVE_INTERVAL_SECONDS = 30 * 60;
 const MAX_VISIBLE_UPGRADES = 5;
+const MAX_OFFLINE_SECONDS = 24 * 60 * 60;
 
-const elderPledge = {
-  basePrice: 6666666,
-  currentPrice: 6666666,
-  count: 0
-};
+/* ---------------------------------------------------------------- */
+/* DOM and formatting helpers                                        */
+/* ---------------------------------------------------------------- */
 
 function getElement(id) {
   return document.getElementById(id);
@@ -54,6 +53,12 @@ const defaultSettings = {
 };
 const settings = { ...defaultSettings };
 
+const elderPledge = {
+  basePrice: 6666666,
+  currentPrice: 6666666,
+  count: 0
+};
+
 let loaded = false;
 let storeToRebuild = true;
 let upgradesToRebuild = true;
@@ -69,6 +74,7 @@ let saveTimer = SAVE_INTERVAL_SECONDS;
 let resetCount = 0;
 let globalMultiplier = 1;
 
+/* Golden cookie state */
 let goldenCookieVisible = false;
 let goldenCookieTimer = null;
 let goldenCookieTimeout = null;
@@ -79,11 +85,15 @@ let goldenCookieFrenzyTimer = 0;
 let goldenCookieClickMultiplier = 1;
 let goldenCookieClickFrenzyTimer = 0;
 
-/* Idling catchup */
+/* Idle and offline catch-up state */
 let lastTickTimestamp = performance.now ? performance.now() : Date.now();
-const MAX_OFFLINE_SECONDS = 24 * 60 * 60; // Max offline production
 let cameBackFromIdle = false;
 let cookiesGainedWhileHidden = 0;
+
+/* Floating number pops */
+const pops = [];/* ---------------------------------------------------------------- */
+/* Buildings                                                        */
+/* ---------------------------------------------------------------- */
 
 const buildings = {
   Cursor: {
@@ -187,7 +197,9 @@ const buildings = {
 const multipliers = {};
 Object.keys(buildings).forEach(name => multipliers[name] = 1);
 
-const pops = [];
+/* ---------------------------------------------------------------- */
+/* Achievement types                                                */
+/* ---------------------------------------------------------------- */
 
 const achievementTypes = {
   cps: {
@@ -221,6 +233,10 @@ const achievementTypes = {
     }
   }
 };
+
+/* ---------------------------------------------------------------- */
+/* Achievements                                                     */
+/* ---------------------------------------------------------------- */
 
 const achievements = {
   "Casual baking": { id: 0, type: "cps", requirement: 1, description: "Bake 1 cookie per second.", unlocked: false },
@@ -323,6 +339,10 @@ const achievements = {
   "Apotheosis": { id: 70, type: "resets", requirement: 50, description: "Reset 50 times.", unlocked: false },
   "Reincarnation": { id: 71, type: "resets", requirement: 100, description: "Reset 100 times.", unlocked: false }
 };
+
+/* ---------------------------------------------------------------- */
+/* Upgrades                                                         */
+/* ---------------------------------------------------------------- */
 
 const upgrades = {
   // Cursor upgrades
@@ -680,7 +700,7 @@ function resetGame() {
 }
 
 /* ---------------------------------------------------------------- */
-/* Cookie clicking                                                  */
+/* Cookie clicking and production                                   */
 /* ---------------------------------------------------------------- */
 
 function getCursorGain() {
@@ -714,6 +734,20 @@ function clickCookie() {
   }
 }
 
+function getBuildingGain(name) {
+  return buildings[name].gain * multipliers[name] * goldenCookieCpsMultiplier * globalMultiplier;
+}
+
+function addCookies(amount, elementId) {
+  amount *= prestige + 1;
+  cookies += amount;
+  cookiesBakedAllTime += amount;
+
+  if (elementId && pops.length < 250 && settings.numbersOn) {
+    new Pop(elementId, "+" + amount);
+  }
+}
+
 function produceCursorCookies() {
   const count = buildings.Cursor.count;
   if (!count) return;
@@ -725,6 +759,16 @@ function produceCursorCookies() {
   }
 }
 
+function produceBuildingCookies(name, elementId) {
+  const count = buildings[name].count;
+  if (!count) return;
+
+  const interval = Math.max(1, Math.ceil(150 / count));
+
+  if (ticks % interval === 0) {
+    addCookies(getBuildingGain(name), elementId);
+  }
+}
 
 function getCursorCps() {
   const count = buildings.Cursor.count;
@@ -750,367 +794,21 @@ function getCookiesPerSecond() {
   return cps;
 }
 
-function addCookies(amount, elementId) {
-  amount *= prestige + 1;
-  cookies += amount;
-  cookiesBakedAllTime += amount;
+/* ---------------------------------------------------------------- */
+/* Prestige                                                         */
+/* ---------------------------------------------------------------- */
 
-  if (elementId && pops.length < 250 && settings.numbersOn) {
-    new Pop(elementId, "+" + amount);
-  }
+function calculatePrestige() {
+  return Math.max(
+    0,
+    Math.floor(
+      (-1 + Math.sqrt(1 + 8 * (cookiesBakedAllTime / 100000000))) / 2
+    )
+  );
 }
 
 /* ---------------------------------------------------------------- */
-/* Building rendering                                               */
-/* ---------------------------------------------------------------- */
-
-function refreshBuildingVisuals(name, elementId, className, side, spacingX = 24, spacingY = 24) {
-  const count = buildings[name].count;
-  let output = "";
-
-  for (let i = 0; i < count; i++) {
-    const x = Math.floor(Math.random() * 20 + (i % 10) * spacingX);
-    const y = Math.floor(
-      Math.random() * 20 + Math.floor(i / 10) * spacingY
-    );
-
-    output += `
-      <div class="${className}"
-        style="${side}:${x}px;top:${y}px;">
-      </div>
-    `;
-  }
-
-  getElement(elementId).innerHTML = output;
-}
-
-
-function refreshGrandmas() {
-  const count = buildings.Grandma.count;
-  let output = "";
-
-  for (let i = 0; i < count; i++) {
-    const x = Math.floor(Math.random() * 20 + (i % 10) * 24);
-    const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 24);
-    let className = "";
-
-    if (buildings["Alchemy lab"].count && Math.random() < 0.2) className = "goldengrandma";
-    if (buildings["Factory"].count && Math.random() < 0.2) className = "factorygrandma";
-    if (buildings["Mine"].count && Math.random() < 0.2) className = "minegrandma";
-    if (buildings["Shipment"].count && Math.random() < 0.2) className = "shipmentgrandma";
-    if (buildings["Portal"].count && pledge <= 0 && Math.random() < 0.2) className = "portalgrandma";
-    if (buildings["Time machine"].count && Math.random() < 0.2) className = "timegrandma";
-    if (buildings["Farm"].count && Math.random() < 0.2) className = "farmgrandma";
-    if (buildings["Bank"].count && Math.random() < 0.2) className = "bankgrandma";
-    if (buildings["Temple"].count && Math.random() < 0.2) className = "templegrandma";
-    if (buildings["Wizard tower"].count && Math.random() < 0.2) className = "wizardtowergrandma";
-    if (pledge && Math.random() < 0.2) className = "pledgedgrandma";
-
-    output += `
-      <div class="${className ? className + " " : ""}grandma"
-        style="left:${x}px;top:${y}px;">
-      </div>
-    `;
-  }
-
-  getElement("grandmas").innerHTML = output;
-}
-
-
-function refreshAllBuildingVisuals() {
-  refreshGrandmas();
-
-  const buildingsToRefresh = [
-    ["Mine", "mines", "mine", "left", 16, 16],
-    ["Factory", "factories", "factory", "right", 32, 24],
-    ["Shipment", "shipments", "shipment", "right", 24, 24],
-    ["Alchemy lab", "labs", "lab", "right", 24, 16],
-    ["Portal", "portals", "portal", "right", 24, 24],
-    ["Time machine", "times", "time", "right", 24, 24],
-    ["Farm", "farms", "farm", "left", 24, 24],
-    ["Bank", "banks", "bank", "right", 24, 24],
-    ["Temple", "temples", "temple", "right", 24, 24],
-    ["Wizard tower", "towers", "tower", "right", 24, 24]
-  ];
-
-  buildingsToRefresh.forEach(config => {
-    refreshBuildingVisuals(...config);
-  });
-}
-
-
-function buyBuilding(name) {
-  const building = getBuilding(name);
-  if (!building || !loaded || cookies < building.currentPrice) return;
-
-  cookies -= building.currentPrice;
-  building.count++;
-
-  updateBuildingPrice(name);
-  rebuildStore();
-  refreshAllBuildingVisuals();
-
-  upgradesToRebuild = true;
-}
-
-/* ---------------------------------------------------------------- */
-/* GC                                                             */
-/* ---------------------------------------------------------------- */
-function spawnGoldenCookie() {
-    // Sécurité : pas deux GC à la fois
-    if (goldenCookieVisible) return;
-
-    goldenCookieVisible = true;
-
-    const cookie = document.createElement("img");
-
-    cookie.id = "goldenCookie";
-    cookie.src = "goldencookie.png";
-    cookie.alt = "Golden Cookie";
-
-    cookie.style.position = "fixed";
-    cookie.style.width = "128px";
-    cookie.style.height = "128px";
-    cookie.style.cursor = "pointer";
-    cookie.style.zIndex = "100001";
-
-    const maxX = Math.max(0, window.innerWidth - 128);
-    const maxY = Math.max(0, window.innerHeight - 128);
-
-    cookie.style.left = `${Math.random() * maxX}px`;
-    cookie.style.top = `${Math.random() * maxY}px`;
-
-    cookie.addEventListener("click", () => {
-        clickGoldenCookie(cookie);
-    });
-
-    document.body.appendChild(cookie);
-
-    setTimeout(() => {
-        cookie.style.opacity = "1";
-    }, 0);
-
-    // Makes GC disappearing
-    goldenCookieTimeout = setTimeout(() => {
-        removeGoldenCookie(cookie);
-    }, 13 * 1000 * goldenCookieDurationMultiplier);
-}
-
-function clickGoldenCookie(cookie) {
-    if (goldenCookieTimeout) {
-        clearTimeout(goldenCookieTimeout);
-        goldenCookieTimeout = null;
-    }
-
-    if (cookie.parentNode) {
-        cookie.parentNode.removeChild(cookie);
-    }
-
-    goldenCookieVisible = false;
-
-    const roll = Math.random();
-
-    if (roll < 0.40) {
-        goldenCookieLucky();
-    } else if (roll < 0.80) {
-        goldenCookieFrenzy();
-    } else if (roll < 0.837) {
-        goldenCookieClickFrenzy();
-    } else {
-        goldenCookieClot();
-    }
-
-    scheduleGoldenCookie();
-}
-
-function removeGoldenCookie(cookie) {
-    if (!cookie || !cookie.parentNode) {
-        goldenCookieVisible = false;
-        scheduleGoldenCookie();
-        return;
-    }
-
-    cookie.classList.add("fadingOut");
-
-    setTimeout(() => {
-        if (cookie.parentNode) {
-            cookie.parentNode.removeChild(cookie);
-        }
-
-        goldenCookieVisible = false;
-        goldenCookieTimeout = null;
-
-        scheduleGoldenCookie();
-    }, 3000);
-}
-
-function randomGoldenCookieDelay() {
-    const minDelay = 5 * 60 * 1000;
-    const maxDelay = 15 * 60 * 1000;
-
-    const delay = (
-        minDelay + Math.random() * (maxDelay - minDelay)
-    ) / goldenCookieSpawnMultiplier;
-
-    return delay;
-}
-
-function scheduleGoldenCookie() {
-    // Le système n'est actif que si l'upgrade est achetée
-    if (!upgrades["Golden Cookies"]?.bought) return;
-
-    // Ne jamais programmer un nouveau GC s'il y en a déjà un
-    if (goldenCookieVisible || goldenCookieTimer) return;
-
-    const delay = randomGoldenCookieDelay();
-
-    goldenCookieTimer = setTimeout(() => {
-        goldenCookieTimer = null;
-        spawnGoldenCookie();
-    }, delay);
-}
-
-function updateGoldenCookieModifiers() {
-    goldenCookieSpawnMultiplier = 1;
-    goldenCookieDurationMultiplier = 1;
-
-    if (upgrades["Lucky Day"]?.bought) {
-        goldenCookieSpawnMultiplier *= 2;
-        goldenCookieDurationMultiplier *= 2;
-    }
-
-    if (upgrades["Serendipity"]?.bought) {
-        goldenCookieSpawnMultiplier *= 2;
-        goldenCookieDurationMultiplier *= 2;
-    }
-
-    if (upgrades["Get Lucky"]?.bought) {
-        goldenCookieSpawnMultiplier *= 2;
-    }
-}
-
-function goldenCookieLucky() {
-    const bankedCookies = cookies * 0.15 + 13;
-    const fifteenMinutes = getCookiesPerSecond() * 900 + 13;
-
-    const reward = Math.min(bankedCookies, fifteenMinutes);
-
-    cookies += reward;
-    cookiesBakedAllTime += reward;
-
-    new Pop("credits", `Lucky! +${Math.floor(reward)} cookies`);
-}
-
-function goldenCookieFrenzy() {
-    goldenCookieCpsMultiplier = 7;
-    goldenCookieFrenzyTimer = 77 * TICKS_PER_SECOND;
-    new Pop("credits", "Frenzy!");
-}
-
-function goldenCookieClickFrenzy() {
-    goldenCookieClickMultiplier = 777;
-    goldenCookieClickFrenzyTimer = 13 * TICKS_PER_SECOND;
-    new Pop("credits", "Click Frenzy!");
-}
-
-function goldenCookieClot() {
-    new Pop("credits", "Clot");
-}
-
-function createBuffDisplay() {
-  if (getElement("buffs")) return;
-
-  const saveMenu = getElement("saveMenu");
-  if (!saveMenu) return;
-
-  const buffs = document.createElement("div");
-  buffs.id = "buffs";
-
-  saveMenu.insertAdjacentElement("afterend", buffs);
-}
-
-function updateBuffDisplay() {
-  const container = getElement("buffs");
-  if (!container) return;
-
-  const activeBuffs = getActiveBuffs();
-
-  const activeIds = activeBuffs.map(buff => buff.id).join(",");
-
-  if (container.dataset.active !== activeIds) {
-    container.innerHTML = activeBuffs.map(buff => `
-      <div class="activeBuff" data-buff="${buff.id}">
-        <img src="${buff.icon}">
-        <div class="buffTimer"></div>
-        <span class="buffTooltip">
-          <b>${buff.name}</b><br>
-          ${buff.description}
-        </span>
-      </div>
-    `).join("");
-
-    container.dataset.active = activeIds;
-  }
-
-  activeBuffs.forEach(buff => {
-    const element = container.querySelector(
-      `[data-buff="${buff.id}"]`
-    );
-
-    if (!element) return;
-
-    const seconds = Math.ceil(buff.timer / TICKS_PER_SECOND);
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-
-    const timerText =
-      minutes > 0
-        ? `${minutes}:${String(remainingSeconds).padStart(2, "0")}`
-        : `${remainingSeconds}s`;
-
-    element.querySelector(".buffTimer").textContent = timerText;
-  });
-}
-
-function updateFrenzyHalo() {
-  const comment = getElement("comment");
-  if (!comment) return;
-
-  const frenzyActive =
-    goldenCookieFrenzyTimer > 0 ||
-    goldenCookieClickFrenzyTimer > 0;
-
-  comment.classList.toggle("goldenFrenzy", frenzyActive);
-}
-
-function getActiveBuffs() {
-  const buffs = [];
-
-  if (goldenCookieFrenzyTimer > 0) {
-    buffs.push({
-      id: "frenzy",
-      name: "Frenzy",
-      icon: "frenzyicon.png",
-      description: "Cookie production x7.",
-      timer: goldenCookieFrenzyTimer
-    });
-  }
-
-  if (goldenCookieClickFrenzyTimer > 0) {
-    buffs.push({
-      id: "clickFrenzy",
-      name: "Click Frenzy",
-      icon: "clickfrenzyicon.png",
-      description: "Cookie clicking x777.",
-      timer: goldenCookieClickFrenzyTimer
-    });
-  }
-
-  return buffs;
-}
-
-/* ---------------------------------------------------------------- */
-/* Store                                                             */
+/* Store                                                            */
 /* ---------------------------------------------------------------- */
 
 function rebuildStore() {
@@ -1150,26 +848,78 @@ function setupStoreDelegation() {
   });
 }
 
-/* ---------------------------------------------------------------- */
-/* Elder Pledge                                                     */
-/* ---------------------------------------------------------------- */
+function buyBuilding(name) {
+  const building = getBuilding(name);
+  if (!building || !loaded || cookies < building.currentPrice) return;
 
-function buyElderPledge() {
-  if (!loaded || pledge > 0 || cookies < elderPledge.currentPrice) return;
+  cookies -= building.currentPrice;
+  building.count++;
 
-  cookies -= elderPledge.currentPrice;
-  elderPledge.count++;
-  elderPledge.currentPrice = Math.ceil(elderPledge.basePrice * Math.pow(1.1, elderPledge.count));
+  updateBuildingPrice(name);
+  rebuildStore();
+  refreshAllBuildingVisuals();
 
-  pledge += 30 * 60 * 10;
-
-  refreshGrandmas();
   upgradesToRebuild = true;
+}
+
+function updateStoreAffordability() {
+  Object.keys(storeBuyElements).forEach(name => {
+    const element = storeBuyElements[name];
+    if (!element) return;
+
+    element.classList.toggle(
+      "grayed",
+      cookies < buildings[name].currentPrice
+    );
+  });
+}
+
+/* ---------------------------------------------------------------- */
+/* Store tooltips                                                   */
+/* ---------------------------------------------------------------- */
+
+function positionStoreTooltip(item) {
+  const tooltip = item.querySelector(".tooltipTextStore");
+  if (!tooltip) return;
+
+  const rect = item.getBoundingClientRect();
+  const tooltipWidth = tooltip.offsetWidth;
+  const tooltipHeight = tooltip.offsetHeight;
+
+  let left = rect.left - tooltipWidth - 6;
+  const top = rect.top + rect.height / 2 - tooltipHeight / 2;
+
+  if (left < 6) left = rect.right + 6;
+
+  tooltip.style.left = left + "px";
+  tooltip.style.top = top + "px";
+}
+
+function setupStoreTooltips() {
+  const itemSelector = "#store > div, #store_upgrades > div";
+
+  document.addEventListener("mouseover", event => {
+    const item = event.target.closest(itemSelector);
+    if (item) positionStoreTooltip(item);
+  });
+
+  const repositionHovered = () => {
+    const hovered = document.querySelector(itemSelector + ":hover");
+    if (hovered) positionStoreTooltip(hovered);
+  };
+
+  window.addEventListener("resize", repositionHovered);
+
+  const panel = getElement("rightPanel");
+  if (panel) {
+    panel.addEventListener("scroll", repositionHovered);
+  }
 }
 
 /* ---------------------------------------------------------------- */
 /* Upgrades                                                         */
 /* ---------------------------------------------------------------- */
+
 function isUpgradeAvailable(upgrade) {
   if (upgrade.bought) return false;
 
@@ -1307,46 +1057,427 @@ function setupStoreUpgradesDelegation() {
   });
 }
 
-/* ---------------------------------------------------------------- */
-/* Store tooltips                                                   */
-/* ---------------------------------------------------------------- */
+function updateUpgradeAffordability() {
+  Object.keys(upgradeRowElements).forEach(name => {
+    const element = upgradeRowElements[name];
+    if (!element) return;
 
-function positionStoreTooltip(item) {
-  const tooltip = item.querySelector(".tooltipTextStore");
-  if (!tooltip) return;
+    if (name === "pledge") {
+      element.classList.toggle(
+        "grayed",
+        pledge > 0 || cookies < elderPledge.currentPrice
+      );
+      return;
+    }
 
-  const rect = item.getBoundingClientRect();
-  const tooltipWidth = tooltip.offsetWidth;
-  const tooltipHeight = tooltip.offsetHeight;
+    const upgrade = upgrades[name];
+    if (!upgrade || upgrade.bought || element.classList.contains("hidden")) return;
 
-  let left = rect.left - tooltipWidth - 6;
-  const top = rect.top + rect.height / 2 - tooltipHeight / 2;
-
-  if (left < 6) left = rect.right + 6;
-
-  tooltip.style.left = left + "px";
-  tooltip.style.top = top + "px";
+    element.classList.toggle("grayed", cookies < upgrade.price);
+  });
 }
 
-function setupStoreTooltips() {
-  const itemSelector = "#store > div, #store_upgrades > div";
+/* ---------------------------------------------------------------- */
+/* Elder Pledge                                                     */
+/* ---------------------------------------------------------------- */
 
-  document.addEventListener("mouseover", event => {
-    const item = event.target.closest(itemSelector);
-    if (item) positionStoreTooltip(item);
+function buyElderPledge() {
+  if (!loaded || pledge > 0 || cookies < elderPledge.currentPrice) return;
+
+  cookies -= elderPledge.currentPrice;
+  elderPledge.count++;
+  elderPledge.currentPrice = Math.ceil(elderPledge.basePrice * Math.pow(1.1, elderPledge.count));
+
+  pledge += 30 * 60 * 10;
+
+  refreshGrandmas();
+  upgradesToRebuild = true;
+}
+
+function updatePledgeTimer() {
+  if (pledge > 0) {
+    pledge--;
+
+    const secondsLeft = Math.ceil(pledge / TICKS_PER_SECOND);
+    const minutes = Math.floor(secondsLeft / 60);
+    let seconds = secondsLeft % 60;
+
+    if (seconds < 10) seconds = "0" + seconds;
+
+    getElement("pledgeTimer").innerHTML = minutes + ":" + seconds;
+  } else {
+    getElement("pledgeTimer").innerHTML = "666";
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/* Building rendering                                               */
+/* ---------------------------------------------------------------- */
+
+let lastRenderedCursorCount = -1;
+
+function renderCursors() {
+  const count = buildings.Cursor.count;
+  if (count === lastRenderedCursorCount) return;
+
+  lastRenderedCursorCount = count;
+  const cookie = getElement("cookie");
+
+  if (!count) {
+    cookie.innerHTML = "";
+    return;
+  }
+
+  let output = "";
+
+  for (let i = 0; i < count; i++) {
+    const rotation = -Math.floor((360 / count) * i);
+    const x = Math.floor(64 + Math.sin((Math.PI * 2 / count) * i) * 64) - 16;
+    const y = Math.floor(64 + Math.cos((Math.PI * 2 / count) * i) * 64) - 16;
+    const bobDelay = Math.ceil((150 / count) * i) / 30;
+
+    output += `
+      <div class="cursor"
+        style="left:${x}px;top:${y}px;--cursor-rot:${rotation}deg;animation-delay:-${bobDelay}s;"
+        data-cursor>
+      </div>
+    `;
+  }
+
+  cookie.innerHTML = output;
+}
+
+function refreshBuildingVisuals(name, elementId, className, side, spacingX = 24, spacingY = 24) {
+  const count = buildings[name].count;
+  let output = "";
+
+  for (let i = 0; i < count; i++) {
+    const x = Math.floor(Math.random() * 20 + (i % 10) * spacingX);
+    const y = Math.floor(
+      Math.random() * 20 + Math.floor(i / 10) * spacingY
+    );
+
+    output += `
+      <div class="${className}"
+        style="${side}:${x}px;top:${y}px;">
+      </div>
+    `;
+  }
+
+  getElement(elementId).innerHTML = output;
+}
+
+function refreshGrandmas() {
+  const count = buildings.Grandma.count;
+  let output = "";
+
+  for (let i = 0; i < count; i++) {
+    const x = Math.floor(Math.random() * 20 + (i % 10) * 24);
+    const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 24);
+    let className = "";
+
+    if (buildings["Alchemy lab"].count && Math.random() < 0.2) className = "goldengrandma";
+    if (buildings["Factory"].count && Math.random() < 0.2) className = "factorygrandma";
+    if (buildings["Mine"].count && Math.random() < 0.2) className = "minegrandma";
+    if (buildings["Shipment"].count && Math.random() < 0.2) className = "shipmentgrandma";
+    if (buildings["Portal"].count && pledge <= 0 && Math.random() < 0.2) className = "portalgrandma";
+    if (buildings["Time machine"].count && Math.random() < 0.2) className = "timegrandma";
+    if (buildings["Farm"].count && Math.random() < 0.2) className = "farmgrandma";
+    if (buildings["Bank"].count && Math.random() < 0.2) className = "bankgrandma";
+    if (buildings["Temple"].count && Math.random() < 0.2) className = "templegrandma";
+    if (buildings["Wizard tower"].count && Math.random() < 0.2) className = "wizardtowergrandma";
+    if (pledge && Math.random() < 0.2) className = "pledgedgrandma";
+
+    output += `
+      <div class="${className ? className + " " : ""}grandma"
+        style="left:${x}px;top:${y}px;">
+      </div>
+    `;
+  }
+
+  getElement("grandmas").innerHTML = output;
+}
+
+function refreshAllBuildingVisuals() {
+  refreshGrandmas();
+
+  const buildingsToRefresh = [
+    ["Mine", "mines", "mine", "left", 16, 16],
+    ["Factory", "factories", "factory", "right", 32, 24],
+    ["Shipment", "shipments", "shipment", "right", 24, 24],
+    ["Alchemy lab", "labs", "lab", "right", 24, 16],
+    ["Portal", "portals", "portal", "right", 24, 24],
+    ["Time machine", "times", "time", "right", 24, 24],
+    ["Farm", "farms", "farm", "left", 24, 24],
+    ["Bank", "banks", "bank", "right", 24, 24],
+    ["Temple", "temples", "temple", "right", 24, 24],
+    ["Wizard tower", "towers", "tower", "right", 24, 24]
+  ];
+
+  buildingsToRefresh.forEach(config => {
+    refreshBuildingVisuals(...config);
+  });
+}
+
+/* ---------------------------------------------------------------- */
+/* Golden Cookies                                                   */
+/* ---------------------------------------------------------------- */
+
+function spawnGoldenCookie() {
+  // Safety: never spawn two golden cookies at once.
+  if (goldenCookieVisible) return;
+
+  goldenCookieVisible = true;
+
+  const cookie = document.createElement("img");
+
+  cookie.id = "goldenCookie";
+  cookie.src = "goldencookie.png";
+  cookie.alt = "Golden Cookie";
+
+  cookie.style.position = "fixed";
+  cookie.style.width = "128px";
+  cookie.style.height = "128px";
+  cookie.style.cursor = "pointer";
+  cookie.style.zIndex = "100001";
+
+  const maxX = Math.max(0, window.innerWidth - 128);
+  const maxY = Math.max(0, window.innerHeight - 128);
+
+  cookie.style.left = `${Math.random() * maxX}px`;
+  cookie.style.top = `${Math.random() * maxY}px`;
+
+  cookie.addEventListener("click", () => {
+    clickGoldenCookie(cookie);
   });
 
-  const repositionHovered = () => {
-    const hovered = document.querySelector(itemSelector + ":hover");
-    if (hovered) positionStoreTooltip(hovered);
-  };
+  document.body.appendChild(cookie);
 
-  window.addEventListener("resize", repositionHovered);
+  setTimeout(() => {
+    cookie.style.opacity = "1";
+  }, 0);
 
-  const panel = getElement("rightPanel");
-  if (panel) {
-    panel.addEventListener("scroll", repositionHovered);
+  // Schedule the golden cookie to disappear.
+  goldenCookieTimeout = setTimeout(() => {
+    removeGoldenCookie(cookie);
+  }, 13 * 1000 * goldenCookieDurationMultiplier);
+}
+
+function clickGoldenCookie(cookie) {
+  if (goldenCookieTimeout) {
+    clearTimeout(goldenCookieTimeout);
+    goldenCookieTimeout = null;
   }
+
+  if (cookie.parentNode) {
+    cookie.parentNode.removeChild(cookie);
+  }
+
+  goldenCookieVisible = false;
+
+  const roll = Math.random();
+
+  if (roll < 0.40) {
+    goldenCookieLucky();
+  } else if (roll < 0.80) {
+    goldenCookieFrenzy();
+  } else if (roll < 0.837) {
+    goldenCookieClickFrenzy();
+  } else {
+    goldenCookieClot();
+  }
+
+  scheduleGoldenCookie();
+}
+
+function removeGoldenCookie(cookie) {
+  if (!cookie || !cookie.parentNode) {
+    goldenCookieVisible = false;
+    scheduleGoldenCookie();
+    return;
+  }
+
+  cookie.classList.add("fadingOut");
+
+  setTimeout(() => {
+    if (cookie.parentNode) {
+      cookie.parentNode.removeChild(cookie);
+    }
+
+    goldenCookieVisible = false;
+    goldenCookieTimeout = null;
+
+    scheduleGoldenCookie();
+  }, 3000);
+}
+
+function randomGoldenCookieDelay() {
+  const minDelay = 5 * 60 * 1000;
+  const maxDelay = 15 * 60 * 1000;
+
+  const delay = (
+    minDelay + Math.random() * (maxDelay - minDelay)
+  ) / goldenCookieSpawnMultiplier;
+
+  return delay;
+}
+
+function scheduleGoldenCookie() {
+  // Only active once the upgrade has been bought.
+  if (!upgrades["Golden Cookies"]?.bought) return;
+
+  // Never schedule a new golden cookie while one is already present.
+  if (goldenCookieVisible || goldenCookieTimer) return;
+
+  const delay = randomGoldenCookieDelay();
+
+  goldenCookieTimer = setTimeout(() => {
+    goldenCookieTimer = null;
+    spawnGoldenCookie();
+  }, delay);
+}
+
+function updateGoldenCookieModifiers() {
+  goldenCookieSpawnMultiplier = 1;
+  goldenCookieDurationMultiplier = 1;
+
+  if (upgrades["Lucky Day"]?.bought) {
+    goldenCookieSpawnMultiplier *= 2;
+    goldenCookieDurationMultiplier *= 2;
+  }
+
+  if (upgrades["Serendipity"]?.bought) {
+    goldenCookieSpawnMultiplier *= 2;
+    goldenCookieDurationMultiplier *= 2;
+  }
+
+  if (upgrades["Get Lucky"]?.bought) {
+    goldenCookieSpawnMultiplier *= 2;
+  }
+}
+
+function goldenCookieLucky() {
+  const bankedCookies = cookies * 0.15 + 13;
+  const fifteenMinutes = getCookiesPerSecond() * 900 + 13;
+
+  const reward = Math.min(bankedCookies, fifteenMinutes);
+
+  cookies += reward;
+  cookiesBakedAllTime += reward;
+
+  new Pop("credits", `Lucky! +${Math.floor(reward)} cookies`);
+}
+
+function goldenCookieFrenzy() {
+  goldenCookieCpsMultiplier = 7;
+  goldenCookieFrenzyTimer = 77 * TICKS_PER_SECOND;
+  new Pop("credits", "Frenzy!");
+}
+
+function goldenCookieClickFrenzy() {
+  goldenCookieClickMultiplier = 777;
+  goldenCookieClickFrenzyTimer = 13 * TICKS_PER_SECOND;
+  new Pop("credits", "Click Frenzy!");
+}
+
+function goldenCookieClot() {
+  new Pop("credits", "Clot");
+}
+
+/* ---------------------------------------------------------------- */
+/* Buffs display                                                    */
+/* ---------------------------------------------------------------- */
+
+function createBuffDisplay() {
+  if (getElement("buffs")) return;
+
+  const saveMenu = getElement("saveMenu");
+  if (!saveMenu) return;
+
+  const buffs = document.createElement("div");
+  buffs.id = "buffs";
+
+  saveMenu.insertAdjacentElement("afterend", buffs);
+}
+
+function updateBuffDisplay() {
+  const container = getElement("buffs");
+  if (!container) return;
+
+  const activeBuffs = getActiveBuffs();
+
+  const activeIds = activeBuffs.map(buff => buff.id).join(",");
+
+  if (container.dataset.active !== activeIds) {
+    container.innerHTML = activeBuffs.map(buff => `
+      <div class="activeBuff" data-buff="${buff.id}">
+        <img src="${buff.icon}">
+        <div class="buffTimer"></div>
+        <span class="buffTooltip">
+          <b>${buff.name}</b><br>
+          ${buff.description}
+        </span>
+      </div>
+    `).join("");
+
+    container.dataset.active = activeIds;
+  }
+
+  activeBuffs.forEach(buff => {
+    const element = container.querySelector(
+      `[data-buff="${buff.id}"]`
+    );
+
+    if (!element) return;
+
+    const seconds = Math.ceil(buff.timer / TICKS_PER_SECOND);
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+
+    const timerText =
+      minutes > 0
+        ? `${minutes}:${String(remainingSeconds).padStart(2, "0")}`
+        : `${remainingSeconds}s`;
+
+    element.querySelector(".buffTimer").textContent = timerText;
+  });
+}
+
+function updateFrenzyHalo() {
+  const comment = getElement("comment");
+  if (!comment) return;
+
+  const frenzyActive =
+    goldenCookieFrenzyTimer > 0 ||
+    goldenCookieClickFrenzyTimer > 0;
+
+  comment.classList.toggle("goldenFrenzy", frenzyActive);
+}
+
+function getActiveBuffs() {
+  const buffs = [];
+
+  if (goldenCookieFrenzyTimer > 0) {
+    buffs.push({
+      id: "frenzy",
+      name: "Frenzy",
+      icon: "frenzyicon.png",
+      description: "Cookie production x7.",
+      timer: goldenCookieFrenzyTimer
+    });
+  }
+
+  if (goldenCookieClickFrenzyTimer > 0) {
+    buffs.push({
+      id: "clickFrenzy",
+      name: "Click Frenzy",
+      icon: "clickfrenzyicon.png",
+      description: "Cookie clicking x777.",
+      timer: goldenCookieClickFrenzyTimer
+    });
+  }
+
+  return buffs;
 }
 
 /* ---------------------------------------------------------------- */
@@ -1422,14 +1553,6 @@ function refreshPopAnchors() {
   }
 }
 
-/* ---------------------------------------------------------------- */
-/* Game loop                                                        */
-/* ---------------------------------------------------------------- */
-
-function getBuildingGain(name) {
-  return buildings[name].gain * multipliers[name] * goldenCookieCpsMultiplier * globalMultiplier;
-}
-
 function renderPops() {
   if (pops.length === 0) return;
 
@@ -1458,227 +1581,6 @@ function renderPops() {
   }
 
   getElement("pops").innerHTML = output;
-}
-
-let lastRenderedCursorCount = -1;
-
-function renderCursors() {
-  const count = buildings.Cursor.count;
-  if (count === lastRenderedCursorCount) return;
-
-  lastRenderedCursorCount = count;
-  const cookie = getElement("cookie");
-
-  if (!count) {
-    cookie.innerHTML = "";
-    return;
-  }
-
-  let output = "";
-
-  for (let i = 0; i < count; i++) {
-    const rotation = -Math.floor((360 / count) * i);
-    const x = Math.floor(64 + Math.sin((Math.PI * 2 / count) * i) * 64) - 16;
-    const y = Math.floor(64 + Math.cos((Math.PI * 2 / count) * i) * 64) - 16;
-    const bobDelay = Math.ceil((150 / count) * i) / 30;
-
-    output += `
-      <div class="cursor"
-        style="left:${x}px;top:${y}px;--cursor-rot:${rotation}deg;animation-delay:-${bobDelay}s;"
-        data-cursor>
-      </div>
-    `;
-  }
-
-  cookie.innerHTML = output;
-}
-
-function produceBuildingCookies(name, elementId) {
-  const count = buildings[name].count;
-  if (!count) return;
-
-  const interval = Math.max(1, Math.ceil(150 / count));
-
-  if (ticks % interval === 0) {
-    addCookies(getBuildingGain(name), elementId);
-  }
-}
-
-function updateStoreAffordability() {
-  Object.keys(storeBuyElements).forEach(name => {
-    const element = storeBuyElements[name];
-    if (!element) return;
-
-    element.classList.toggle(
-      "grayed",
-      cookies < buildings[name].currentPrice
-    );
-  });
-}
-
-function updateUpgradeAffordability() {
-  Object.keys(upgradeRowElements).forEach(name => {
-    const element = upgradeRowElements[name];
-    if (!element) return;
-
-    if (name === "pledge") {
-      element.classList.toggle(
-        "grayed",
-        pledge > 0 || cookies < elderPledge.currentPrice
-      );
-      return;
-    }
-
-    const upgrade = upgrades[name];
-    if (!upgrade || upgrade.bought || element.classList.contains("hidden")) return;
-
-    element.classList.toggle("grayed", cookies < upgrade.price);
-  });
-}
-
-function updatePledgeTimer() {
-  if (pledge > 0) {
-    pledge--;
-
-    const secondsLeft = Math.ceil(pledge / TICKS_PER_SECOND);
-    const minutes = Math.floor(secondsLeft / 60);
-    let seconds = secondsLeft % 60;
-
-    if (seconds < 10) seconds = "0" + seconds;
-
-    getElement("pledgeTimer").innerHTML = minutes + ":" + seconds;
-  } else {
-    getElement("pledgeTimer").innerHTML = "666";
-  }
-}
-
-/* Idling handling */
-// Le bloc de rattrapage extrait dans sa propre fonction, réutilisable
-function catchUpIdleTime() {
-  const now = performance.now();
-  const elapsedSeconds = Math.min((now - lastTickTimestamp) / 1000, MAX_OFFLINE_SECONDS);
-  lastTickTimestamp = now;
-  const missedTicks = Math.max(0, Math.floor(elapsedSeconds * TICKS_PER_SECOND) - 1);
-  if (missedTicks <= 0) return 0;
-
-  const gained = getCookiesPerSecond() * (missedTicks / TICKS_PER_SECOND);
-  cookies += gained;
-  cookiesBakedAllTime += gained;
-  ticks += missedTicks;
-  saveTimer -= missedTicks;
-  pledge = Math.max(0, pledge - missedTicks);
-  goldenCookieFrenzyTimer = Math.max(0, goldenCookieFrenzyTimer - missedTicks);
-  goldenCookieClickFrenzyTimer = Math.max(0, goldenCookieClickFrenzyTimer - missedTicks);
-  cookiesGainedWhileHidden += gained;
-
-  return gained;
-}
-
-function updateTitle() {
-  document.title = beautify(cookies) + " cookies - Cookie Clicker";
-}
-
-function handleVisibilityChange() {
-  if (document.hidden) {
-    document.title = "Idling... - Cookie Clicker";
-    cookiesGainedWhileHidden = 0;
-    return;
-  }
-  cameBackFromIdle = true;              // simple drapeau, pas de calcul ici
-}
-
-
-function main() {
-  catchUpIdleTime();
-
-  if (cameBackFromIdle) {
-    cameBackFromIdle = false;
-    if (cookiesGainedWhileHidden > 0) {
-      new Pop("credits", "Oh, you're back! Here are your cookies: " + beautify(Math.round(cookiesGainedWhileHidden)));
-    }
-    cookiesGainedWhileHidden = 0;
-    updateTitle();
-  }
-
-  if (storeToRebuild) rebuildStore();
-  if (upgradesToRebuild) rebuildUpgradesStore();
-
-  renderPops();
-  renderCursors();
-
-  produceBuildingCookies("Time machine", "times");
-  produceBuildingCookies("Portal", "portals");
-  produceBuildingCookies("Alchemy lab", "labs");
-  produceBuildingCookies("Shipment", "shipments");
-  produceBuildingCookies("Wizard tower", "towers");
-  produceBuildingCookies("Temple", "temples");
-  produceBuildingCookies("Bank", "banks");
-  produceBuildingCookies("Factory", "factories");
-  produceBuildingCookies("Mine", "mines");
-  produceBuildingCookies("Farm", "farms");
-  produceBuildingCookies("Grandma", "grandmas");
-  produceCursorCookies();
-
-
-  /* GC Timers */
-  if (goldenCookieFrenzyTimer > 0) {
-      goldenCookieFrenzyTimer--;
-
-      if (goldenCookieFrenzyTimer <= 0) {
-          goldenCookieFrenzyTimer = 0;
-          goldenCookieCpsMultiplier = 1;
-      }
-  }
-  if (goldenCookieClickFrenzyTimer > 0) {
-      goldenCookieClickFrenzyTimer--;
-
-      if (goldenCookieClickFrenzyTimer <= 0) {
-          goldenCookieClickFrenzyTimer = 0;
-          goldenCookieClickMultiplier = 1;
-      }
-  }
-
-  updateFrenzyHalo();
-  updateBuffDisplay();
-
-  const cps = getCookiesPerSecond();
-
-  if (ticks % 30 === 0) checkAchievements();
-
-  const floater = Math.round(cps * 10 - Math.floor(cps) * 10);
-
-  setElementText(
-    "cps",
-    "Cookies per second : " +
-    beautify(cps) +
-    (floater ? "." + floater : "")
-  );
-
-  updateStoreAffordability();
-  updateUpgradeAffordability();
-
-  cookiesDisplay += (cookies - cookiesDisplay) * 0.5;
-  setElementText("money", beautify(Math.round(cookiesDisplay)));
-  setElementText("comment", getComment(cookies));
-
-  updatePledgeTimer();
-
-  setElementText("prestigeDisplay", prestige);
-  setElementText("prestigeGainDisplay", Math.max(0, calculatePrestige() - prestige));
-  setElementText("resetCounterDisplay", resetCount);
-  setElementText("overlayAllTimeCookies", "Cookies baked (all time): " + beautify(cookiesBakedAllTime));
-
-  applyFlashEffect();
-
-  if (ticks % 30 === 0 && loaded) {
-    document.title = beautify(cookies) + " cookies - Cookie Clicker";
-  }
-
-  saveTimer--;
-  if (saveTimer <= 0 && loaded) saveGame();
-
-  ticks++;
-  setTimeout(main, 1000 / TICKS_PER_SECOND);
 }
 
 /* ---------------------------------------------------------------- */
@@ -1754,14 +1656,9 @@ function applyFlashEffect() {
   }
 }
 
-function calculatePrestige() {
-  return Math.max(
-    0,
-    Math.floor(
-      (-1 + Math.sqrt(1 + 8 * (cookiesBakedAllTime / 100000000))) / 2
-    )
-  );
-}
+/* ---------------------------------------------------------------- */
+/* Results overlay                                                  */
+/* ---------------------------------------------------------------- */
 
 function initOverlay() {
   const backdrop = getElement("overlayBackdrop");
@@ -1842,6 +1739,7 @@ function renderOverlayUpgrades() {
     `;
   }).join("");
 }
+
 function renderOverlayAchievements() {
   const unlocked = Object.values(achievements).filter(a => a.unlocked).length;
   const total = Object.keys(achievements).length;
@@ -1866,7 +1764,6 @@ function renderOverlayAchievements() {
     `;
   }).join("");
 }
-
 
 /* ---------------------------------------------------------------- */
 /* UI controls                                                      */
@@ -1912,6 +1809,141 @@ function toggleFlash() {
   settings.flashing = !settings.flashing;
   applySettingsToUI();
   saveSettings();
+}
+
+/* ---------------------------------------------------------------- */
+/* Idle handling                                                    */
+/* ---------------------------------------------------------------- */
+
+// Catch-up loop extracted into its own reusable function.
+function catchUpIdleTime() {
+  const now = performance.now();
+  const elapsedSeconds = Math.min((now - lastTickTimestamp) / 1000, MAX_OFFLINE_SECONDS);
+  lastTickTimestamp = now;
+  const missedTicks = Math.max(0, Math.floor(elapsedSeconds * TICKS_PER_SECOND) - 1);
+  if (missedTicks <= 0) return 0;
+
+  const gained = getCookiesPerSecond() * (missedTicks / TICKS_PER_SECOND);
+  cookies += gained;
+  cookiesBakedAllTime += gained;
+  ticks += missedTicks;
+  saveTimer -= missedTicks;
+  pledge = Math.max(0, pledge - missedTicks);
+  goldenCookieFrenzyTimer = Math.max(0, goldenCookieFrenzyTimer - missedTicks);
+  goldenCookieClickFrenzyTimer = Math.max(0, goldenCookieClickFrenzyTimer - missedTicks);
+  cookiesGainedWhileHidden += gained;
+
+  return gained;
+}
+
+function updateTitle() {
+  document.title = beautify(cookies) + " cookies - Cookie Clicker";
+}
+
+function handleVisibilityChange() {
+  if (document.hidden) {
+    document.title = "Idling... - Cookie Clicker";
+    cookiesGainedWhileHidden = 0;
+    return;
+  }
+  // Simple flag, no computation here; catch-up happens in main().
+  cameBackFromIdle = true;
+}
+
+/* ---------------------------------------------------------------- */
+/* Main game loop                                                   */
+/* ---------------------------------------------------------------- */
+
+function main() {
+  catchUpIdleTime();
+
+  if (cameBackFromIdle) {
+    cameBackFromIdle = false;
+    if (cookiesGainedWhileHidden > 0) {
+      new Pop("credits", "Oh, you're back! Here are your cookies: " + beautify(Math.round(cookiesGainedWhileHidden)));
+    }
+    cookiesGainedWhileHidden = 0;
+    updateTitle();
+  }
+
+  if (storeToRebuild) rebuildStore();
+  if (upgradesToRebuild) rebuildUpgradesStore();
+
+  renderPops();
+  renderCursors();
+
+  produceBuildingCookies("Time machine", "times");
+  produceBuildingCookies("Portal", "portals");
+  produceBuildingCookies("Alchemy lab", "labs");
+  produceBuildingCookies("Shipment", "shipments");
+  produceBuildingCookies("Wizard tower", "towers");
+  produceBuildingCookies("Temple", "temples");
+  produceBuildingCookies("Bank", "banks");
+  produceBuildingCookies("Factory", "factories");
+  produceBuildingCookies("Mine", "mines");
+  produceBuildingCookies("Farm", "farms");
+  produceBuildingCookies("Grandma", "grandmas");
+  produceCursorCookies();
+
+  // Golden cookie timers.
+  if (goldenCookieFrenzyTimer > 0) {
+    goldenCookieFrenzyTimer--;
+
+    if (goldenCookieFrenzyTimer <= 0) {
+      goldenCookieFrenzyTimer = 0;
+      goldenCookieCpsMultiplier = 1;
+    }
+  }
+  if (goldenCookieClickFrenzyTimer > 0) {
+    goldenCookieClickFrenzyTimer--;
+
+    if (goldenCookieClickFrenzyTimer <= 0) {
+      goldenCookieClickFrenzyTimer = 0;
+      goldenCookieClickMultiplier = 1;
+    }
+  }
+
+  updateFrenzyHalo();
+  updateBuffDisplay();
+
+  const cps = getCookiesPerSecond();
+
+  if (ticks % 30 === 0) checkAchievements();
+
+  const floater = Math.round(cps * 10 - Math.floor(cps) * 10);
+
+  setElementText(
+    "cps",
+    "Cookies per second : " +
+    beautify(cps) +
+    (floater ? "." + floater : "")
+  );
+
+  updateStoreAffordability();
+  updateUpgradeAffordability();
+
+  cookiesDisplay += (cookies - cookiesDisplay) * 0.5;
+  setElementText("money", beautify(Math.round(cookiesDisplay)));
+  setElementText("comment", getComment(cookies));
+
+  updatePledgeTimer();
+
+  setElementText("prestigeDisplay", prestige);
+  setElementText("prestigeGainDisplay", Math.max(0, calculatePrestige() - prestige));
+  setElementText("resetCounterDisplay", resetCount);
+  setElementText("overlayAllTimeCookies", "Cookies baked (all time): " + beautify(cookiesBakedAllTime));
+
+  applyFlashEffect();
+
+  if (ticks % 30 === 0 && loaded) {
+    document.title = beautify(cookies) + " cookies - Cookie Clicker";
+  }
+
+  saveTimer--;
+  if (saveTimer <= 0 && loaded) saveGame();
+
+  ticks++;
+  setTimeout(main, 1000 / TICKS_PER_SECOND);
 }
 
 /* ---------------------------------------------------------------- */
