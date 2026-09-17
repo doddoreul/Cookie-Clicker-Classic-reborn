@@ -199,8 +199,7 @@ const achievementTypes = {
 
   resets: {
     getProgress() {
-      // TODO: implement reset count
-      return 0;
+      return resetCount;
     }
   }
 };
@@ -212,6 +211,20 @@ const achievements = {
   "Cookie monster": { id: 3, type: "cps", requirement: 1000, description: "Bake 1,000 cookies per second.", unlocked: false },
   "Mass producer": { id: 4, type: "cps", requirement: 10000, description: "Bake 10,000 cookies per second.", unlocked: false },
   "Cookie vortex": { id: 5, type: "cps", requirement: 1000000, description: "Bake 1 million cookies per second.", unlocked: false },
+  "Cookie pulsar": { id: 72, type: "cps", requirement: 10000000, description: "Bake 10 million cookies per second.", unlocked: false },
+  "Cookie quasar": { id: 73, type: "cps", requirement: 100000000, description: "Bake 100 million cookies per second.", unlocked: false },
+  "Oh hey, you're still here": { id: 74, type: "cps", requirement: 1000000000, description: "Bake 1 billion cookies per second.", unlocked: false },
+  "Let's never bake again": { id: 75, type: "cps", requirement: 10000000000, description: "Bake 10 billion cookies per second.", unlocked: false },
+
+  "Wake and bake": { id: 76, type: "cookies", requirement: 1, description: "Bake 1 cookie in one reset.", unlocked: false },
+  "Making some dough": { id: 77, type: "cookies", requirement: 1000, description: "Bake 1,000 cookies in one reset.", unlocked: false },
+  "So baked right now": { id: 78, type: "cookies", requirement: 100000, description: "Bake 100,000 cookies in one reset.", unlocked: false },
+  "Fledgling bakery": { id: 79, type: "cookies", requirement: 1000000, description: "Bake 1 million cookies in one reset.", unlocked: false },
+  "Affluent bakery": { id: 80, type: "cookies", requirement: 100000000, description: "Bake 100 million cookies in one reset.", unlocked: false },
+  "World-famous bakery": { id: 81, type: "cookies", requirement: 1000000000, description: "Bake 1 billion cookies in one reset.", unlocked: false },
+  "Cosmic bakery": { id: 82, type: "cookies", requirement: 100000000000, description: "Bake 100 billion cookies in one reset.", unlocked: false },
+  "Galactic bakery": { id: 83, type: "cookies", requirement: 1000000000000, description: "Bake 1 trillion cookies in one reset.", unlocked: false },
+  "Universal bakery": { id: 84, type: "cookies", requirement: 100000000000000, description: "Bake 100 trillion cookies in one reset.", unlocked: false },
 
   "One finger": { id: 6, type: "buildings", target: "Cursor", requirement: 1, description: "Have 1 Cursor.", unlocked: false },
   "A handful of fingers": { id: 7, type: "buildings", target: "Cursor", requirement: 5, description: "Have 5 Cursors.", unlocked: false },
@@ -283,7 +296,14 @@ const achievements = {
   "Time traveler": { id: 62, type: "buildings", target: "Time machine", requirement: 5, description: "Have 5 Time Machines.", unlocked: false },
   "Temporal explorer": { id: 63, type: "buildings", target: "Time machine", requirement: 10, description: "Have 10 Time Machines.", unlocked: false },
   "Time network": { id: 64, type: "buildings", target: "Time machine", requirement: 20, description: "Have 20 Time Machines.", unlocked: false },
-  "Master of time": { id: 65, type: "buildings", target: "Time machine", requirement: 50, description: "Have 50 Time Machines.", unlocked: false }
+  "Master of time": { id: 65, type: "buildings", target: "Time machine", requirement: 50, description: "Have 50 Time Machines.", unlocked: false },
+
+  "Rebirth": { id: 66, type: "resets", requirement: 1, description: "Reset 1 time.", unlocked: false },
+  "Renaissance": { id: 67, type: "resets", requirement: 5, description: "Reset 5 times.", unlocked: false },
+  "Resurrection": { id: 68, type: "resets", requirement: 10, description: "Reset 10 times.", unlocked: false },
+  "Metempsychosis": { id: 69, type: "resets", requirement: 25, description: "Reset 25 times.", unlocked: false },
+  "Apotheosis": { id: 70, type: "resets", requirement: 50, description: "Reset 50 times.", unlocked: false },
+  "Reincarnation": { id: 71, type: "resets", requirement: 100, description: "Reset 100 times.", unlocked: false }
 };
 
 const upgrades = {

@@ -305,7 +305,7 @@ moni {
 .overlayTab:hover { background:#fff; }
 .overlayTab.active { background:#eee; }
 
-#overlayContent { padding:16px; overflow-y:auto; }
+#overlayContent { padding:16px; overflow-y:auto; min-height:0; }
 .overlayPane { display:none; }
 .overlayPane.active { display:block; }
 
