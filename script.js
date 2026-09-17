@@ -1391,7 +1391,7 @@ function updatePledgeTimer() {
 
     getElement("pledgeTimer").innerHTML = minutes + ":" + seconds;
   } else {
-    getElement("pledgeTimer").innerHTML = "00:00";
+    getElement("pledgeTimer").innerHTML = "666";
   }
 }
 
@@ -1506,6 +1506,7 @@ function main() {
   getElement("prestigeDisplay").innerHTML = prestige;
   getElement("prestigeGainDisplay").innerHTML = calculatePrestige();
   getElement("resetCounterDisplay").innerHTML = resetCount;
+  getElement("overlayAllTimeCookies").innerHTML = "Cookies baked (all time): " + beautify(cookiesBakedAllTime);
 
   applyFlashEffect();
 
