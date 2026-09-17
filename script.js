@@ -4,7 +4,7 @@
 /* Constants                                                        */
 /* ---------------------------------------------------------------- */
 
-const VERSION = "0.132";
+const VERSION = "0.133;
 const SAVE_KEY = "CookieClickerClassic_Reborn_Save";
 const SETTINGS_KEY = "CookieClickerClassic_Reborn_Settings";
 const SAVE_FORMAT_VERSION = 2;
@@ -163,7 +163,7 @@ const buildings = {
   Shipment: {
     id: 8,
     count: 0,
-    basePrice: 1000000000,
+    basePrice: 2000000000,
     gain: 5000000,
     description: "Brings in fresh cookies from the cookie planet.",
     icon: "shipmenticon"
@@ -171,7 +171,7 @@ const buildings = {
   "Alchemy lab": {
     id: 9,
     count: 0,
-    basePrice: 2500000000,
+    basePrice: 5000000000,
     gain: 10000000,
     description: "Turns gold into cookies!",
     icon: "labicon"
@@ -179,7 +179,7 @@ const buildings = {
   Portal: {
     id: 10,
     count: 0,
-    basePrice: 420000000000,
+    basePrice: 550000000000,
     gain: 20000000,
     description: "Opens a door to the Cookieverse.",
     icon: "portalicon"
@@ -266,6 +266,8 @@ const achievements = {
   "Many fingers": { id: 9, type: "buildings", target: "Cursor", requirement: 20, description: "Have 20 Cursors.", unlocked: false },
   "Finger army": { id: 10, type: "buildings", target: "Cursor", requirement: 50, description: "Have 50 Cursors.", unlocked: false },
   "Of Mice and Men": { id: 85, type: "buildings", target: "Cursor", requirement: 100, description: "Have 100 Cursors.", unlocked: false },
+  "The Digital": { id: 97, type: "buildings", target: "Cursor", requirement: 200, description: "Have 200 Cursors.", unlocked: false },
+  "Extreme polydactyly": { id: 98, type: "buildings", target: "Cursor", requirement: 300, description: "Have 300 Cursors.", unlocked: false },
 
   "First grandma": { id: 11, type: "buildings", target: "Grandma", requirement: 1, description: "Have 1 Grandma.", unlocked: false },
   "Grandma's kitchen": { id: 12, type: "buildings", target: "Grandma", requirement: 5, description: "Have 5 Grandmas.", unlocked: false },
@@ -273,6 +275,8 @@ const achievements = {
   "Grandma's village": { id: 14, type: "buildings", target: "Grandma", requirement: 20, description: "Have 20 Grandmas.", unlocked: false },
   "Grandma's empire": { id: 15, type: "buildings", target: "Grandma", requirement: 50, description: "Have 50 Grandmas.", unlocked: false },
   "Retirement home": { id: 86, type: "buildings", target: "Grandma", requirement: 100, description: "Have 100 Grandmas.", unlocked: false },
+  "Ruler of the ancients": { id: 99, type: "buildings", target: "Grandma", requirement: 200, description: "Have 200 Grandmas.", unlocked: false },
+  "The agemaster": { id: 100, type: "buildings", target: "Grandma", requirement: 300, description: "Have 300 Grandmas.", unlocked: false },
 
   "First harvest": { id: 16, type: "buildings", target: "Farm", requirement: 1, description: "Have 1 Farm.", unlocked: false },
   "Small farm": { id: 17, type: "buildings", target: "Farm", requirement: 5, description: "Have 5 Farms.", unlocked: false },
@@ -280,6 +284,8 @@ const achievements = {
   "Big farm": { id: 19, type: "buildings", target: "Farm", requirement: 20, description: "Have 20 Farms.", unlocked: false },
   "Cookie plantation": { id: 20, type: "buildings", target: "Farm", requirement: 50, description: "Have 50 Farms.", unlocked: false },
   "Farm ill": { id: 87, type: "buildings", target: "Farm", requirement: 100, description: "Have 100 Farms.", unlocked: false },
+  "Homegrown": { id: 101, type: "buildings", target: "Farm", requirement: 200, description: "Have 200 Farms.", unlocked: false },
+  "Seedy business": { id: 102, type: "buildings", target: "Farm", requirement: 300, description: "Have 300 Farms.", unlocked: false },
 
   "First mine": { id: 21, type: "buildings", target: "Mine", requirement: 1, description: "Have 1 Mine.", unlocked: false },
   "Small operation": { id: 22, type: "buildings", target: "Mine", requirement: 5, description: "Have 5 Mines.", unlocked: false },
@@ -287,6 +293,8 @@ const achievements = {
   "Deep mining": { id: 24, type: "buildings", target: "Mine", requirement: 20, description: "Have 20 Mines.", unlocked: false },
   "Cookie extraction": { id: 25, type: "buildings", target: "Mine", requirement: 50, description: "Have 50 Mines.", unlocked: false },
   "Hollow the planet": { id: 88, type: "buildings", target: "Mine", requirement: 100, description: "Have 100 Mines.", unlocked: false },
+  "The center of the Earth": { id: 103, type: "buildings", target: "Mine", requirement: 200, description: "Have 200 Mines.", unlocked: false },
+  "Freak fracking": { id: 104, type: "buildings", target: "Mine", requirement: 300, description: "Have 300 Mines.", unlocked: false },
 
   "First factory": { id: 26, type: "buildings", target: "Factory", requirement: 1, description: "Have 1 Factory.", unlocked: false },
   "Small industry": { id: 27, type: "buildings", target: "Factory", requirement: 5, description: "Have 5 Factories.", unlocked: false },
@@ -294,6 +302,8 @@ const achievements = {
   "Industrial complex": { id: 29, type: "buildings", target: "Factory", requirement: 20, description: "Have 20 Factories.", unlocked: false },
   "Cookie industry": { id: 30, type: "buildings", target: "Factory", requirement: 50, description: "Have 50 Factories.", unlocked: false },
   "Global warming": { id: 89, type: "buildings", target: "Factory", requirement: 100, description: "Have 100 Factories.", unlocked: false },
+  "Technocracy": { id: 105, type: "buildings", target: "Factory", requirement: 200, description: "Have 200 Factories.", unlocked: false },
+  "Modern times": { id: 106, type: "buildings", target: "Factory", requirement: 300, description: "Have 300 Factories.", unlocked: false },
 
   "First investment": { id: 31, type: "buildings", target: "Bank", requirement: 1, description: "Have 1 Bank.", unlocked: false },
   "Small savings": { id: 32, type: "buildings", target: "Bank", requirement: 5, description: "Have 5 Banks.", unlocked: false },
@@ -301,6 +311,8 @@ const achievements = {
   "Cookie finance": { id: 34, type: "buildings", target: "Bank", requirement: 20, description: "Have 20 Banks.", unlocked: false },
   "Cookie banking empire": { id: 35, type: "buildings", target: "Bank", requirement: 50, description: "Have 50 Banks.", unlocked: false },
   "A loan in the dark": { id: 90, type: "buildings", target: "Bank", requirement: 100, description: "Have 100 Banks.", unlocked: false },
+  "It's the economy, stupid": { id: 107, type: "buildings", target: "Bank", requirement: 200, description: "Have 200 Banks.", unlocked: false },
+  "The nerve of war": { id: 108, type: "buildings", target: "Bank", requirement: 300, description: "Have 300 Banks.", unlocked: false },
 
   "First temple": { id: 36, type: "buildings", target: "Temple", requirement: 1, description: "Have 1 Temple.", unlocked: false },
   "Sacred grounds": { id: 37, type: "buildings", target: "Temple", requirement: 5, description: "Have 5 Temples.", unlocked: false },
@@ -308,6 +320,8 @@ const achievements = {
   "Grand temple": { id: 39, type: "buildings", target: "Temple", requirement: 20, description: "Have 20 Temples.", unlocked: false },
   "Temple complex": { id: 40, type: "buildings", target: "Temple", requirement: 50, description: "Have 50 Temples.", unlocked: false },
   "New-age cult": { id: 91, type: "buildings", target: "Temple", requirement: 100, description: "Have 100 Temples.", unlocked: false },
+  "Fanaticism": { id: 109, type: "buildings", target: "Temple", requirement: 200, description: "Have 200 Temples.", unlocked: false },
+  "Wololo": { id: 110, type: "buildings", target: "Temple", requirement: 300, description: "Have 300 Temples.", unlocked: false },
 
   "First spell": { id: 41, type: "buildings", target: "Wizard tower", requirement: 1, description: "Have 1 Wizard Tower.", unlocked: false },
   "Apprentice wizard": { id: 42, type: "buildings", target: "Wizard tower", requirement: 5, description: "Have 5 Wizard Towers.", unlocked: false },
@@ -315,6 +329,8 @@ const achievements = {
   "Magical complex": { id: 44, type: "buildings", target: "Wizard tower", requirement: 20, description: "Have 20 Wizard Towers.", unlocked: false },
   "Wizarding citadel": { id: 45, type: "buildings", target: "Wizard tower", requirement: 50, description: "Have 50 Wizard Towers.", unlocked: false },
   "Charms and enchantments": { id: 92, type: "buildings", target: "Wizard tower", requirement: 100, description: "Have 100 Wizard Towers.", unlocked: false },
+  "Magic kingdom": { id: 111, type: "buildings", target: "Wizard tower", requirement: 200, description: "Have 200 Wizard Towers.", unlocked: false },
+  "And now for my next trick, I'll need a volunteer from the audience": { id: 112, type: "buildings", target: "Wizard tower", requirement: 300, description: "Have 300 Wizard Towers.", unlocked: false },
 
   "First shipment": { id: 46, type: "buildings", target: "Shipment", requirement: 1, description: "Have 1 Shipment.", unlocked: false },
   "Small fleet": { id: 47, type: "buildings", target: "Shipment", requirement: 5, description: "Have 5 Shipments.", unlocked: false },
@@ -322,6 +338,8 @@ const achievements = {
   "Trade network": { id: 49, type: "buildings", target: "Shipment", requirement: 20, description: "Have 20 Shipments.", unlocked: false },
   "Cookie trade empire": { id: 50, type: "buildings", target: "Shipment", requirement: 50, description: "Have 50 Shipments.", unlocked: false },
   "Far far away": { id: 93, type: "buildings", target: "Shipment", requirement: 100, description: "Have 100 Shipments.", unlocked: false },
+  "We come in peace": { id: 113, type: "buildings", target: "Shipment", requirement: 200, description: "Have 200 Shipments.", unlocked: false },
+  "It's not delivery": { id: 114, type: "buildings", target: "Shipment", requirement: 300, description: "Have 300 Shipments.", unlocked: false },
 
   "First experiment": { id: 51, type: "buildings", target: "Alchemy lab", requirement: 1, description: "Have 1 Alchemy Lab.", unlocked: false },
   "Amateur alchemist": { id: 52, type: "buildings", target: "Alchemy lab", requirement: 5, description: "Have 5 Alchemy Labs.", unlocked: false },
@@ -329,6 +347,8 @@ const achievements = {
   "Master laboratory": { id: 54, type: "buildings", target: "Alchemy lab", requirement: 20, description: "Have 20 Alchemy Labs.", unlocked: false },
   "Alchemy empire": { id: 55, type: "buildings", target: "Alchemy lab", requirement: 50, description: "Have 50 Alchemy Labs.", unlocked: false },
   "Gold member": { id: 94, type: "buildings", target: "Alchemy lab", requirement: 100, description: "Have 100 Alchemy Labs.", unlocked: false },
+  "The secrets of the universe": { id: 115, type: "buildings", target: "Alchemy lab", requirement: 200, description: "Have 200 Alchemy Labs.", unlocked: false },
+  "Gold, Jerry! Gold!": { id: 116, type: "buildings", target: "Alchemy lab", requirement: 300, description: "Have 300 Alchemy Labs.", unlocked: false },
 
   "First portal": { id: 56, type: "buildings", target: "Portal", requirement: 1, description: "Have 1 Portal.", unlocked: false },
   "Portal network": { id: 57, type: "buildings", target: "Portal", requirement: 5, description: "Have 5 Portals.", unlocked: false },
@@ -336,6 +356,8 @@ const achievements = {
   "Interdimensional network": { id: 59, type: "buildings", target: "Portal", requirement: 20, description: "Have 20 Portals.", unlocked: false },
   "Cookie multiverse": { id: 60, type: "buildings", target: "Portal", requirement: 50, description: "Have 50 Portals.", unlocked: false },
   "Dimensional shift": { id: 95, type: "buildings", target: "Portal", requirement: 100, description: "Have 100 Portals.", unlocked: false },
+  "Realm of the Mad God": { id: 117, type: "buildings", target: "Portal", requirement: 200, description: "Have 200 Portals.", unlocked: false },
+  "Forbidden zone": { id: 118, type: "buildings", target: "Portal", requirement: 300, description: "Have 300 Portals.", unlocked: false },
 
   "First trip": { id: 61, type: "buildings", target: "Time machine", requirement: 1, description: "Have 1 Time Machine.", unlocked: false },
   "Time traveler": { id: 62, type: "buildings", target: "Time machine", requirement: 5, description: "Have 5 Time Machines.", unlocked: false },
@@ -343,6 +365,8 @@ const achievements = {
   "Time network": { id: 64, type: "buildings", target: "Time machine", requirement: 20, description: "Have 20 Time Machines.", unlocked: false },
   "Master of time": { id: 65, type: "buildings", target: "Time machine", requirement: 50, description: "Have 50 Time Machines.", unlocked: false },
   "Rewriting history": { id: 96, type: "buildings", target: "Time machine", requirement: 100, description: "Have 100 Time Machines.", unlocked: false },
+  "Forever and ever": { id: 119, type: "buildings", target: "Time machine", requirement: 200, description: "Have 200 Time Machines.", unlocked: false },
+  "cookie clicker forever and forever a hundred years cookie clicker, all day long forever, forever a hundred times, over and over cookie clicker adventures dot com": { id: 120, type: "buildings", target: "Time machine", requirement: 300, description: "Have 300 Time Machines.", unlocked: false },
 
   "Rebirth": { id: 66, type: "resets", requirement: 1, description: "Reset 1 time.", unlocked: false },
   "Renaissance": { id: 67, type: "resets", requirement: 5, description: "Reset 5 times.", unlocked: false },
@@ -426,30 +450,30 @@ const upgrades = {
   "Primal chocolate": { id: 51, description: "Wizard towers x2.", price: 16500000000000000000, building: "Wizard tower", requiredCount: 200, multiplier: 2, requires: 50, bought: false },
 
   // Shipment upgrades
-  "Vanilla nebulae": { id: 52, description: "Shipments x2.", price: 51000000000, building: "Shipment", requiredCount: 1, multiplier: 2, bought: false },
-  "Wormholes": { id: 53, description: "Shipments x2.", price: 255000000000, building: "Shipment", requiredCount: 5, multiplier: 2, requires: 52, bought: false },
-  "Frequent flyer": { id: 54, description: "Shipments x2.", price: 2550000000000, building: "Shipment", requiredCount: 25, multiplier: 2, requires: 53, bought: false },
-  "Warp drive": { id: 55, description: "Shipments x2.", price: 255000000000000, building: "Shipment", requiredCount: 50, multiplier: 2, requires: 54, bought: false },
-  "Chocolate monoliths": { id: 56, description: "Shipments x2.", price: 25500000000000000, building: "Shipment", requiredCount: 100, multiplier: 2, requires: 55, bought: false },
-  "Generation ship": { id: 57, description: "Shipments x2.", price: 2550000000000000000, building: "Shipment", requiredCount: 150, multiplier: 2, requires: 56, bought: false },
-  "Dyson sphere": { id: 58, description: "Shipments x2.", price: 255000000000000000000, building: "Shipment", requiredCount: 200, multiplier: 2, requires: 57, bought: false },
+  "Vanilla nebulae": { id: 52, description: "Shipments x2.", price: 102000000000, building: "Shipment", requiredCount: 1, multiplier: 2, bought: false },
+  "Wormholes": { id: 53, description: "Shipments x2.", price: 510000000000, building: "Shipment", requiredCount: 5, multiplier: 2, requires: 52, bought: false },
+  "Frequent flyer": { id: 54, description: "Shipments x2.", price: 5100000000000, building: "Shipment", requiredCount: 25, multiplier: 2, requires: 53, bought: false },
+  "Warp drive": { id: 55, description: "Shipments x2.", price: 510000000000000, building: "Shipment", requiredCount: 50, multiplier: 2, requires: 54, bought: false },
+  "Chocolate monoliths": { id: 56, description: "Shipments x2.", price: 51000000000000000, building: "Shipment", requiredCount: 100, multiplier: 2, requires: 55, bought: false },
+  "Generation ship": { id: 57, description: "Shipments x2.", price: 5100000000000000000, building: "Shipment", requiredCount: 150, multiplier: 2, requires: 56, bought: false },
+  "Dyson sphere": { id: 58, description: "Shipments x2.", price: 510000000000000000000, building: "Shipment", requiredCount: 200, multiplier: 2, requires: 57, bought: false },
 
   // Alchemy Lab upgrades
-  "Antimony": { id: 59, description: "Alchemy labs x2.", price: 750000000000, building: "Alchemy lab", requiredCount: 1, multiplier: 2, bought: false },
-  "Essence of dough": { id: 60, description: "Alchemy labs x2.", price: 3750000000000, building: "Alchemy lab", requiredCount: 5, multiplier: 2, requires: 59, bought: false },
-  "True chocolate": { id: 61, description: "Alchemy labs x2.", price: 37500000000000, building: "Alchemy lab", requiredCount: 25, multiplier: 2, requires: 60, bought: false },
-  "Ambrosia": { id: 62, description: "Alchemy labs x2.", price: 3750000000000000, building: "Alchemy lab", requiredCount: 50, multiplier: 2, requires: 61, bought: false },
-  "Aqua crustulae": { id: 63, description: "Alchemy labs x2.", price: 375000000000000000, building: "Alchemy lab", requiredCount: 100, multiplier: 2, requires: 62, bought: false },
-  "Origin crucible": { id: 64, description: "Alchemy labs x2.", price: 3750000000000000000000, building: "Alchemy lab", requiredCount: 200, multiplier: 2, requires: 63, bought: false },
+  "Antimony": { id: 59, description: "Alchemy labs x2.", price: 1500000000000, building: "Alchemy lab", requiredCount: 1, multiplier: 2, bought: false },
+  "Essence of dough": { id: 60, description: "Alchemy labs x2.", price: 7500000000000, building: "Alchemy lab", requiredCount: 5, multiplier: 2, requires: 59, bought: false },
+  "True chocolate": { id: 61, description: "Alchemy labs x2.", price: 75000000000000, building: "Alchemy lab", requiredCount: 25, multiplier: 2, requires: 60, bought: false },
+  "Ambrosia": { id: 62, description: "Alchemy labs x2.", price: 7500000000000000, building: "Alchemy lab", requiredCount: 50, multiplier: 2, requires: 61, bought: false },
+  "Aqua crustulae": { id: 63, description: "Alchemy labs x2.", price: 750000000000000000, building: "Alchemy lab", requiredCount: 100, multiplier: 2, requires: 62, bought: false },
+  "Origin crucible": { id: 64, description: "Alchemy labs x2.", price: 7500000000000000000000, building: "Alchemy lab", requiredCount: 200, multiplier: 2, requires: 63, bought: false },
 
   // Portal upgrades
-  "Elder pact": { id: 65, description: "Portals x2.", price: 1000000000000, building: "Portal", requiredCount: 1, multiplier: 2, bought: false },
-  "Labyrinth": { id: 66, description: "Portals x2.", price: 5000000000000, building: "Portal", requiredCount: 5, multiplier: 2, requires: 65, bought: false },
-  "Neverclick": { id: 67, description: "Portals x2.", price: 50000000000000, building: "Portal", requiredCount: 25, multiplier: 2, requires: 66, bought: false },
-  "Heavenly chip secret": { id: 68, description: "Portals x2.", price: 5000000000000000, building: "Portal", requiredCount: 50, multiplier: 2, requires: 67, bought: false },
-  "Arcane aura": { id: 69, description: "Portals x2.", price: 500000000000000000, building: "Portal", requiredCount: 100, multiplier: 2, requires: 68, bought: false },
-  "The final frontier": { id: 70, description: "Portals x2.", price: 50000000000000000000, building: "Portal", requiredCount: 150, multiplier: 2, requires: 69, bought: false },
-  "Cookie dimensionality": { id: 71, description: "Portals x2.", price: 5000000000000000000000, building: "Portal", requiredCount: 200, multiplier: 2, requires: 70, bought: false },
+  "Elder pact": { id: 65, description: "Portals x2.", price: 1500000000000, building: "Portal", requiredCount: 1, multiplier: 2, bought: false },
+  "Labyrinth": { id: 66, description: "Portals x2.", price: 7500000000000, building: "Portal", requiredCount: 5, multiplier: 2, requires: 65, bought: false },
+  "Neverclick": { id: 67, description: "Portals x2.", price: 75000000000000, building: "Portal", requiredCount: 25, multiplier: 2, requires: 66, bought: false },
+  "Heavenly chip secret": { id: 68, description: "Portals x2.", price: 7500000000000000, building: "Portal", requiredCount: 50, multiplier: 2, requires: 67, bought: false },
+  "Arcane aura": { id: 69, description: "Portals x2.", price: 750000000000000000, building: "Portal", requiredCount: 100, multiplier: 2, requires: 68, bought: false },
+  "The final frontier": { id: 70, description: "Portals x2.", price: 75000000000000000000, building: "Portal", requiredCount: 150, multiplier: 2, requires: 69, bought: false },
+  "Cookie dimensionality": { id: 71, description: "Portals x2.", price: 7500000000000000000000, building: "Portal", requiredCount: 200, multiplier: 2, requires: 70, bought: false },
 
   // Time Machine upgrades
   "Flux capacitor": { id: 72, description: "Time machines x2.", price: 14000000000000, building: "Time machine", requiredCount: 1, multiplier: 2, bought: false },
@@ -472,6 +496,26 @@ const upgrades = {
   "Kitten engineers": { id: 85, description: "Production x2.", price: 90000000000, building: "kitten", requiredAchievements: 50, multiplier: 2, bought: false, requires: 84 },
   "Kitten overseers": { id: 86, description: "Production x2.5.", price: 9000000000000, building: "kitten", requiredAchievements: 75, multiplier: 2.5, bought: false, requires: 85 },
   "Kitten managers": { id: 87, description: "Production x3.", price: 900000000000000, building: "kitten", requiredAchievements: 100, multiplier: 3, bought: false, requires: 86 },
+
+  // Synergy upgrades
+  "Synergies vol. I": { id: 88, description: "A tome on building synergies. No effect yet.", price: 1000000000000, building: "synergies", bought: false },
+  "Synergies vol. II": { id: 89, description: "A weighty tome on building synergies. No effect yet.", price: 1000000000000000, building: "synergies", bought: false, requires: 88 },
+  "Future almanacs": { id: 90, description: "Farms gain +5% CpS per time machine. Time machines gain +0.1% CpS per farm. Lets you predict optimal planting times.", price: 2800000000000000000, building: "synergies", requiredBuildings: { Farm: 15, "Time machine": 15 }, effect: { Farm: { "Time machine": 0.05 }, "Time machine": { Farm: 0.001 } }, requires: 88, bought: false },
+  "Seismic magic": { id: 91, description: "Mines gain +5% CpS per wizard tower. Wizard towers gain +0.1% CpS per mine. Surprise earthquakes are an old favorite of wizardly frat houses.", price: 66024000000000, building: "synergies", requiredBuildings: { Mine: 15, "Wizard tower": 15 }, effect: { Mine: { "Wizard tower": 0.05 }, "Wizard tower": { Mine: 0.001 } }, requires: 88, bought: false },
+  "Contracts from beyond": { id: 92, description: "Banks gain +5% CpS per portal. Portals gain +0.1% CpS per bank. Make sure to read the fine print!", price: 200003000000000000, building: "synergies", requiredBuildings: { Bank: 15, Portal: 15 }, effect: { Bank: { Portal: 0.05 }, Portal: { Bank: 0.001 } }, requires: 88, bought: false },
+  "Paganism": { id: 93, description: "Temples gain +5% CpS per portal. Portals gain +0.1% CpS per temple. Some deities are better left unworshipped.", price: 200040000000000000, building: "synergies", requiredBuildings: { Temple: 15, Portal: 15 }, effect: { Temple: { Portal: 0.05 }, Portal: { Temple: 0.001 } }, requires: 88, bought: false },
+  "Arcane knowledge": { id: 94, description: "Wizard towers gain +5% CpS per alchemy lab. Alchemy labs gain +0.1% CpS per wizard tower. Some things were never meant to be known - only mildly speculated.", price: 15660000000000000, building: "synergies", requiredBuildings: { "Wizard tower": 15, "Alchemy lab": 15 }, effect: { "Wizard tower": { "Alchemy lab": 0.05 }, "Alchemy lab": { "Wizard tower": 0.001 } }, requires: 88, bought: false },
+  "Fossil fuels": { id: 95, description: "Mines gain +5% CpS per shipment. Shipments gain +0.1% CpS per mine. Extracted from the fuels of ancient, fossilized civilizations.", price: 1020000000000000, building: "synergies", requiredBuildings: { Mine: 15, Shipment: 15 }, effect: { Mine: { Shipment: 0.05 }, Shipment: { Mine: 0.001 } }, requires: 88, bought: false },
+  "Primordial ores": { id: 96, description: "Mines gain +5% CpS per alchemy lab. Alchemy labs gain +0.1% CpS per mine. Only the purest metals yield the sweetest sap of the earth.", price: 15000000000000000, building: "synergies", requiredBuildings: { Mine: 15, "Alchemy lab": 15 }, effect: { Mine: { "Alchemy lab": 0.05 }, "Alchemy lab": { Mine: 0.001 } }, requires: 88, bought: false },
+  "Infernal crops": { id: 97, description: "Farms gain +5% CpS per portal. Portals gain +0.1% CpS per farm. Sprinkle regularly with FIRE.", price: 200000000000000000, building: "synergies", requiredBuildings: { Farm: 15, Portal: 15 }, effect: { Farm: { Portal: 0.05 }, Portal: { Farm: 0.001 } }, requires: 88, bought: false },
+  "Relativistic parsec-skipping": { id: 98, description: "Shipments gain +5% CpS per time machine. Time machines gain +0.1% CpS per shipment. You don't want these naysayers on your ship.", price: 2810000000000000000, building: "synergies", requiredBuildings: { Shipment: 15, "Time machine": 15 }, effect: { Shipment: { "Time machine": 0.05 }, "Time machine": { Shipment: 0.001 } }, requires: 88, bought: false },
+  "Rain prayer": { id: 99, description: "Farms gain +5% CpS per temple. Temples gain +0.1% CpS per farm. A deeply spiritual ceremonial with complicated dance moves.", price: 4002000000000000000, building: "synergies", requiredBuildings: { Farm: 75, Temple: 75 }, effect: { Farm: { Temple: 0.05 }, Temple: { Farm: 0.001 } }, requires: 89, bought: false },
+  "Asteroid mining": { id: 100, description: "Mines gain +5% CpS per shipment. Shipments gain +0.1% CpS per mine. The 1974 United Cosmic Convention forbids it, but a space bribe goes a long way.", price: 1020000000000000000000, building: "synergies", requiredBuildings: { Mine: 75, Shipment: 75 }, effect: { Mine: { Shipment: 0.05 }, Shipment: { Mine: 0.001 } }, requires: 89, bought: false },
+  "Temporal overclocking": { id: 101, description: "Factories gain +5% CpS per time machine. Time machines gain +0.1% CpS per factory. More quickitude for increased speedation of fastness.", price: 2800000000000000000000000, building: "synergies", requiredBuildings: { Factory: 75, "Time machine": 75 }, effect: { Factory: { "Time machine": 0.05 }, "Time machine": { Factory: 0.001 } }, requires: 89, bought: false },
+  "Printing presses": { id: 102, description: "Factories gain +5% CpS per bank. Banks gain +0.1% CpS per factory. Fake bills so real, they're almost worth the ink.", price: 540000000000000000, building: "synergies", requiredBuildings: { Bank: 75, Factory: 75 }, effect: { Factory: { Bank: 0.05 }, Bank: { Factory: 0.001 } }, requires: 89, bought: false },
+  "Magical botany": { id: 103, description: "Farms gain +5% CpS per wizard tower. Wizard towers gain +0.1% CpS per farm. Already known in some newspapers as the wizard's GMOs.", price: 66002000000000000000, building: "synergies", requiredBuildings: { Farm: 75, "Wizard tower": 75 }, effect: { Farm: { "Wizard tower": 0.05 }, "Wizard tower": { Farm: 0.001 } }, requires: 89, bought: false },
+  "Shipyards": { id: 104, description: "Factories gain +5% CpS per shipment. Shipments gain +0.1% CpS per factory. Carpentry, blind luck, and asbestos insulation unite.", price: 1020000000000000000000, building: "synergies", requiredBuildings: { Factory: 75, Shipment: 75 }, effect: { Factory: { Shipment: 0.05 }, Shipment: { Factory: 0.001 } }, requires: 89, bought: false },
+  "Gold fund": { id: 105, description: "Banks gain +5% CpS per alchemy lab. Alchemy labs gain +0.1% CpS per bank. If gold is the economy's backbone, cookies are its hip joints.", price: 15003000000000000000000, building: "synergies", requiredBuildings: { Bank: 75, "Alchemy lab": 75 }, effect: { Bank: { "Alchemy lab": 0.05 }, "Alchemy lab": { Bank: 0.001 } }, requires: 89, bought: false },
 };
 
 /* ---------------------------------------------------------------- */
@@ -746,8 +790,23 @@ function clickCookie() {
   }
 }
 
+function getSynergyMultiplier(name) {
+  let multiplier = 1;
+
+  for (const upgrade of Object.values(upgrades)) {
+    const coefficients = !upgrade.bought ? null : upgrade.effect?.[name];
+    if (!coefficients) continue;
+
+    for (const [partner, coefficient] of Object.entries(coefficients)) {
+      multiplier += coefficient * getBuildingCount(partner);
+    }
+  }
+
+  return multiplier;
+}
+
 function getBuildingGain(name) {
-  return buildings[name].gain * multipliers[name] * goldenCookieCpsMultiplier * globalMultiplier;
+  return buildings[name].gain * multipliers[name] * getSynergyMultiplier(name) * goldenCookieCpsMultiplier * globalMultiplier;
 }
 
 function addCookies(amount, elementId) {
@@ -965,11 +1024,18 @@ function isUpgradeAvailable(upgrade) {
     }
   }
 
+  if (upgrade.requiredBuildings) {
+    for (const [buildingName, required] of Object.entries(upgrade.requiredBuildings)) {
+      const building = buildings[buildingName];
+      if (!building || building.count < required) return false;
+    }
+  }
+
   return true;
 }
 
 function applyUpgradeMultiplier(upgrade) {
-  if (upgrade.building === "GC") return;
+  if (upgrade.building === "GC" || upgrade.building === "synergies") return;
 
   if (upgrade.building === "kitten") {
     globalMultiplier *= upgrade.multiplier;
@@ -1708,7 +1774,8 @@ function initOverlay() {
 
 function renderChangelog() {
   const entries = [
-    { version: "0.132", date: "17/09/2026", notes: ["adding achievements and cleaning code"] },
+    { version: "0.133", date: "17/09/2026", notes: ["making Alek's gameplay harder"] },
+    { version: "0.132", notes: ["adding achievements and cleaning code"] },
     { version: "0.131f", notes: ["I'm bored"] },
     { version: "0.131e", notes: ["fixing prestige, adding kittens"] },
     { version: "0.131b", notes: ["adding icons, minor bug fixes, idling tests"] },
