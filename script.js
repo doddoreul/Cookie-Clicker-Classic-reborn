@@ -4,7 +4,7 @@
 /* DOM and formatting helpers                                      */
 /* ---------------------------------------------------------------- */
 
-const VERSION = "0.131d";
+const VERSION = "0.131e";
 const SAVE_KEY = "CookieClickerClassic_Reborn_Save";
 const SAVE_FORMAT_VERSION = 2;
 const TICKS_PER_SECOND = 30;
@@ -50,6 +50,7 @@ let prestige = 0;
 let pledge = 0;
 let saveTimer = SAVE_INTERVAL_SECONDS;
 let resetCount = 0;
+let globalMultiplier = 1;
 
 let goldenCookieVisible = false;
 let goldenCookieTimer = null;
@@ -415,6 +416,13 @@ const upgrades = {
   "Lucky Day": { id: 80, description: "GC appears twice as often and stay twice as long", price: 10000000, building: "GC", requiredCount: 1, multiplier: 1, bought: false, requires: 79 },
   "Serendipity": { id: 81, description: "GC appears twice as often and stay twice as long", price: 1000000000, building: "GC", requiredCount: 1, multiplier: 1, bought: false, requires: 80 },
   "Get Lucky": { id: 82, description: "GC appears twice as often", price: 100000000000, building: "GC", requiredCount: 1, multiplier: 1, bought: false, requires: 81 },
+
+  // Kitten upgrades
+  "Kitten helpers": { id: 83, description: "Production x2.", price: 9000000, building: "kitten", requiredAchievements: 13, multiplier: 2, bought: false },
+  "Kitten workers": { id: 84, description: "Production x2.", price: 900000000, building: "kitten", requiredAchievements: 25, multiplier: 2, bought: false, requires: 83 },
+  "Kitten engineers": { id: 85, description: "Production x2.", price: 90000000000, building: "kitten", requiredAchievements: 50, multiplier: 2, bought: false, requires: 84 },
+  "Kitten overseers": { id: 86, description: "Production x2.", price: 9000000000000, building: "kitten", requiredAchievements: 75, multiplier: 2, bought: false, requires: 85 },
+  "Kitten managers": { id: 87, description: "Production x2.", price: 900000000000000, building: "kitten", requiredAchievements: 100, multiplier: 2, bought: false, requires: 86 },
 };
 
 /* ---------------------------------------------------------------- */
@@ -560,14 +568,14 @@ function applySaveData(data) {
     multipliers[name] = 1;
   });
 
+  globalMultiplier = 1;
+
   (data.upgrades || []).forEach(name => {
     const upgrade = upgrades[name];
     if (!upgrade) return;
 
     upgrade.bought = true;
-    if (upgrade.building !== "GC") {
-      multipliers[upgrade.building] *= upgrade.multiplier;
-    }
+    applyUpgradeMultiplier(upgrade);
 
   });
 
@@ -674,7 +682,8 @@ function getCursorClickGain() {
 function getCursorAutoClickGain() {
   return getCursorGain()
     * (prestige + 1)
-    * goldenCookieCpsMultiplier;
+    * goldenCookieCpsMultiplier
+    * globalMultiplier;
 }
 
 function clickCookie() {
@@ -1149,6 +1158,15 @@ function isUpgradeAvailable(upgrade) {
     }
   }
 
+  if (upgrade.requiredAchievements !== undefined) {
+    const unlockedCount = Object.values(achievements)
+      .filter(achievement => achievement.unlocked).length;
+
+    if (unlockedCount < upgrade.requiredAchievements) {
+      return false;
+    }
+  }
+
   if (
     upgrade.building !== "GC" &&
     upgrade.requiredCount !== undefined
@@ -1163,6 +1181,16 @@ function isUpgradeAvailable(upgrade) {
   return true;
 }
 
+function applyUpgradeMultiplier(upgrade) {
+  if (upgrade.building === "GC") return;
+
+  if (upgrade.building === "kitten") {
+    globalMultiplier *= upgrade.multiplier;
+  } else {
+    multipliers[upgrade.building] *= upgrade.multiplier;
+  }
+}
+
 function buyUpgrade(name) {
   const upgrade = upgrades[name];
 
@@ -1171,9 +1199,7 @@ function buyUpgrade(name) {
   cookies -= upgrade.price;
   upgrade.bought = true;
 
-  if (upgrade.building !== "GC") {
-    multipliers[upgrade.building] *= upgrade.multiplier;
-  }
+  applyUpgradeMultiplier(upgrade);
 
   if (name === "Golden Cookies") {
     scheduleGoldenCookie();
@@ -1192,12 +1218,17 @@ function rebuildUpgradesStore() {
   const smallFont = "font-size:80%;";
 
   Object.entries(upgrades)
-    .sort(([, a], [, b]) => a.requiredCount - b.requiredCount)
+    .sort(([, a], [, b]) =>
+      (a.requiredCount ?? a.requiredAchievements ?? 0) -
+      (b.requiredCount ?? b.requiredAchievements ?? 0)
+    )
     .forEach(([name, upgrade]) => {
 
       // Upgrade filtering
       if (upgrade.building === "GC") {
         upgrade.icon = upgrade.building + "icon.png";
+      } else if (upgrade.building === "kitten") {
+        upgrade.icon = "kittensicon.png";
       } else {
         upgrade.icon =
           upgrade.building.replace(/\s/g, "").toLowerCase() + "icon.png";
@@ -1341,7 +1372,7 @@ function Pop(elementId, text) {
 /* ---------------------------------------------------------------- */
 
 function getBuildingGain(name) {
-  return buildings[name].gain * multipliers[name] * goldenCookieCpsMultiplier;
+  return buildings[name].gain * multipliers[name] * goldenCookieCpsMultiplier * globalMultiplier;
 }
 
 function renderPops() {
@@ -1701,7 +1732,7 @@ function initOverlay() {
 
 function renderChangelog() {
   const entries = [
-    { version: "0.131d", date: "17/09/2026", notes: ["fixing prestige"] },
+    { version: "0.131e", date: "17/09/2026", notes: ["fixing prestige, adding kittens"] },
     { version: "0.131b", notes: ["adding icons, minor bug fixes, idling tests"] },
     { version: "0.130", notes: ["adding Golden Cookies"] },
     { version: "0.129", notes: ["adding achievements"] },
