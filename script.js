@@ -4,7 +4,7 @@
 /* DOM and formatting helpers                                      */
 /* ---------------------------------------------------------------- */
 
-const VERSION = "0.131b";
+const VERSION = "0.131c";
 const SAVE_KEY = "CookieClickerClassic_Reborn_Save";
 const SAVE_FORMAT_VERSION = 2;
 const TICKS_PER_SECOND = 30;
@@ -492,6 +492,8 @@ function applySaveData(data) {
   pledge = Number.isFinite(data.pledge) ? data.pledge : 0;
   cookiesBakedAllTime = Number.isFinite(data.cookiesBakedAllTime) ? data.cookiesBakedAllTime : 0;
 
+  prestige = Math.min(prestige, calculatePrestige());
+
   goldenCookieClickFrenzyTimer = Number.isFinite(data.goldenCookieClickFrenzyTimer)
     ? Math.max(0, data.goldenCookieClickFrenzyTimer)
     : 0;
@@ -625,7 +627,7 @@ function importSave() {
 function resetGame() {
   if (!confirm("Do you REALLY want to start over?")) return;
 
-  prestige += calculatePrestige();
+  prestige = calculatePrestige();
   resetCount++;
   localStorage.setItem(SAVE_KEY, resetSaveString());
 
@@ -1221,6 +1223,48 @@ function rebuildUpgradesStore() {
 }
 
 /* ---------------------------------------------------------------- */
+/* Store tooltips                                                   */
+/* ---------------------------------------------------------------- */
+
+function positionStoreTooltip(item) {
+  const tooltip = item.querySelector(".tooltipTextStore");
+  if (!tooltip) return;
+
+  const rect = item.getBoundingClientRect();
+  const tooltipWidth = tooltip.offsetWidth;
+  const tooltipHeight = tooltip.offsetHeight;
+
+  let left = rect.left - tooltipWidth - 6;
+  const top = rect.top + rect.height / 2 - tooltipHeight / 2;
+
+  if (left < 6) left = rect.right + 6;
+
+  tooltip.style.left = left + "px";
+  tooltip.style.top = top + "px";
+}
+
+function setupStoreTooltips() {
+  const itemSelector = "#store > div, #store_upgrades > div";
+
+  document.addEventListener("mouseover", event => {
+    const item = event.target.closest(itemSelector);
+    if (item) positionStoreTooltip(item);
+  });
+
+  const repositionHovered = () => {
+    const hovered = document.querySelector(itemSelector + ":hover");
+    if (hovered) positionStoreTooltip(hovered);
+  };
+
+  window.addEventListener("resize", repositionHovered);
+
+  const panel = getElement("rightPanel");
+  if (panel) {
+    panel.addEventListener("scroll", repositionHovered);
+  }
+}
+
+/* ---------------------------------------------------------------- */
 /* Achievements                                                     */
 /* ---------------------------------------------------------------- */
 
@@ -1504,7 +1548,7 @@ function main() {
   updatePledgeTimer();
 
   getElement("prestigeDisplay").innerHTML = prestige;
-  getElement("prestigeGainDisplay").innerHTML = calculatePrestige();
+  getElement("prestigeGainDisplay").innerHTML = Math.max(0, calculatePrestige() - prestige);
   getElement("resetCounterDisplay").innerHTML = resetCount;
   getElement("overlayAllTimeCookies").innerHTML = "Cookies baked (all time): " + beautify(cookiesBakedAllTime);
 
@@ -1596,7 +1640,7 @@ function calculatePrestige() {
   return Math.max(
     0,
     Math.floor(
-      (-1 + Math.sqrt(1 + 8 * (cookies / 100000000))) / 2
+      (-1 + Math.sqrt(1 + 8 * (cookiesBakedAllTime / 100000000))) / 2
     )
   );
 }
@@ -1637,7 +1681,8 @@ function initOverlay() {
 
 function renderChangelog() {
   const entries = [
-    { version: "0.131b", date: "17/09/2026", notes: ["adding icons, minor bug fixes, idling tests"] },
+    { version: "0.131c", date: "17/09/2026", notes: ["fixing prestige"] },
+    { version: "0.131b", notes: ["adding icons, minor bug fixes, idling tests"] },
     { version: "0.130", notes: ["adding Golden Cookies"] },
     { version: "0.129", notes: ["adding achievements"] },
     { version: "0.128", notes: ["refactored naming and comments", "refactored building state", "cleaned up save handling"] },
@@ -1745,6 +1790,7 @@ function initialize() {
 
   initOverlay();
   createBuffDisplay();
+  setupStoreTooltips();
   loadGame();
 }
 

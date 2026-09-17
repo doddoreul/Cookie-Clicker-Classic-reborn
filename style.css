@@ -217,16 +217,29 @@ moni {
   padding: 5px;
   position: absolute;
   z-index: 1000000;
-  left: 50%;
-  bottom: 100%;
-  transform: translateX(-50%);
-  margin-bottom: 6px;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-right: 6px;
 }
 
 /* Show the tooltip text on hover */
 #store>div:hover .tooltipTextStore,
 #store_upgrades>div:hover .tooltipTextStore {
   visibility: visible;
+}
+
+/* Tooltip dans les stores : position fix pilotée par JS pour éviter le
+   clipping du #rightPanel (overflow-y:auto / overflow-x:hidden). */
+#store > div .tooltipTextStore,
+#store_upgrades > div .tooltipTextStore {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: auto;
+  bottom: auto;
+  transform: none;
+  margin: 0;
 }
 
 #goldenCookie {
