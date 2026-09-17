@@ -22,6 +22,16 @@ function getElement(id) {
   return document.getElementById(id);
 }
 
+const lastRenderedText = {};
+
+function setElementText(id, text) {
+  if (lastRenderedText[id] === text) return;
+
+  lastRenderedText[id] = text;
+  const element = getElement(id);
+  if (element) element.innerHTML = text;
+}
+
 function beautify(value) {
   const digits = Math.floor(value).toString().split("").reverse();
   let output = "";
@@ -1366,7 +1376,28 @@ function Pop(elementId, text) {
   this.life = 0;
   this.offsetX = Math.floor(Math.random() * 20 - 10);
   this.offsetY = Math.floor(Math.random() * 20 - 10);
+
+  const element = getElement(elementId);
+  const rect = element ? element.getBoundingClientRect() : null;
+  this.anchorX = rect ? (rect.left + rect.right) / 2 : 0;
+  this.anchorY = rect ? (rect.top + rect.bottom) / 2 : 0;
+
   pops.push(this);
+}
+
+function refreshPopAnchors() {
+  for (let i = pops.length - 1; i >= 0; i--) {
+    const pop = pops[i];
+    const element = getElement(pop.elementId);
+    if (!element) {
+      pops.splice(i, 1);
+      continue;
+    }
+
+    const rect = element.getBoundingClientRect();
+    pop.anchorX = (rect.left + rect.right) / 2;
+    pop.anchorY = (rect.top + rect.bottom) / 2;
+  }
 }
 
 /* ---------------------------------------------------------------- */
@@ -1378,20 +1409,16 @@ function getBuildingGain(name) {
 }
 
 function renderPops() {
+  if (pops.length === 0) return;
+
   let output = "";
 
   for (let i = pops.length - 1; i >= 0; i--) {
     const pop = pops[i];
-    const element = getElement(pop.elementId);
-    if (!element) {
-      pops.splice(i, 1);
-      continue;
-    }
 
-    const rect = element.getBoundingClientRect();
-    const x = Math.floor((rect.left + rect.right) / 2 + pop.offsetX) - 100;
+    const x = Math.floor(pop.anchorX + pop.offsetX) - 100;
     const y = Math.floor(
-      (rect.top + rect.bottom) / 2
+      pop.anchorY
       - Math.pow(pop.life / 100, 0.5) * 100
       + pop.offsetY
     ) - 10;
@@ -1411,30 +1438,37 @@ function renderPops() {
   getElement("pops").innerHTML = output;
 }
 
+let lastRenderedCursorCount = -1;
+
 function renderCursors() {
-  let output = "";
   const count = buildings.Cursor.count;
+  if (count === lastRenderedCursorCount) return;
+
+  lastRenderedCursorCount = count;
+  const cookie = getElement("cookie");
 
   if (!count) {
-    getElement("cookie").innerHTML = "";
+    cookie.innerHTML = "";
     return;
   }
 
+  let output = "";
+
   for (let i = 0; i < count; i++) {
     const rotation = -Math.floor((360 / count) * i);
-    let x = Math.floor(64 + Math.sin((Math.PI * 2 / count) * i) * 64) - 16;
-    let y = Math.floor(64 + Math.cos((Math.PI * 2 / count) * i) * 64) - 16;
-
-    if (ticks % 150 === Math.ceil((150 / count) * i)) y += 2;
+    const x = Math.floor(64 + Math.sin((Math.PI * 2 / count) * i) * 64) - 16;
+    const y = Math.floor(64 + Math.cos((Math.PI * 2 / count) * i) * 64) - 16;
+    const bobDelay = Math.ceil((150 / count) * i) / 30;
 
     output += `
       <div class="cursor"
-        style="left:${x}px;top:${y}px;transform:rotate(${rotation}deg);">
+        style="left:${x}px;top:${y}px;--cursor-rot:${rotation}deg;animation-delay:-${bobDelay}s;"
+        data-cursor>
       </div>
     `;
   }
 
-  getElement("cookie").innerHTML = output;
+  cookie.innerHTML = output;
 }
 
 function produceBuildingCookies(name, elementId) {
@@ -1586,24 +1620,26 @@ function main() {
 
   const floater = Math.round(cps * 10 - Math.floor(cps) * 10);
 
-  getElement("cps").innerHTML =
+  setElementText(
+    "cps",
     "Cookies per second : " +
     beautify(cps) +
-    (floater ? "." + floater : "");
+    (floater ? "." + floater : "")
+  );
 
   updateStoreAffordability();
   updateUpgradeAffordability();
 
   cookiesDisplay += (cookies - cookiesDisplay) * 0.5;
-  getElement("money").innerHTML = beautify(Math.round(cookiesDisplay));
-  getElement("comment").innerHTML = getComment(cookies);
+  setElementText("money", beautify(Math.round(cookiesDisplay)));
+  setElementText("comment", getComment(cookies));
 
   updatePledgeTimer();
 
-  getElement("prestigeDisplay").innerHTML = prestige;
-  getElement("prestigeGainDisplay").innerHTML = Math.max(0, calculatePrestige() - prestige);
-  getElement("resetCounterDisplay").innerHTML = resetCount;
-  getElement("overlayAllTimeCookies").innerHTML = "Cookies baked (all time): " + beautify(cookiesBakedAllTime);
+  setElementText("prestigeDisplay", prestige);
+  setElementText("prestigeGainDisplay", Math.max(0, calculatePrestige() - prestige));
+  setElementText("resetCounterDisplay", resetCount);
+  setElementText("overlayAllTimeCookies", "Cookies baked (all time): " + beautify(cookiesBakedAllTime));
 
   applyFlashEffect();
 
@@ -1859,6 +1895,7 @@ function initialize() {
   applySettingsToUI();
 
   document.addEventListener("visibilitychange", handleVisibilityChange);
+  window.addEventListener("resize", refreshPopAnchors);
 
   getElement("version").innerHTML = "running v." + VERSION;
 

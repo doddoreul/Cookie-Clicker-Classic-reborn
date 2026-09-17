@@ -30,6 +30,12 @@ body::selection { background:transparent; }
   width:32px; height:32px;
   position:absolute;
   background:url(cursor.png);
+  transform:rotate(var(--cursor-rot)) translateY(0);
+  animation:cursorBob 5s linear infinite;
+}
+
+@keyframes cursorBob {
+  50% { transform:rotate(var(--cursor-rot)) translateY(2px); }
 }
 
 #pops {
