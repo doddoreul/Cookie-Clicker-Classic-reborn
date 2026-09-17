@@ -418,11 +418,11 @@ const upgrades = {
   "Get Lucky": { id: 82, description: "GC appears twice as often", price: 100000000000, building: "GC", requiredCount: 1, multiplier: 1, bought: false, requires: 81 },
 
   // Kitten upgrades
-  "Kitten helpers": { id: 83, description: "Production x2.", price: 9000000, building: "kitten", requiredAchievements: 13, multiplier: 2, bought: false },
-  "Kitten workers": { id: 84, description: "Production x2.", price: 900000000, building: "kitten", requiredAchievements: 25, multiplier: 2, bought: false, requires: 83 },
+  "Kitten helpers": { id: 83, description: "Production x1.5.", price: 9000000, building: "kitten", requiredAchievements: 13, multiplier: 1.5, bought: false },
+  "Kitten workers": { id: 84, description: "Production x1.75.", price: 900000000, building: "kitten", requiredAchievements: 25, multiplier: 1.75, bought: false, requires: 83 },
   "Kitten engineers": { id: 85, description: "Production x2.", price: 90000000000, building: "kitten", requiredAchievements: 50, multiplier: 2, bought: false, requires: 84 },
-  "Kitten overseers": { id: 86, description: "Production x2.", price: 9000000000000, building: "kitten", requiredAchievements: 75, multiplier: 2, bought: false, requires: 85 },
-  "Kitten managers": { id: 87, description: "Production x2.", price: 900000000000000, building: "kitten", requiredAchievements: 100, multiplier: 2, bought: false, requires: 86 },
+  "Kitten overseers": { id: 86, description: "Production x2.5.", price: 9000000000000, building: "kitten", requiredAchievements: 75, multiplier: 2.5, bought: false, requires: 85 },
+  "Kitten managers": { id: 87, description: "Production x3.", price: 900000000000000, building: "kitten", requiredAchievements: 100, multiplier: 3, bought: false, requires: 86 },
 };
 
 /* ---------------------------------------------------------------- */
@@ -1768,7 +1768,14 @@ function renderOverlayUpgrades() {
   }).join("");
 }
 function renderOverlayAchievements() {
-  getElement("overlayAchievementsList").innerHTML = Object.entries(achievements).map(([name, achievement]) => {
+  const unlocked = Object.values(achievements).filter(a => a.unlocked).length;
+  const total = Object.keys(achievements).length;
+
+  const header = `
+    <div class="overlayAchievementsHeader">Achievements ${unlocked}/${total}</div>
+  `;
+
+  getElement("overlayAchievementsList").innerHTML = header + Object.entries(achievements).map(([name, achievement]) => {
     const progress = getAchievementProgress(achievement);
     const status = achievement.unlocked ? "bought" : "locked";
     const label = achievement.unlocked
