@@ -169,6 +169,9 @@ let goldenCookieCpsMultiplier = 1;
 let goldenCookieFrenzyTimer = 0;
 let goldenCookieClickMultiplier = 1;
 let goldenCookieClickFrenzyTimer = 0;
+let goldenCookieBuildingSpecialTimer = 0;
+let goldenCookieBuildingSpecialMultiplier = 1;
+let goldenCookieBuildingSpecialBuilding = null;
 
 /* Idle and offline catch-up state */
 let lastTickTimestamp = performance.now ? performance.now() : Date.now();
@@ -661,6 +664,9 @@ function getSaveData() {
       .filter(name => achievements[name].unlocked),
     goldenCookieClickFrenzyTimer: goldenCookieClickFrenzyTimer,
     goldenCookieFrenzyTimer: goldenCookieFrenzyTimer,
+    goldenCookieBuildingSpecialTimer: goldenCookieBuildingSpecialTimer,
+    goldenCookieBuildingSpecialMultiplier: goldenCookieBuildingSpecialMultiplier,
+    goldenCookieBuildingSpecialBuilding: goldenCookieBuildingSpecialBuilding,
     elderPledgeCount: elderPledge.count,
     cookiesBakedAllTime,
   };
@@ -721,6 +727,24 @@ function applySaveData(data) {
 
   goldenCookieCpsMultiplier =
     goldenCookieFrenzyTimer > 0 ? 7 : 1;
+
+  goldenCookieBuildingSpecialTimer = Number.isFinite(data.goldenCookieBuildingSpecialTimer)
+    ? Math.max(0, data.goldenCookieBuildingSpecialTimer)
+    : 0;
+
+  goldenCookieBuildingSpecialMultiplier = Number.isFinite(data.goldenCookieBuildingSpecialMultiplier)
+    ? Math.max(0, data.goldenCookieBuildingSpecialMultiplier)
+    : 1;
+
+  goldenCookieBuildingSpecialBuilding =
+    typeof data.goldenCookieBuildingSpecialBuilding === "string"
+      ? data.goldenCookieBuildingSpecialBuilding
+      : null;
+
+  if (goldenCookieBuildingSpecialTimer <= 0) {
+    goldenCookieBuildingSpecialMultiplier = 1;
+    goldenCookieBuildingSpecialBuilding = null;
+  }
 
   elderPledge.count = Number.isFinite(data.elderPledgeCount)
     ? Math.max(0, data.elderPledgeCount)
@@ -873,6 +897,7 @@ function getCursorAutoClickGain() {
   return getCursorGain()
     * (prestige + 1)
     * goldenCookieCpsMultiplier
+    * goldenCookieBuildingSpecialMultiplier
     * globalMultiplier;
 }
 
@@ -908,7 +933,7 @@ function getSynergyMultiplier(name) {
 }
 
 function getBuildingGain(name) {
-  return buildings[name].gain * multipliers[name] * getSynergyMultiplier(name) * goldenCookieCpsMultiplier * globalMultiplier;
+  return buildings[name].gain * multipliers[name] * getSynergyMultiplier(name) * goldenCookieCpsMultiplier * goldenCookieBuildingSpecialMultiplier * globalMultiplier;
 }
 
 function addCookies(amount, elementId) {
@@ -1521,7 +1546,9 @@ function clickGoldenCookie(cookie) {
     goldenCookieLucky();
   } else if (roll < 0.80) {
     goldenCookieFrenzy();
-  } else if (roll < 0.837) {
+  } else if (roll < 0.90) {
+    goldenCookieBuildingSpecial();
+  } else if (roll < 0.937) {
     goldenCookieClickFrenzy();
   } else {
     goldenCookieClot();
@@ -1621,6 +1648,25 @@ function goldenCookieClickFrenzy() {
   new Pop("credits", "Click Frenzy!");
 }
 
+function goldenCookieBuildingSpecial() {
+  const owned = buildingNames.filter(name => buildings[name].count > 0);
+
+  if (!owned.length) {
+    goldenCookieLucky();
+    return;
+  }
+
+  const building = owned[Math.floor(Math.random() * owned.length)];
+
+  goldenCookieBuildingSpecialBuilding = building;
+  goldenCookieBuildingSpecialMultiplier =
+    buildings[building].count / 10 + 1;
+  goldenCookieBuildingSpecialTimer = 30 * TICKS_PER_SECOND;
+  invalidateGainCache();
+
+  new Pop("credits", "Building special!");
+}
+
 function goldenCookieClot() {
   new Pop("credits", "Clot");
 }
@@ -1715,6 +1761,17 @@ function getActiveBuffs() {
       icon: "clickfrenzyicon.png",
       description: "Cookie clicking x777.",
       timer: goldenCookieClickFrenzyTimer
+    });
+  }
+
+  if (goldenCookieBuildingSpecialTimer > 0) {
+    const multiplier = Math.round(goldenCookieBuildingSpecialMultiplier * 10) / 10;
+    buffs.push({
+      id: "buildingSpecial",
+      name: "Building special",
+      icon: "buildingspecialicon.png",
+      description: `${goldenCookieBuildingSpecialBuilding ?? ""} x${multiplier} cookie production.`,
+      timer: goldenCookieBuildingSpecialTimer
     });
   }
 
@@ -2126,6 +2183,16 @@ function catchUpIdleTime() {
   pledge = Math.max(0, pledge - missedTicks);
   goldenCookieFrenzyTimer = Math.max(0, goldenCookieFrenzyTimer - missedTicks);
   goldenCookieClickFrenzyTimer = Math.max(0, goldenCookieClickFrenzyTimer - missedTicks);
+
+  if (goldenCookieBuildingSpecialTimer > 0) {
+    goldenCookieBuildingSpecialTimer = Math.max(0, goldenCookieBuildingSpecialTimer - missedTicks);
+
+    if (goldenCookieBuildingSpecialTimer <= 0) {
+      goldenCookieBuildingSpecialMultiplier = 1;
+      goldenCookieBuildingSpecialBuilding = null;
+    }
+  }
+
   cookiesGainedWhileHidden += gained;
 
   return gained;
@@ -2197,6 +2264,17 @@ function main() {
     if (goldenCookieClickFrenzyTimer <= 0) {
       goldenCookieClickFrenzyTimer = 0;
       goldenCookieClickMultiplier = 1;
+    }
+  }
+
+  if (goldenCookieBuildingSpecialTimer > 0) {
+    goldenCookieBuildingSpecialTimer--;
+
+    if (goldenCookieBuildingSpecialTimer <= 0) {
+      goldenCookieBuildingSpecialTimer = 0;
+      goldenCookieBuildingSpecialMultiplier = 1;
+      goldenCookieBuildingSpecialBuilding = null;
+      invalidateGainCache();
     }
   }
 
