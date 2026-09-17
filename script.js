@@ -4,7 +4,7 @@
 /* Constants                                                        */
 /* ---------------------------------------------------------------- */
 
-const VERSION = "0.133;
+const VERSION = "0.133";
 const SAVE_KEY = "CookieClickerClassic_Reborn_Save";
 const SETTINGS_KEY = "CookieClickerClassic_Reborn_Settings";
 const SAVE_FORMAT_VERSION = 2;
@@ -31,7 +31,73 @@ function setElementText(id, text) {
   if (element) element.innerHTML = text;
 }
 
+const NUMBER_SUFFIXES = [
+  [1e6, "M"],        // million
+  [1e9, "B"],        // billion
+  [1e12, "T"],       // trillion
+  [1e15, "Qa"],      // quadrillion
+  [1e18, "Qi"],      // quintillion
+  [1e21, "Sx"],      // sextillion
+  [1e24, "Sp"],      // septillion
+  [1e27, "Oc"],      // octillion
+  [1e30, "No"],      // nonillion
+  [1e33, "Dc"],      // decillion
+  [1e36, "UDc"],     // undecillion
+  [1e39, "DDc"],     // duodecillion
+  [1e42, "TDc"],     // tredecillion
+  [1e45, "QaDc"],    // quattuordecillion
+  [1e48, "QiDc"],    // quindecillion
+  [1e51, "SxDc"],    // sexdecillion
+  [1e54, "SpDc"],    // septendecillion
+  [1e57, "OcDc"],    // octodecillion
+  [1e60, "NoDc"],    // novemdecillion
+  [1e63, "Vg"],      // vigintillion
+  [1e66, "UVg"],     // unvigintillion
+  [1e69, "DVg"],     // duovigintillion
+  [1e72, "TVg"],     // tresvigintillion
+  [1e75, "QaVg"],    // quattuorvigintillion
+  [1e78, "QiVg"],    // quinvigintillion
+  [1e81, "SxVg"],    // sesvigintillion
+  [1e84, "SpVg"],    // septenvigintillion
+  [1e87, "OcVg"],    // octovigintillion
+  [1e90, "NoVg"],    // novemvigintillion
+  [1e93, "VgVg"],    // trigintillion
+  [1e96, "UVgVg"],   // untrigintillion
+  [1e99, "DVgVg"],   // duotrigintillion
+  [1e102, "TVgVg"],  // tretrigintillion
+  [1e105, "QaVgVg"], // quattuortrigintillion
+  [1e108, "QiVgVg"], // quintrigintillion
+  [1e111, "SxVgVg"], // sextrigintillion
+  [1e114, "SpVgVg"], // septentrigintillion
+  [1e117, "OcVgVg"], // octotrigintillion
+  [1e120, "NoVgVg"], // novemtrigintillion
+  [1e123, "VgVgVg"]  // centillion
+];
+
+function beautifyShort(value) {
+  for (let i = NUMBER_SUFFIXES.length - 1; i >= 0; i--) {
+    const [power, suffix] = NUMBER_SUFFIXES[i];
+
+    if (value >= power) {
+      const scaled = value / power;
+
+      let decimals;
+      if (scaled < 10) decimals = 3;
+      else if (scaled < 100) decimals = 2;
+      else if (scaled < 1000) decimals = 1;
+      else decimals = 0;
+
+      return String(parseFloat(scaled.toFixed(decimals))) + suffix;
+    }
+  }
+
+  return null;
+}
+
 function beautify(value) {
+  const short = beautifyShort(value);
+  if (short !== null) return short;
+
   const digits = Math.floor(value).toString().split("").reverse();
   let output = "";
 
@@ -49,7 +115,8 @@ function beautify(value) {
 
 const defaultSettings = {
   numbersOn: true,
-  flashing: true
+  flashing: true,
+  bakeryName: ""
 };
 const settings = { ...defaultSettings };
 
@@ -123,72 +190,72 @@ const buildings = {
   Mine: {
     id: 3,
     count: 0,
-    basePrice: 2000,
-    gain: 50,
+    basePrice: 4000,
+    gain: 125,
     description: "Mines out cookie dough and chocolate chips.",
     icon: "mineicon"
   },
   Factory: {
     id: 4,
     count: 0,
-    basePrice: 7000,
-    gain: 100,
+    basePrice: 32000,
+    gain: 900,
     description: "Produces large quantities of cookies.",
     icon: "factoryicon"
   },
   Bank: {
     id: 5,
     count: 0,
-    basePrice: 50000,
-    gain: 250,
+    basePrice: 280000,
+    gain: 7000,
     description: "Generates cookies from interest.",
     icon: "bankicon"
   },
   Temple: {
     id: 6,
     count: 0,
-    basePrice: 1000000,
-    gain: 390,
+    basePrice: 1900000,
+    gain: 43000,
     description: "Full of precious, ancient chocolate.",
     icon: "templeicon"
   },
   "Wizard tower": {
     id: 7,
     count: 0,
-    basePrice: 123456789,
-    gain: 123456,
+    basePrice: 15000000,
+    gain: 325000,
     description: "Summons cookies with magic spells.",
     icon: "wizardtowericon"
   },
   Shipment: {
     id: 8,
     count: 0,
-    basePrice: 2000000000,
-    gain: 5000000,
+    basePrice: 130000000,
+    gain: 2400000,
     description: "Brings in fresh cookies from the cookie planet.",
     icon: "shipmenticon"
   },
   "Alchemy lab": {
     id: 9,
     count: 0,
-    basePrice: 5000000000,
-    gain: 10000000,
+    basePrice: 1300000000,
+    gain: 25000000,
     description: "Turns gold into cookies!",
     icon: "labicon"
   },
   Portal: {
     id: 10,
     count: 0,
-    basePrice: 550000000000,
-    gain: 20000000,
+    basePrice: 9000000000,
+    gain: 150000000,
     description: "Opens a door to the Cookieverse.",
     icon: "portalicon"
   },
   "Time machine": {
     id: 11,
     count: 0,
-    basePrice: 8000000000000,
-    gain: 200000000,
+    basePrice: 70000000000,
+    gain: 750000000,
     description: '<span style="font-size:80%;">Brings cookies from the past, before they were even eaten.</span>',
     icon: "timemachineicon"
   }
@@ -786,7 +853,7 @@ function clickCookie() {
   cookiesBakedAllTime += amount;
 
   if (pops.length < 260 && settings.numbersOn) {
-    new Pop("cookie", "+" + amount);
+    new Pop("cookie", "+" + beautify(amount));
   }
 }
 
@@ -815,7 +882,7 @@ function addCookies(amount, elementId) {
   cookiesBakedAllTime += amount;
 
   if (elementId && pops.length < 250 && settings.numbersOn) {
-    new Pop(elementId, "+" + amount);
+    new Pop(elementId, "+" + beautify(amount));
   }
 }
 
@@ -897,6 +964,8 @@ function rebuildStore() {
           ${building.count > 0 ? `<div class="amount">${building.count}</div>` : ""}
           <span class="tooltipTextStore">${building.description}</span>
         </div>
+        <div class="buySub buy10" data-name="${name}" data-buymulti="10" title="Buy 10">x10</div>
+        <div class="buySub buy100" data-name="${name}" data-buymulti="100" title="Buy 100">x100</div>
       </div>
     `;
   });
@@ -914,9 +983,46 @@ function rebuildStore() {
 
 function setupStoreDelegation() {
   getElement("store").addEventListener("click", event => {
+    const multiButton = event.target.closest("[data-buymulti]");
+    if (multiButton) {
+      buyBuildings(multiButton.dataset.name, Number(multiButton.dataset.buymulti));
+      return;
+    }
+
     const target = event.target.closest("[data-buy]");
     if (target) buyBuilding(target.dataset.buy);
   });
+}
+
+function getBulkBuildingPrice(name, amount) {
+  const building = getBuilding(name);
+  if (!building) return 0;
+
+  let total = 0;
+  for (let i = 0; i < amount; i++) {
+    total += Math.ceil(
+      building.basePrice * Math.pow(1.1, building.count + i)
+    );
+  }
+
+  return total;
+}
+
+function buyBuildings(name, amount) {
+  const building = getBuilding(name);
+  if (!building || !loaded || amount <= 0) return;
+
+  const totalPrice = getBulkBuildingPrice(name, amount);
+  if (cookies < totalPrice) return;
+
+  cookies -= totalPrice;
+  building.count += amount;
+
+  updateBuildingPrice(name);
+  rebuildStore();
+  refreshAllBuildingVisuals();
+
+  upgradesToRebuild = true;
 }
 
 function buyBuilding(name) {
@@ -942,6 +1048,14 @@ function updateStoreAffordability() {
       "grayed",
       cookies < buildings[name].currentPrice
     );
+
+    element.querySelectorAll("[data-buymulti]").forEach(button => {
+      const amount = Number(button.dataset.buymulti);
+      button.classList.toggle(
+        "grayed",
+        cookies < getBulkBuildingPrice(name, amount)
+      );
+    });
   });
 }
 
@@ -1443,7 +1557,7 @@ function goldenCookieLucky() {
   cookies += reward;
   cookiesBakedAllTime += reward;
 
-  new Pop("credits", `Lucky! +${Math.floor(reward)} cookies`);
+  new Pop("credits", `Lucky! +${beautify(Math.floor(reward))} cookies`);
 }
 
 function goldenCookieFrenzy() {
@@ -1872,6 +1986,39 @@ function saveSettings() {
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
 }
 
+function getBakeryDisplayName() {
+  return settings.bakeryName || "Cookie";
+}
+
+function refreshBakeryName() {
+  setElementText("bakeryName", getBakeryDisplayName() + "'s bakery");
+}
+
+function ensureBakeryName() {
+  if (settings.bakeryName) {
+    refreshBakeryName();
+    return;
+  }
+
+  const name = prompt("Welcome! What is the name of your bakery?");
+  settings.bakeryName = (name === null ? "" : name.trim()) || "Cookie";
+
+  saveSettings();
+  refreshBakeryName();
+}
+
+function changeBakeryName() {
+  const name = prompt(
+    "Enter a new name for your bakery:",
+    getBakeryDisplayName()
+  );
+  if (name === null) return;
+
+  settings.bakeryName = name.trim() || "Cookie";
+  saveSettings();
+  refreshBakeryName();
+}
+
 function applySettingsToUI() {
   getElement("toggleNumbers").innerHTML =
     settings.numbersOn ? "Numbers On" : "Numbers Off";
@@ -1996,7 +2143,7 @@ function main() {
     "cps",
     "Cookies per second : " +
     beautify(cps) +
-    (floater ? "." + floater : "")
+    (cps < 1e6 && floater ? "." + floater : "")
   );
 
   updateStoreAffordability();
@@ -2034,6 +2181,7 @@ function initialize() {
   initializeBuildingPrices();
   loadSettings();
   applySettingsToUI();
+  ensureBakeryName();
 
   document.addEventListener("visibilitychange", handleVisibilityChange);
   window.addEventListener("resize", refreshPopAnchors);
@@ -2058,6 +2206,7 @@ function initialize() {
   getElement("reset").addEventListener("click", resetGame);
   getElement("toggleNumbers").addEventListener("click", toggleNumbers);
   getElement("toggleFlash").addEventListener("click", toggleFlash);
+  getElement("changeBakeryName").addEventListener("click", changeBakeryName);
 
   setupStoreDelegation();
   setupStoreUpgradesDelegation();

@@ -101,6 +101,29 @@ body::selection { background:transparent; }
   position:absolute; right:8px; top:8px;
   font-size:48px; color:#000; opacity:.2;
 }
+#store > div .buySub {
+  position:absolute;
+  left:72px;
+  bottom:0;
+  width:46px;
+  height:16px;
+  line-height:16px;
+  text-align:center;
+  font-size:11px; font-weight:bold;
+  color:#000;
+  background:#eee;
+  border:1px solid #000;
+  box-sizing:border-box;
+  cursor:pointer;
+  z-index:2;
+}
+#store > div .buySub.buy10 { left:72px; }
+#store > div .buySub.buy100 { left:120px; }
+#store > div .buySub.grayed {
+  background:#888;
+  color:#000;
+  cursor:default;
+}
 #store_upgrades > div.bought,
 #store_upgrades > div.hidden { display:none; }
 
@@ -131,6 +154,10 @@ body::selection { background:transparent; }
   background:var(--panel-bg);
   border-radius:8px;
   line-height:125%; z-index:100;
+}
+#saveMenu #bakeryName {
+  color:#000; font-size:15px;
+  white-space:nowrap;
 }
 #saveMenu .button {
   text-decoration:underline;
