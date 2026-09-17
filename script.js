@@ -4,7 +4,7 @@
 /* DOM and formatting helpers                                      */
 /* ---------------------------------------------------------------- */
 
-const VERSION = "0.131a";
+const VERSION = "0.131b";
 const SAVE_KEY = "CookieClickerClassic_Reborn_Save";
 const SAVE_FORMAT_VERSION = 2;
 const TICKS_PER_SECOND = 30;
@@ -60,6 +60,12 @@ let goldenCookieCpsMultiplier = 1;
 let goldenCookieFrenzyTimer = 0;
 let goldenCookieClickMultiplier = 1;
 let goldenCookieClickFrenzyTimer = 0;
+
+/* Idling catchup */
+let lastTickTimestamp = performance.now ? performance.now() : Date.now();
+const MAX_OFFLINE_SECONDS = 24 * 60 * 60; // Max offline production
+let cameBackFromIdle = false;
+let cookiesGainedWhileHidden = 0;
 
 const buildings = {
   Cursor: {
@@ -1214,7 +1220,6 @@ function rebuildUpgradesStore() {
   upgradesToRebuild = false;
 }
 
-
 /* ---------------------------------------------------------------- */
 /* Achievements                                                     */
 /* ---------------------------------------------------------------- */
@@ -1346,7 +1351,6 @@ function produceBuildingCookies(name, elementId) {
   }
 }
 
-
 function updateStoreAffordability() {
   Object.keys(buildings).forEach(name => {
     const element = getElement("buy" + name);
@@ -1391,7 +1395,54 @@ function updatePledgeTimer() {
   }
 }
 
+/* Idling handling */
+// Le bloc de rattrapage extrait dans sa propre fonction, réutilisable
+function catchUpIdleTime() {
+  const now = performance.now();
+  const elapsedSeconds = Math.min((now - lastTickTimestamp) / 1000, MAX_OFFLINE_SECONDS);
+  lastTickTimestamp = now;
+  const missedTicks = Math.max(0, Math.floor(elapsedSeconds * TICKS_PER_SECOND) - 1);
+  if (missedTicks <= 0) return 0;
+
+  const gained = getCookiesPerSecond() * (missedTicks / TICKS_PER_SECOND);
+  cookies += gained;
+  cookiesBakedAllTime += gained;
+  ticks += missedTicks;
+  saveTimer -= missedTicks;
+  pledge = Math.max(0, pledge - missedTicks);
+  goldenCookieFrenzyTimer = Math.max(0, goldenCookieFrenzyTimer - missedTicks);
+  goldenCookieClickFrenzyTimer = Math.max(0, goldenCookieClickFrenzyTimer - missedTicks);
+  cookiesGainedWhileHidden += gained;
+
+  return gained;
+}
+
+function updateTitle() {
+  document.title = beautify(cookies) + " cookies - Cookie Clicker";
+}
+
+function handleVisibilityChange() {
+  if (document.hidden) {
+    document.title = "Idling... - Cookie Clicker";
+    cookiesGainedWhileHidden = 0;
+    return;
+  }
+  cameBackFromIdle = true;              // simple drapeau, pas de calcul ici
+}
+
+
 function main() {
+  catchUpIdleTime();
+
+  if (cameBackFromIdle) {
+    cameBackFromIdle = false;
+    if (cookiesGainedWhileHidden > 0) {
+      new Pop("credits", "Oh, you're back! Here are your cookies: " + beautify(Math.round(cookiesGainedWhileHidden)));
+    }
+    cookiesGainedWhileHidden = 0;
+    updateTitle();
+  }
+
   if (storeToRebuild) rebuildStore();
   if (upgradesToRebuild) rebuildUpgradesStore();
 
@@ -1585,7 +1636,7 @@ function initOverlay() {
 
 function renderChangelog() {
   const entries = [
-    { version: "0.131a", date: "15/09/2026", notes: ["adding icons, minor bug fixes"] },
+    { version: "0.131b", date: "17/09/2026", notes: ["adding icons, minor bug fixes, idling tests"] },
     { version: "0.130", notes: ["adding Golden Cookies"] },
     { version: "0.129", notes: ["adding achievements"] },
     { version: "0.128", notes: ["refactored naming and comments", "refactored building state", "cleaned up save handling"] },
@@ -1660,6 +1711,8 @@ function toggleFlash() {
 
 function initialize() {
   initializeBuildingPrices();
+
+  document.addEventListener("visibilitychange", handleVisibilityChange);
 
   getElement("version").innerHTML = "running v." + VERSION;
 
