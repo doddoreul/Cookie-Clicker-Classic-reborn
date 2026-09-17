@@ -209,16 +209,18 @@ moni {
 
 /* Tooltip text */
 .tooltipTextStore {
-  visibility: hidden; /* Hidden by default */
-  width: 150px;
+  visibility: hidden;
+  width: 200px;
   background-color: black;
   color: #ffffff;
   text-align: center;
-  padding: 5px 0;
+  padding: 5px;
   position: absolute;
-  z-index: 1; /* Ensure tooltip is displayed above content */
-  top: -5px;
-  right: 105%;
+  z-index: 1000000;
+  left: 50%;
+  bottom: 100%;
+  transform: translateX(-50%);
+  margin-bottom: 6px;
 }
 
 /* Show the tooltip text on hover */
