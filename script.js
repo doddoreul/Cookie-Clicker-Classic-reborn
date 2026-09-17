@@ -4,7 +4,7 @@
 /* Constants                                                        */
 /* ---------------------------------------------------------------- */
 
-const VERSION = "0.133";
+const VERSION = "0.134";
 const SAVE_KEY = "CookieClickerClassic_Reborn_Save";
 const SETTINGS_KEY = "CookieClickerClassic_Reborn_Settings";
 const SAVE_FORMAT_VERSION = 2;
@@ -130,6 +130,7 @@ let loaded = false;
 let storeToRebuild = true;
 let upgradesToRebuild = true;
 let storeBuyElements = {};
+let storeBulkElements = {};
 let upgradeRowElements = {};
 let cookies = 0;
 let cookiesBakedAllTime = 0;
@@ -140,6 +141,23 @@ let pledge = 0;
 let saveTimer = SAVE_INTERVAL_SECONDS;
 let resetCount = 0;
 let globalMultiplier = 1;
+
+/* Gain cache (synergy multipliers and cookies per second) */
+let gainCacheDirty = true;
+let cachedSynergy = {};
+let cachedCps = null;
+
+function invalidateGainCache() {
+  gainCacheDirty = true;
+}
+
+function ensureGainCache() {
+  if (gainCacheDirty) {
+    cachedSynergy = {};
+    cachedCps = null;
+    gainCacheDirty = false;
+  }
+}
 
 /* Golden cookie state */
 let goldenCookieVisible = false;
@@ -158,7 +176,10 @@ let cameBackFromIdle = false;
 let cookiesGainedWhileHidden = 0;
 
 /* Floating number pops */
-const pops = [];/* ---------------------------------------------------------------- */
+const pops = [];
+const popAnchors = {};
+
+/* ---------------------------------------------------------------- */
 /* Buildings                                                        */
 /* ---------------------------------------------------------------- */
 
@@ -585,6 +606,9 @@ const upgrades = {
   "Gold fund": { id: 105, description: "Banks gain +5% CpS per alchemy lab. Alchemy labs gain +0.1% CpS per bank. If gold is the economy's backbone, cookies are its hip joints.", price: 15003000000000000000000, building: "synergies", requiredBuildings: { Bank: 75, "Alchemy lab": 75 }, effect: { Bank: { "Alchemy lab": 0.05 }, "Alchemy lab": { Bank: 0.001 } }, requires: 89, bought: false },
 };
 
+const upgradeList = Object.values(upgrades);
+const buildingNames = Object.keys(buildings);
+
 /* ---------------------------------------------------------------- */
 /* Building helpers                                                 */
 /* ---------------------------------------------------------------- */
@@ -602,6 +626,8 @@ function updateBuildingPrice(name) {
   building.currentPrice = Math.ceil(
     building.basePrice * Math.pow(1.1, building.count)
   );
+  building.bulkPrice10 = getBulkBuildingPrice(name, 10);
+  building.bulkPrice100 = getBulkBuildingPrice(name, 100);
 }
 
 function initializeBuildingPrices() {
@@ -714,6 +740,9 @@ function applySaveData(data) {
     if (building.currentPrice < building.basePrice) {
       building.currentPrice = building.basePrice;
     }
+
+    building.bulkPrice10 = getBulkBuildingPrice(name, 10);
+    building.bulkPrice100 = getBulkBuildingPrice(name, 100);
   });
 
   Object.keys(upgrades).forEach(name => {
@@ -751,6 +780,7 @@ function applySaveData(data) {
   refreshAllBuildingVisuals();
   storeToRebuild = true;
   upgradesToRebuild = true;
+  invalidateGainCache();
   return true;
 }
 
@@ -858,9 +888,13 @@ function clickCookie() {
 }
 
 function getSynergyMultiplier(name) {
+  ensureGainCache();
+
+  if (cachedSynergy[name] !== undefined) return cachedSynergy[name];
+
   let multiplier = 1;
 
-  for (const upgrade of Object.values(upgrades)) {
+  for (const upgrade of upgradeList) {
     const coefficients = !upgrade.bought ? null : upgrade.effect?.[name];
     if (!coefficients) continue;
 
@@ -869,6 +903,7 @@ function getSynergyMultiplier(name) {
     }
   }
 
+  cachedSynergy[name] = multiplier;
   return multiplier;
 }
 
@@ -920,15 +955,22 @@ function getCursorCps() {
 }
 
 function getCookiesPerSecond() {
+  ensureGainCache();
+
+  if (cachedCps !== null) return cachedCps;
+
   let cps = getCursorCps();
 
-  Object.keys(buildings).forEach(name => {
+  buildingNames.forEach(name => {
     if (name === "Cursor") return;
 
     const count = buildings[name].count;
+    if (!count) return;
+
     cps += count * getBuildingGain(name) / 5;
   });
 
+  cachedCps = cps;
   return cps;
 }
 
@@ -974,8 +1016,13 @@ function rebuildStore() {
   getElement("store").innerHTML = output;
 
   storeBuyElements = {};
+  storeBulkElements = {};
   getElement("store").querySelectorAll("[data-buy]").forEach(element => {
     storeBuyElements[element.dataset.buy] = element;
+  });
+  getElement("store").querySelectorAll("[data-buymulti]").forEach(element => {
+    const amount = Number(element.dataset.buymulti);
+    (storeBulkElements[element.dataset.name] ??= {})[amount] = element;
   });
 
   storeToRebuild = false;
@@ -1021,6 +1068,7 @@ function buyBuildings(name, amount) {
   updateBuildingPrice(name);
   rebuildStore();
   refreshAllBuildingVisuals();
+  invalidateGainCache();
 
   upgradesToRebuild = true;
 }
@@ -1035,6 +1083,7 @@ function buyBuilding(name) {
   updateBuildingPrice(name);
   rebuildStore();
   refreshAllBuildingVisuals();
+  invalidateGainCache();
 
   upgradesToRebuild = true;
 }
@@ -1044,18 +1093,15 @@ function updateStoreAffordability() {
     const element = storeBuyElements[name];
     if (!element) return;
 
-    element.classList.toggle(
-      "grayed",
-      cookies < buildings[name].currentPrice
-    );
+    const building = buildings[name];
 
-    element.querySelectorAll("[data-buymulti]").forEach(button => {
-      const amount = Number(button.dataset.buymulti);
-      button.classList.toggle(
-        "grayed",
-        cookies < getBulkBuildingPrice(name, amount)
-      );
-    });
+    element.classList.toggle("grayed", cookies < building.currentPrice);
+
+    const bulk = storeBulkElements[name];
+    if (!bulk) return;
+
+    if (bulk[10]) bulk[10].classList.toggle("grayed", cookies < building.bulkPrice10);
+    if (bulk[100]) bulk[100].classList.toggle("grayed", cookies < building.bulkPrice100);
   });
 }
 
@@ -1167,6 +1213,7 @@ function buyUpgrade(name) {
   upgrade.bought = true;
 
   applyUpgradeMultiplier(upgrade);
+  invalidateGainCache();
 
   if (name === "Golden Cookies") {
     scheduleGoldenCookie();
@@ -1283,6 +1330,7 @@ function buyElderPledge() {
   pledge += 30 * 60 * 10;
 
   refreshGrandmas();
+  invalidateGainCache();
   upgradesToRebuild = true;
 }
 
@@ -1563,6 +1611,7 @@ function goldenCookieLucky() {
 function goldenCookieFrenzy() {
   goldenCookieCpsMultiplier = 7;
   goldenCookieFrenzyTimer = 77 * TICKS_PER_SECOND;
+  invalidateGainCache();
   new Pop("credits", "Frenzy!");
 }
 
@@ -1715,6 +1764,23 @@ function checkAchievements() {
 /* Floating number pops                                             */
 /* ---------------------------------------------------------------- */
 
+function getPopAnchor(elementId) {
+  const cached = popAnchors[elementId];
+  if (cached) return cached;
+
+  const element = getElement(elementId);
+  if (!element) return { x: 0, y: 0 };
+
+  const rect = element.getBoundingClientRect();
+  const anchor = {
+    x: (rect.left + rect.right) / 2,
+    y: (rect.top + rect.bottom) / 2
+  };
+
+  popAnchors[elementId] = anchor;
+  return anchor;
+}
+
 function Pop(elementId, text) {
   this.elementId = elementId;
   this.text = text;
@@ -1722,15 +1788,16 @@ function Pop(elementId, text) {
   this.offsetX = Math.floor(Math.random() * 20 - 10);
   this.offsetY = Math.floor(Math.random() * 20 - 10);
 
-  const element = getElement(elementId);
-  const rect = element ? element.getBoundingClientRect() : null;
-  this.anchorX = rect ? (rect.left + rect.right) / 2 : 0;
-  this.anchorY = rect ? (rect.top + rect.bottom) / 2 : 0;
+  const anchor = getPopAnchor(elementId);
+  this.anchorX = anchor.x;
+  this.anchorY = anchor.y;
 
   pops.push(this);
 }
 
 function refreshPopAnchors() {
+  Object.keys(popAnchors).forEach(key => delete popAnchors[key]);
+
   for (let i = pops.length - 1; i >= 0; i--) {
     const pop = pops[i];
     const element = getElement(pop.elementId);
@@ -1739,9 +1806,9 @@ function refreshPopAnchors() {
       continue;
     }
 
-    const rect = element.getBoundingClientRect();
-    pop.anchorX = (rect.left + rect.right) / 2;
-    pop.anchorY = (rect.top + rect.bottom) / 2;
+    const anchor = getPopAnchor(pop.elementId);
+    pop.anchorX = anchor.x;
+    pop.anchorY = anchor.y;
   }
 }
 
@@ -1888,7 +1955,8 @@ function initOverlay() {
 
 function renderChangelog() {
   const entries = [
-    { version: "0.133", date: "17/09/2026", notes: ["making Alek's gameplay harder"] },
+    { version: "0.134", date: "17/09/2026", notes: ["optimizing runtime and adding a few tweaks"] },
+    { version: "0.133", notes: ["making Alek's gameplay harder"] },
     { version: "0.132", notes: ["adding achievements and cleaning code"] },
     { version: "0.131f", notes: ["I'm bored"] },
     { version: "0.131e", notes: ["fixing prestige, adding kittens"] },
@@ -2082,6 +2150,7 @@ function handleVisibilityChange() {
 /* ---------------------------------------------------------------- */
 
 function main() {
+  invalidateGainCache();
   catchUpIdleTime();
 
   if (cameBackFromIdle) {
@@ -2119,6 +2188,7 @@ function main() {
     if (goldenCookieFrenzyTimer <= 0) {
       goldenCookieFrenzyTimer = 0;
       goldenCookieCpsMultiplier = 1;
+      invalidateGainCache();
     }
   }
   if (goldenCookieClickFrenzyTimer > 0) {
