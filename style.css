@@ -17,6 +17,15 @@ body {
 }
 body::selection { background:transparent; }
 
+#eldersBackdrop {
+  position:fixed;
+  left:0; top:0;
+  width:100%; height:100%;
+  z-index:-1;
+  opacity:.5;
+  pointer-events:none;
+}
+
 #cookie {
   width:128px; height:128px;
   background:url(cookie.png);

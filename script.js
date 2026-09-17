@@ -57,6 +57,8 @@ const settings = { ...defaultSettings };
 let loaded = false;
 let storeToRebuild = true;
 let upgradesToRebuild = true;
+let storeBuyElements = {};
+let upgradeRowElements = {};
 let cookies = 0;
 let cookiesBakedAllTime = 0;
 let cookiesDisplay = 0;
@@ -1133,11 +1135,19 @@ function rebuildStore() {
 
   getElement("store").innerHTML = output;
 
+  storeBuyElements = {};
   getElement("store").querySelectorAll("[data-buy]").forEach(element => {
-    element.addEventListener("click", () => buyBuilding(element.dataset.buy));
+    storeBuyElements[element.dataset.buy] = element;
   });
 
   storeToRebuild = false;
+}
+
+function setupStoreDelegation() {
+  getElement("store").addEventListener("click", event => {
+    const target = event.target.closest("[data-buy]");
+    if (target) buyBuilding(target.dataset.buy);
+  });
 }
 
 /* ---------------------------------------------------------------- */
@@ -1276,13 +1286,25 @@ function rebuildUpgradesStore() {
 
   getElement("store_upgrades").innerHTML = output;
 
+  upgradeRowElements = {};
   getElement("store_upgrades").querySelectorAll("[data-upgrade]").forEach(element => {
-    element.addEventListener("click", () => buyUpgrade(element.dataset.upgrade));
+    upgradeRowElements[element.dataset.upgrade] = element;
   });
-
-  getElement("buyElderPledge").addEventListener("click", buyElderPledge);
+  upgradeRowElements.pledge = getElement("buyElderPledge");
 
   upgradesToRebuild = false;
+}
+
+function setupStoreUpgradesDelegation() {
+  getElement("store_upgrades").addEventListener("click", event => {
+    if (event.target.closest("#buyElderPledge")) {
+      buyElderPledge();
+      return;
+    }
+
+    const target = event.target.closest("[data-upgrade]");
+    if (target) buyUpgrade(target.dataset.upgrade);
+  });
 }
 
 /* ---------------------------------------------------------------- */
@@ -1483,8 +1505,8 @@ function produceBuildingCookies(name, elementId) {
 }
 
 function updateStoreAffordability() {
-  Object.keys(buildings).forEach(name => {
-    const element = getElement("buy" + name);
+  Object.keys(storeBuyElements).forEach(name => {
+    const element = storeBuyElements[name];
     if (!element) return;
 
     element.classList.toggle(
@@ -1495,19 +1517,23 @@ function updateStoreAffordability() {
 }
 
 function updateUpgradeAffordability() {
-  Object.keys(upgrades).forEach(name => {
-    const upgrade = upgrades[name];
-    const element = getElement("upgrade" + name);
+  Object.keys(upgradeRowElements).forEach(name => {
+    const element = upgradeRowElements[name];
+    if (!element) return;
 
-    if (!element || upgrade.bought || element.classList.contains("hidden")) return;
+    if (name === "pledge") {
+      element.classList.toggle(
+        "grayed",
+        pledge > 0 || cookies < elderPledge.currentPrice
+      );
+      return;
+    }
+
+    const upgrade = upgrades[name];
+    if (!upgrade || upgrade.bought || element.classList.contains("hidden")) return;
 
     element.classList.toggle("grayed", cookies < upgrade.price);
   });
-
-  const pledgeElement = getElement("buyElderPledge");
-  if (pledgeElement) {
-    pledgeElement.classList.toggle("grayed", pledge > 0 || cookies < elderPledge.currentPrice);
-  }
 }
 
 function updatePledgeTimer() {
@@ -1616,7 +1642,8 @@ function main() {
   updateBuffDisplay();
 
   const cps = getCookiesPerSecond();
-  checkAchievements();
+
+  if (ticks % 30 === 0) checkAchievements();
 
   const floater = Math.round(cps * 10 - Math.floor(cps) * 10);
 
@@ -1697,6 +1724,10 @@ function getComment(totalCookies) {
 
 function applyFlashEffect() {
   const whole = getElement("whole");
+  const backdrop = getElement("eldersBackdrop");
+
+  whole.style.background = "#ccc";
+  if (backdrop) backdrop.style.background = "";
 
   if (cookies >= 1000000 && pledge <= 0 && settings.flashing) {
     const intensity = (cookies - 1000000) / 2000000;
@@ -1710,18 +1741,16 @@ function applyFlashEffect() {
 
     if (cookies >= 10000000 && Math.random() < 0.02) icon = "skellington";
 
-    if (cookies >= 1000000000) {
-      whole.style.background =
+    if (backdrop && cookies >= 1000000000) {
+      backdrop.style.background =
         `url(kaleigrandma.png) ${Math.floor(ticks * 0.2)}px -${Math.floor(ticks * 0.1)}px`;
-    } else if (Math.random() < intensity) {
-      whole.style.background =
+    } else if (backdrop && Math.random() < intensity) {
+      backdrop.style.background =
         `url(${icon}.png) ${Math.floor(Math.random() * 4)}px ${Math.floor(Math.random() * 4)}px`;
-      whole.style.backgroundSize =
+      backdrop.style.backgroundSize =
         `${Math.floor(intensity2 * Math.random() * 64 + 64)}px ` +
         `${Math.floor(intensity2 * Math.random() * 64 + 64)}px`;
     }
-  } else {
-    whole.style.background = "#ccc";
   }
 }
 
@@ -1917,6 +1946,9 @@ function initialize() {
   getElement("reset").addEventListener("click", resetGame);
   getElement("toggleNumbers").addEventListener("click", toggleNumbers);
   getElement("toggleFlash").addEventListener("click", toggleFlash);
+
+  setupStoreDelegation();
+  setupStoreUpgradesDelegation();
 
   document.addEventListener("keydown", event => {
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
