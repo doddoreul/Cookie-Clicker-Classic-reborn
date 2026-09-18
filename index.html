@@ -1,109 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cookie Clicker</title>
-<!--
-  Cookie Clicker
-  Original code & graphics (c) Orteil, 2013
-  Cleaned up / refactored version — same gameplay, tidier code.
--->
-   <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cookie Clicker</title>
+  <!--
+    Cookie Clicker
+    Original code & graphics (c) Orteil, 2013
+    Cleaned up / refactored version — same gameplay, tidier code.
+  -->
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body id="whole">
-<div id="hiddenLoader" style="display:none;"></div>
-<div id="eldersBackdrop"></div>
+  <div id="hiddenLoader" style="display:none;"></div>
+  <div id="eldersBackdrop"></div>
 
-<div id="credits">
-  <span><b>Cookie Clicker</b> &copy;
-    <a href="http://orteil.dashnet.org" target="_blank" rel="noopener">Orteil</a>, 2013
-  </span>
-</div>
-
-<div id="game">
-
-  <div id="money"></div>
-
-  <div id="saveMenu">
-    <div id="bakeryName"></div>
-    <div id="cps"></div>
-    <div id="overlayAllTimeCookies"></div>
-    <div id="pledgeTime">Elder Pledge <span id="pledgeTimer">666</span></div>
-    <div id="grandmaAngerDisplay">Grandmas: Calm</div>
-    <div id="prestige">Prestige <span id="prestigeDisplay">0</span></div>
-    <div id="prestigeGain">Prestige gain <span id="prestigeGainDisplay">0</span></div>
-    <div id="prestigeUnleashed">Prestige unleashed <span id="prestigeUnleashedDisplay">0%</span></div>
-    <br>
-    <div class="button" id="reset">Reset</div>
-    <div id="resetCounter">Resets <span id="resetCounterDisplay">0</span></div>
-    <br>
-    <div class="button" id="openOverlayBtn" title="Menu">Menu</div>
-    <br>
-    <div id="version"></div>
+  <div id="credits">
+    <span><b>Cookie Clicker</b> &copy;
+      <a href="http://orteil.dashnet.org" target="_blank" rel="noopener">Orteil</a>, 2013
+    </span>
   </div>
 
-  <div id="rightPanel">
-    <div id="store_upgrades_title">Upgrades</div>
-    <div id="store_upgrades"></div>
-    <div id="store_title">Buildings</div>
-    <div id="store"></div>
-  </div>
+  <div id="game">
+    <div id="money"></div>
 
-  <div id="middle">
-    <div id="grandmas"></div>
-    <div id="farms"></div>
-    <div id="factories"></div>
-    <div id="banks"></div>
-    <div id="temples"></div>
-    <div id="mines"></div>
-    <div id="shipments"></div>
-    <div id="labs"></div>
-    <div id="portals"></div>
-    <div id="towers"></div>
-    <div id="times"></div>
-    <div id="comment">Loading...</div>
-    <div id="cookie"></div>
-  </div>
-
-  <div id="pops"></div>
-</div>
-
-<div id="overlayBackdrop">
-  <div id="overlay">
-    <div id="overlayClose">&times;</div>
-
-    <div id="overlayTabs">
-      <div class="overlayTab active" data-tab="settings">Settings</div>
-      <div class="overlayTab" data-tab="upgrades">Upgrades</div>
-      <div class="overlayTab" data-tab="achievements">Achievements</div>
+    <div id="saveMenu">
+      <div id="bakeryName"></div>
+      <div id="cps"></div>
+      <div id="overlayAllTimeCookies"></div>
+      <div id="pledgeTime">Elder Pledge <span id="pledgeTimer">666</span></div>
+      <div id="grandmaAngerDisplay">Grandmas: Calm</div>
+      <div id="prestige">Prestige <span id="prestigeDisplay">0</span></div>
+      <div id="prestigeGain">Prestige gain <span id="prestigeGainDisplay">0</span></div>
+      <div id="prestigeUnleashed">Prestige unleashed <span id="prestigeUnleashedDisplay">0%</span></div>
+      <br>
+      <div class="button" id="reset">Reset</div>
+      <div id="resetCounter">Resets <span id="resetCounterDisplay">0</span></div>
+      <br>
+      <div class="button" id="openOverlayBtn" title="Menu">Menu</div>
+      <br>
+      <div id="version"></div>
     </div>
 
-    <div id="overlayContent">
-      <div class="overlayPane active" data-pane="settings">
-        <button id="save" class="overlayButton">Save</button>
-        <button id="exportSave" class="overlayButton">Export save</button>
-        <button id="importSave" class="overlayButton">Import save</button>
-        <br><br>
-        <button id="toggleNumbers" class="overlayButton">Numbers On</button>
-        <button id="toggleFlash" class="overlayButton">Flashing On</button>
-        <br><br>
-        <button id="changeBakeryName" class="overlayButton">Change bakery name</button>
-        <br><br>
-        <div id="overlayChangelog"></div>
+    <div id="rightPanel">
+      <div id="store_upgrades_title">Upgrades</div>
+      <div id="store_upgrades"></div>
+      <div id="store_title">Buildings</div>
+      <div id="store"></div>
+    </div>
+
+    <div id="middle">
+      <div id="grandmas"></div>
+      <div id="farms"></div>
+      <div id="factories"></div>
+      <div id="banks"></div>
+      <div id="temples"></div>
+      <div id="mines"></div>
+      <div id="shipments"></div>
+      <div id="labs"></div>
+      <div id="portals"></div>
+      <div id="towers"></div>
+      <div id="times"></div>
+      <div id="comment">Loading...</div>
+      <div id="cookie"></div>
+    </div>
+
+    <div id="pops"></div>
+  </div>
+
+  <div id="overlayBackdrop">
+    <div id="overlay">
+      <div id="overlayClose">&times;</div>
+
+      <div id="overlayTabs">
+        <div class="overlayTab active" data-tab="settings">Settings</div>
+        <div class="overlayTab" data-tab="upgrades">Upgrades</div>
+        <div class="overlayTab" data-tab="achievements">Achievements</div>
       </div>
 
-      <div class="overlayPane" data-pane="upgrades">
-        <div id="overlayUpgradesList"></div>
-      </div>
+      <div id="overlayContent">
+        <div class="overlayPane active" data-pane="settings">
+          <button id="save" class="overlayButton">Save</button>
+          <button id="exportSave" class="overlayButton">Export save</button>
+          <button id="importSave" class="overlayButton">Import save</button>
+          <br><br>
+          <button id="toggleNumbers" class="overlayButton">Numbers On</button>
+          <button id="toggleFlash" class="overlayButton">Flashing On</button>
+          <br><br>
+          <button id="changeBakeryName" class="overlayButton">Change bakery name</button>
+          <br><br>
+          <div id="overlayChangelog"></div>
+        </div>
 
-      <div class="overlayPane" data-pane="achievements">
-        <div id="overlayAchievementsList"></div>
+        <div class="overlayPane" data-pane="upgrades">
+          <div id="overlayUpgradesList"></div>
+        </div>
+
+        <div class="overlayPane" data-pane="achievements">
+          <div id="overlayAchievementsList"></div>
+        </div>
       </div>
     </div>
   </div>
-</div>
- <script src="script.js"></script>
+
+  <script src="script.js"></script>
 </body>
 </html>
