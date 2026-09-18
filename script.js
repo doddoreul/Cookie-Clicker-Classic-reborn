@@ -121,8 +121,8 @@ const defaultSettings = {
 const settings = { ...defaultSettings };
 
 const elderPledge = {
-  basePrice: 6666666,
-  currentPrice: 6666666,
+  basePrice: 64,
+  currentPrice: 64,
   count: 0
 };
 
@@ -191,7 +191,7 @@ const buildings = {
     id: 0,
     count: 0,
     basePrice: 15,
-    gain: 1,
+    gain: 0.5,
     description: "Autoclicks every 5 seconds.",
     icon: "cursoricon"
   },
@@ -199,7 +199,7 @@ const buildings = {
     id: 1,
     count: 0,
     basePrice: 100,
-    gain: 4,
+    gain: 5,
     description: "A nice grandma to bake more cookies.",
     icon: "grandmaicon"
   },
@@ -207,7 +207,7 @@ const buildings = {
     id: 2,
     count: 0,
     basePrice: 500,
-    gain: 20,
+    gain: 40,
     description: "Grows cookie plants from cookie seeds.",
     icon: "farmicon"
   },
@@ -215,7 +215,7 @@ const buildings = {
     id: 3,
     count: 0,
     basePrice: 4000,
-    gain: 125,
+    gain: 235,
     description: "Mines out cookie dough and chocolate chips.",
     icon: "mineicon"
   },
@@ -223,7 +223,7 @@ const buildings = {
     id: 4,
     count: 0,
     basePrice: 32000,
-    gain: 900,
+    gain: 1300,
     description: "Produces large quantities of cookies.",
     icon: "factoryicon"
   },
@@ -239,7 +239,7 @@ const buildings = {
     id: 6,
     count: 0,
     basePrice: 1900000,
-    gain: 43000,
+    gain: 39000,
     description: "Full of precious, ancient chocolate.",
     icon: "templeicon"
   },
@@ -247,7 +247,7 @@ const buildings = {
     id: 7,
     count: 0,
     basePrice: 15000000,
-    gain: 325000,
+    gain: 220000,
     description: "Summons cookies with magic spells.",
     icon: "wizardtowericon"
   },
@@ -255,7 +255,7 @@ const buildings = {
     id: 8,
     count: 0,
     basePrice: 130000000,
-    gain: 2400000,
+    gain: 1300000,
     description: "Brings in fresh cookies from the cookie planet.",
     icon: "shipmenticon"
   },
@@ -263,7 +263,7 @@ const buildings = {
     id: 9,
     count: 0,
     basePrice: 1300000000,
-    gain: 25000000,
+    gain: 8000000,
     description: "Turns gold into cookies!",
     icon: "labicon"
   },
@@ -271,7 +271,7 @@ const buildings = {
     id: 10,
     count: 0,
     basePrice: 9000000000,
-    gain: 150000000,
+    gain: 50000000,
     description: "Opens a door to the Cookieverse.",
     icon: "portalicon"
   },
@@ -279,7 +279,7 @@ const buildings = {
     id: 11,
     count: 0,
     basePrice: 70000000000,
-    gain: 750000000,
+    gain: 325000000,
     description: '<span style="font-size:80%;">Brings cookies from the past, before they were even eaten.</span>',
     icon: "timemachineicon"
   }
@@ -609,10 +609,10 @@ const upgrades = {
   "Gold fund": { id: 105, description: "Banks gain +5% CpS per alchemy lab. Alchemy labs gain +0.1% CpS per bank. If gold is the economy's backbone, cookies are its hip joints.", price: 15003000000000000000000, building: "synergies", requiredBuildings: { Bank: 75, "Alchemy lab": 75 }, effect: { Bank: { "Alchemy lab": 0.05 }, "Alchemy lab": { Bank: 0.001 } }, requires: 89, bought: false },
 
   // Prestige power upgrades
-  "Prestige power I": { id: 106, description: "Unlocks 25% of your prestige. Prestige x0.25.", price: 100000, building: "prestige", requiredPrestige: 1, bought: false },
-  "Prestige power II": { id: 107, description: "Unlocks 50% of your prestige. Prestige x0.5.", price: 10000000, building: "prestige", requiredPrestige: 300, requires: 106, bought: false },
-  "Prestige power III": { id: 108, description: "Unlocks 75% of your prestige. Prestige x0.75.", price: 1000000000, building: "prestige", requiredPrestige: 9000, requires: 107, bought: false },
-  "Prestige power IV": { id: 109, description: "Unlocks 100% of your prestige. Full prestige.", price: 100000000000, building: "prestige", requiredPrestige: 81000, requires: 108, bought: false },
+  "Prestige power I": { id: 106, description: "Unlocks 25% of your prestige. Prestige x0.25.", price: 1000000, building: "prestige", requiredPrestige: 1, bought: false },
+  "Prestige power II": { id: 107, description: "Unlocks 50% of your prestige. Prestige x0.5.", price: 1000000000000, building: "prestige", requiredPrestige: 300, requires: 106, bought: false },
+  "Prestige power III": { id: 108, description: "Unlocks 75% of your prestige. Prestige x0.75.", price: 1000000000000000, building: "prestige", requiredPrestige: 9000, requires: 107, bought: false },
+  "Prestige power IV": { id: 109, description: "Unlocks 100% of your prestige. Full prestige.", price: 1000000000000000000, building: "prestige", requiredPrestige: 81000, requires: 108, bought: false },
 };
 
 const upgradeList = Object.values(upgrades);
@@ -774,7 +774,7 @@ function applySaveData(data) {
   elderPledge.count = Number.isFinite(data.elderPledgeCount)
     ? Math.max(0, data.elderPledgeCount)
     : 0;
-  elderPledge.currentPrice = Math.ceil(elderPledge.basePrice * Math.pow(1.1, elderPledge.count));
+  elderPledge.currentPrice = Math.ceil(elderPledge.basePrice * Math.pow(64, elderPledge.count));
 
   Object.keys(buildings).forEach(name => {
     const saved = data.buildings?.[name];
@@ -1383,9 +1383,9 @@ function buyElderPledge() {
 
   cookies -= elderPledge.currentPrice;
   elderPledge.count++;
-  elderPledge.currentPrice = Math.ceil(elderPledge.basePrice * Math.pow(1.1, elderPledge.count));
+  elderPledge.currentPrice = Math.ceil(elderPledge.basePrice * Math.pow(64, elderPledge.count));
 
-  pledge += 30 * 60 * 10;
+  pledge += 6 * 60 * TICKS_PER_SECOND;
 
   refreshGrandmas();
   invalidateGainCache();
@@ -1450,9 +1450,9 @@ function refreshBuildingVisuals(name, elementId, className, side, spacingX = 24,
   let output = "";
 
   for (let i = 0; i < count; i++) {
-    const x = Math.floor(Math.random() * 20 + (i % 10) * spacingX);
+    const x = Math.floor(Math.random() * 20 + (i % 15) * spacingX);
     const y = Math.floor(
-      Math.random() * 20 + Math.floor(i / 10) * spacingY
+      Math.random() * 20 + Math.floor(i / 15) * spacingY
     );
 
     output += `
@@ -1470,8 +1470,8 @@ function refreshGrandmas() {
   let output = "";
 
   for (let i = 0; i < count; i++) {
-    const x = Math.floor(Math.random() * 20 + (i % 10) * 24);
-    const y = Math.floor(Math.random() * 20 + Math.floor(i / 10) * 24);
+    const x = Math.floor(Math.random() * 20 + (i % 15) * 24);
+    const y = Math.floor(Math.random() * 20 + Math.floor(i / 15) * 24);
     let className = "";
 
     if (buildings["Alchemy lab"].count && Math.random() < 0.2) className = "goldengrandma";

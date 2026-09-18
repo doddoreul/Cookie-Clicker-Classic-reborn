@@ -1,4 +1,4 @@
-:root { --panel-bg: rgba(255,255,255,.75); }
+﻿:root { --panel-bg: rgba(255,255,255,.75); }
 
 html, body {
   margin:0;
@@ -181,7 +181,7 @@ moni {
   top:4px; margin-right:-8px;
 }
 
-#grandmas { position:absolute; left:100px; width:240px; }
+#grandmas { position:absolute; left:100px; width:400px; top:-50px; }
 .grandma { position:absolute; background:url(grandma.png); width:24px; height:48px; }
 .goldengrandma { background:url(goldengrandma.png); }
 .factorygrandma { background:url(factorygrandma.png); }
@@ -191,34 +191,34 @@ moni {
 .pledgedgrandma { background:url(pledgedgrandma.png); }
 .timegrandma { background:url(timegrandma.png); }
 
-#factories { position:absolute; left:-420px; width:320px; }
+#factories { position:absolute; left:-600px; width:500px; top:-50px; }
 .factory { position:absolute; background:url(factory.png); width:32px; height:48px; }
 
-#mines { position:absolute; left:100px; width:160px; top:100px; }
+#mines { position:absolute; left:100px; width:280px; top:100px; }
 .mine { position:absolute; background:url(mine.png); width:32px; height:32px; }
 
-#shipments { position:absolute; left:-340px; width:240px; top:100px; }
+#shipments { position:absolute; left:-600px; width:500px; top:100px; }
 .shipment { position:absolute; background:url(shipment.png); width:48px; height:48px; }
 
-#labs { position:absolute; left:-120px; width:240px; top:180px; }
+#labs { position:absolute; left:100px; width:400px; top:50px; }
 .lab { position:absolute; background:url(lab.png); width:24px; height:32px; }
 
-#portals { position:absolute; left:-340px; width:240px; top:180px; }
+#portals { position:absolute; left:-600px; width:500px; top:180px; }
 .portal { position:absolute; background:url(portal.png); width:48px; height:48px; }
 
-#times { position:absolute; left:100px; width:240px; top:180px; }
+#times { position:absolute; left:100px; width:410px; top:180px; }
 .time { position:absolute; background:url(timemachine.png); width:48px; height:48px; }
 
-#farms   { position: absolute; left: 100px; width: 240px; top: 260px; }
+#farms   { position: absolute; left: 100px; width: 390px; top: 260px; }
 .farm    { position: absolute; background: url(farm.png); width: 32px; height: 32px; }
 
-#banks   { position: absolute; left: -420px; width: 320px; top: 260px; }
+#banks   { position: absolute; left:-600px; width: 390px; top: 260px; }
 .bank    { position: absolute; background: url(bank.png); width: 32px; height: 32px; }
 
-#temples { position: absolute; left: 100px; width: 240px; top: 340px; }
+#temples { position: absolute; left: 100px; width: 410px; top: 340px; }
 .temple  { position: absolute; background: url(temple.png); width: 48px; height: 48px; }
 
-#towers { position: absolute; left: -420px; width: 320px; top: 340px; }
+#towers { position: absolute; left:-600px; width: 390px; top: 340px; }
 .tower  { position: absolute; background: url(wizardtower.png); width: 32px; height: 32px; }
 
 #comment {
@@ -271,7 +271,7 @@ moni {
   visibility: visible;
 }
 
-/* Tooltip dans les stores : position fix pilotée par JS pour éviter le
+/* Tooltip dans les stores : position fix pilotÃ©e par JS pour Ã©viter le
    clipping du #rightPanel (overflow-y:auto / overflow-x:hidden). */
 #store > div .tooltipTextStore,
 #store_upgrades > div .tooltipTextStore {
@@ -375,13 +375,13 @@ moni {
 }
 
 .overlayUpgradeRow {
-  position:relative; /* nécessaire pour ancrer .tooltipTextStore */
+  position:relative; /* nÃ©cessaire pour ancrer .tooltipTextStore */
 }
 .overlayUpgradeRow:hover .tooltipTextStore {
   visibility: visible;
 }
 
-/* Positionnement spécifique : au-dessus de la ligne plutôt qu'à gauche */
+/* Positionnement spÃ©cifique : au-dessus de la ligne plutÃ´t qu'Ã  gauche */
 .overlayUpgradeRow .tooltipTextStore {
   right:auto;
   left:50%;
