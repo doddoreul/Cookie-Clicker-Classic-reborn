@@ -212,13 +212,13 @@ moni {
 #farms   { position: absolute; left: 100px; width: 390px; top: 260px; }
 .farm    { position: absolute; background: url(farm.png); width: 32px; height: 32px; }
 
-#banks   { position: absolute; left:-600px; width: 390px; top: 260px; }
+#banks   { position: absolute; left:-490px; width: 390px; top: 260px; }
 .bank    { position: absolute; background: url(bank.png); width: 32px; height: 32px; }
 
 #temples { position: absolute; left: 100px; width: 410px; top: 340px; }
 .temple  { position: absolute; background: url(temple.png); width: 48px; height: 48px; }
 
-#towers { position: absolute; left:-600px; width: 390px; top: 340px; }
+#towers { position: absolute; left:-490px; width: 390px; top: 340px; }
 .tower  { position: absolute; background: url(wizardtower.png); width: 32px; height: 32px; }
 
 #comment {

@@ -4,7 +4,7 @@
 /* Constants                                                        */
 /* ---------------------------------------------------------------- */
 
-const VERSION = "0.134";
+const VERSION = "0.136";
 const SAVE_KEY = "CookieClickerClassic_Reborn_Save";
 const SETTINGS_KEY = "CookieClickerClassic_Reborn_Settings";
 const SAVE_FORMAT_VERSION = 2;
@@ -608,11 +608,11 @@ const upgrades = {
   "Shipyards": { id: 104, description: "Factories gain +5% CpS per shipment. Shipments gain +0.1% CpS per factory. Carpentry, blind luck, and asbestos insulation unite.", price: 1020000000000000000000, building: "synergies", requiredBuildings: { Factory: 75, Shipment: 75 }, effect: { Factory: { Shipment: 0.05 }, Shipment: { Factory: 0.001 } }, requires: 89, bought: false },
   "Gold fund": { id: 105, description: "Banks gain +5% CpS per alchemy lab. Alchemy labs gain +0.1% CpS per bank. If gold is the economy's backbone, cookies are its hip joints.", price: 15003000000000000000000, building: "synergies", requiredBuildings: { Bank: 75, "Alchemy lab": 75 }, effect: { Bank: { "Alchemy lab": 0.05 }, "Alchemy lab": { Bank: 0.001 } }, requires: 89, bought: false },
 
-  // Prestige power upgrades
-  "Prestige power I": { id: 106, description: "Unlocks 25% of your prestige. Prestige x0.25.", price: 1000000, building: "prestige", requiredPrestige: 1, bought: false },
-  "Prestige power II": { id: 107, description: "Unlocks 50% of your prestige. Prestige x0.5.", price: 1000000000000, building: "prestige", requiredPrestige: 300, requires: 106, bought: false },
-  "Prestige power III": { id: 108, description: "Unlocks 75% of your prestige. Prestige x0.75.", price: 1000000000000000, building: "prestige", requiredPrestige: 9000, requires: 107, bought: false },
-  "Prestige power IV": { id: 109, description: "Unlocks 100% of your prestige. Full prestige.", price: 1000000000000000000, building: "prestige", requiredPrestige: 81000, requires: 108, bought: false },
+  // Prestige upgrades
+  "Prestige I": { id: 106, description: "Unlocks 2.5% of your prestige. Prestige x0.025.", price: 1000000, building: "prestige", requiredPrestige: 1, bought: false },
+  "Prestige II": { id: 107, description: "Unlocks 3% of your prestige. Prestige x0.03.", price: 1000000000000, building: "prestige", requiredPrestige: 300, requires: 106, bought: false },
+  "Prestige III": { id: 108, description: "Unlocks 4% of your prestige. Prestige x0.04.", price: 1000000000000000, building: "prestige", requiredPrestige: 9000, requires: 107, bought: false },
+  "Prestige IV": { id: 109, description: "Unlocks 5% of your prestige. Prestige x0.05.", price: 1000000000000000000, building: "prestige", requiredPrestige: 81000, requires: 108, bought: false },
 };
 
 const upgradeList = Object.values(upgrades);
@@ -626,11 +626,11 @@ upgradeList.forEach(upgrade => {
 });
 
 function getPrestigePowerRatio() {
-  if (upgrades["Prestige power IV"]?.bought) return 1;
-  if (upgrades["Prestige power III"]?.bought) return 0.75;
-  if (upgrades["Prestige power II"]?.bought) return 0.5;
-  if (upgrades["Prestige power I"]?.bought) return 0.25;
-  return resetCount > 0 ? 0.1 : 0;
+  if (upgrades["Prestige IV"]?.bought) return 0.05;
+  if (upgrades["Prestige III"]?.bought) return 0.04;
+  if (upgrades["Prestige II"]?.bought) return 0.03;
+  if (upgrades["Prestige I"]?.bought) return 0.025;
+  return resetCount > 0 ? 0.02 : 0;
 }
 
 function getPrestigeMultiplier() {
@@ -737,7 +737,7 @@ function applySaveData(data) {
   pledge = Number.isFinite(data.pledge) ? data.pledge : 0;
   cookiesBakedAllTime = Number.isFinite(data.cookiesBakedAllTime) ? data.cookiesBakedAllTime : 0;
 
-  prestige = Math.min(prestige, calculatePrestige());
+  prestige = calculatePrestige();
 
   goldenCookieClickFrenzyTimer = Number.isFinite(data.goldenCookieClickFrenzyTimer)
     ? Math.max(0, data.goldenCookieClickFrenzyTimer)
@@ -1032,7 +1032,7 @@ function calculatePrestige() {
   return Math.max(
     0,
     Math.floor(
-      (-1 + Math.sqrt(1 + 8 * (cookiesBakedAllTime / 100000000))) / 2
+      (-1 + Math.sqrt(1 + 8 * (cookiesBakedAllTime / 1000000000000))) / 2
     )
   );
 }
@@ -1298,6 +1298,8 @@ function rebuildUpgradesStore() {
         upgrade.icon = upgrade.building + "icon.png";
       } else if (upgrade.building === "kitten") {
         upgrade.icon = "kittensicon.png";
+      } else if (upgrade.building === "Alchemy lab") {
+        upgrade.icon = "labicon.png";
       } else {
         upgrade.icon =
           upgrade.building.replace(/\s/g, "").toLowerCase() + "icon.png";
@@ -2045,6 +2047,8 @@ function initOverlay() {
 
 function renderChangelog() {
   const entries = [
+    { version: "0.136", date: "18/09/2026", notes: ["aligning prestige to the original game (1 trillion chips, 2% up to 5% power)", "reducing offline production to 25%", "pushing the left building column further left to clear the cookie"] },
+    { version: "0.135", date: "18/09/2026", notes: ["adding Building special golden cookie buff", "rebalancing upgrade prices x100", "setting buildings base CpS to wiki values", "reworking Elder Pledge (64 base, x64 per purchase, 6 min)", "widening building display and reworking layout"] },
     { version: "0.134", date: "17/09/2026", notes: ["optimizing runtime and adding a few tweaks"] },
     { version: "0.133", notes: ["making Alek's gameplay harder"] },
     { version: "0.132", notes: ["adding achievements and cleaning code"] },
@@ -2208,7 +2212,7 @@ function catchUpIdleTime() {
   const missedTicks = Math.max(0, Math.floor(elapsedSeconds * TICKS_PER_SECOND) - 1);
   if (missedTicks <= 0) return 0;
 
-  const gained = getCookiesPerSecond() * (missedTicks / TICKS_PER_SECOND);
+  const gained = getCookiesPerSecond() * (missedTicks / TICKS_PER_SECOND) * 0.25;
   cookies += gained;
   cookiesBakedAllTime += gained;
   ticks += missedTicks;
@@ -2336,9 +2340,9 @@ function main() {
 
   updatePledgeTimer();
 
-  setElementText("prestigeDisplay", prestige);
-  setElementText("prestigeGainDisplay", Math.max(0, calculatePrestige() - prestige));
-  setElementText("prestigeUnleashedDisplay", Math.round(getPrestigePowerRatio() * 100) + "%");
+  setElementText("prestigeDisplay", beautify(prestige));
+  setElementText("prestigeGainDisplay", beautify(Math.max(0, calculatePrestige() - prestige)));
+  setElementText("prestigeUnleashedDisplay", Math.round(getPrestigePowerRatio() * 1000) / 10 + "%");
   setElementText("resetCounterDisplay", resetCount);
   setElementText("overlayAllTimeCookies", "Cookies baked (all time): " + beautify(cookiesBakedAllTime));
 
