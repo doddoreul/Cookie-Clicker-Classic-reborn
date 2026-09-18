@@ -311,6 +311,12 @@ const achievementTypes = {
     }
   },
 
+  prestige: {
+    getProgress() {
+      return prestige;
+    }
+  },
+
   grandTotal: {
     getProgress() {
       // TODO: implement grandTotal
@@ -464,7 +470,13 @@ const achievements = {
   "Resurrection": { id: 68, type: "resets", requirement: 10, description: "Reset 10 times.", unlocked: false },
   "Metempsychosis": { id: 69, type: "resets", requirement: 25, description: "Reset 25 times.", unlocked: false },
   "Apotheosis": { id: 70, type: "resets", requirement: 50, description: "Reset 50 times.", unlocked: false },
-  "Reincarnation": { id: 71, type: "resets", requirement: 100, description: "Reset 100 times.", unlocked: false }
+  "Reincarnation": { id: 71, type: "resets", requirement: 100, description: "Reset 100 times.", unlocked: false },
+
+  // Prestige milestones — the three walls
+  "Heavenly crumb": { id: 121, type: "prestige", requirement: 1, description: "Own 1 heavenly chip. Past the first wall.", unlocked: false },
+  "Elder council": { id: 122, type: "prestige", requirement: 300, description: "Own 300 heavenly chips. The ancients gather.", unlocked: false },
+  "Demigod": { id: 123, type: "prestige", requirement: 9000, description: "Own 9,000 heavenly chips. Halfway to godhood.", unlocked: false },
+  "Godhead": { id: 124, type: "prestige", requirement: 81000, description: "Own 81,000 heavenly chips. Beyond the third wall.", unlocked: false }
 };
 
 /* ---------------------------------------------------------------- */
