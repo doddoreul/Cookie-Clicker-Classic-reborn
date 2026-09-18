@@ -154,6 +154,7 @@ let storeBulkElements = {};
 let upgradeRowElements = {};
 let cookies = 0;
 let cookiesBakedAllTime = 0;
+let cookiesFromClicking = 0;
 let cookiesDisplay = 0;
 let ticks = 0;
 let prestige = 0;
@@ -339,6 +340,12 @@ const achievementTypes = {
     }
   },
 
+  clicks: {
+    getProgress() {
+      return cookiesFromClicking;
+    }
+  },
+
   prestige: {
     getProgress() {
       return prestige;
@@ -384,6 +391,15 @@ const achievements = {
   "Cosmic bakery": { id: 82, type: "cookies", requirement: 100000000000, description: "Bake 100 billion cookies in one reset.", unlocked: false },
   "Galactic bakery": { id: 83, type: "cookies", requirement: 1000000000000, description: "Bake 1 trillion cookies in one reset.", unlocked: false },
   "Universal bakery": { id: 84, type: "cookies", requirement: 100000000000000, description: "Bake 100 trillion cookies in one reset.", unlocked: false },
+  "Timeless bakery": { id: 155, type: "cookies", requirement: 1000000000000000, description: "Bake 1 quadrillion cookies in one reset.", unlocked: false },
+
+  // Clicking achievements
+  "Clicktastic": { id: 149, type: "clicks", requirement: 1000, description: "Make 1,000 cookies from clicking.", unlocked: false },
+  "Clickathlon": { id: 150, type: "clicks", requirement: 100000, description: "Make 100,000 cookies from clicking.", unlocked: false },
+  "Clickolympics": { id: 151, type: "clicks", requirement: 10000000, description: "Make 10 million cookies from clicking.", unlocked: false },
+  "Clickorama": { id: 152, type: "clicks", requirement: 1000000000, description: "Make 1 billion cookies from clicking.", unlocked: false },
+  "Clickasmic": { id: 153, type: "clicks", requirement: 100000000000, description: "Make 100 billion cookies from clicking.", unlocked: false },
+  "Clickageddon": { id: 154, type: "clicks", requirement: 10000000000000, description: "Make 10 trillion cookies from clicking.", unlocked: false },
 
   "One finger": { id: 6, type: "buildings", target: "Cursor", requirement: 1, description: "Have 1 Cursor.", unlocked: false },
   "A handful of fingers": { id: 7, type: "buildings", target: "Cursor", requirement: 5, description: "Have 5 Cursors.", unlocked: false },
@@ -540,17 +556,17 @@ const upgrades = {
   "Reinforced index finger": { id: 0, description: "Cursors x2.", price: 100, building: "Cursor", requiredCount: 1, multiplier: 2, bought: false },
   "Carpal tunnel prevention cream": { id: 1, description: "Cursors x2.", price: 500, building: "Cursor", requiredCount: 1, multiplier: 2, requires: 0, bought: false },
   "Ambidextrous": { id: 2, description: "Cursors x2.", price: 10000, building: "Cursor", requiredCount: 10, multiplier: 2, requires: 1, bought: false },
-  "Thousand fingers": { id: 125, description: "Cursors x2.", price: 100000, building: "Cursor", requiredCount: 25, multiplier: 2, requires: 2, bought: false },
-  "Million fingers": { id: 126, description: "Cursors x2.", price: 10000000, building: "Cursor", requiredCount: 50, multiplier: 2, requires: 125, bought: false },
-  "Billion fingers": { id: 127, description: "Cursors x2.", price: 100000000, building: "Cursor", requiredCount: 100, multiplier: 2, requires: 126, bought: false },
-  "Trillion fingers": { id: 128, description: "Cursors x2.", price: 1000000000, building: "Cursor", requiredCount: 150, multiplier: 2, requires: 127, bought: false },
-  "Quadrillion fingers": { id: 129, description: "Cursors x2.", price: 10000000000, building: "Cursor", requiredCount: 200, multiplier: 2, requires: 128, bought: false },
-  "Quintillion fingers": { id: 130, description: "Cursors x2.", price: 10000000000000, building: "Cursor", requiredCount: 250, multiplier: 2, requires: 129, bought: false },
-  "Sextillion fingers": { id: 131, description: "Cursors x2.", price: 10000000000000000, building: "Cursor", requiredCount: 300, multiplier: 2, requires: 130, bought: false },
-  "Septillion fingers": { id: 132, description: "Cursors x2.", price: 10000000000000000000, building: "Cursor", requiredCount: 350, multiplier: 2, requires: 131, bought: false },
-  "Octillion fingers": { id: 133, description: "Cursors x2.", price: 10000000000000000000000, building: "Cursor", requiredCount: 400, multiplier: 2, requires: 132, bought: false },
-  "Nonillion fingers": { id: 134, description: "Cursors x2.", price: 10000000000000000000000000, building: "Cursor", requiredCount: 450, multiplier: 2, requires: 133, bought: false },
-  "Decillion fingers": { id: 135, description: "Cursors x2.", price: 10000000000000000000000000000, building: "Cursor", requiredCount: 500, multiplier: 2, requires: 134, bought: false },
+  "Thousand fingers": { id: 125, description: "Cursors x1,5.", price: 100000, building: "Cursor", requiredCount: 25, multiplier: 1.5, requires: 2, bought: false },
+  "Million fingers": { id: 126, description: "Cursors x1,5.", price: 10000000, building: "Cursor", requiredCount: 50, multiplier: 1.5, requires: 125, bought: false },
+  "Billion fingers": { id: 127, description: "Cursors x1,5.", price: 100000000, building: "Cursor", requiredCount: 100, multiplier: 1.5, requires: 126, bought: false },
+  "Trillion fingers": { id: 128, description: "Cursors x1,5.", price: 1000000000, building: "Cursor", requiredCount: 150, multiplier: 1.5, requires: 127, bought: false },
+  "Quadrillion fingers": { id: 129, description: "Cursors x1,5.", price: 10000000000, building: "Cursor", requiredCount: 200, multiplier: 1.5, requires: 128, bought: false },
+  "Quintillion fingers": { id: 130, description: "Cursors x1,5.", price: 10000000000000, building: "Cursor", requiredCount: 250, multiplier: 1.5, requires: 129, bought: false },
+  "Sextillion fingers": { id: 131, description: "Cursors x1,5.", price: 10000000000000000, building: "Cursor", requiredCount: 300, multiplier: 1.5, requires: 130, bought: false },
+  "Septillion fingers": { id: 132, description: "Cursors x1,5.", price: 10000000000000000000, building: "Cursor", requiredCount: 350, multiplier: 1.5, requires: 131, bought: false },
+  "Octillion fingers": { id: 133, description: "Cursors x1,5.", price: 10000000000000000000000, building: "Cursor", requiredCount: 400, multiplier: 1.5, requires: 132, bought: false },
+  "Nonillion fingers": { id: 134, description: "Cursors x1,5.", price: 10000000000000000000000000, building: "Cursor", requiredCount: 450, multiplier: 1.5, requires: 133, bought: false },
+  "Decillion fingers": { id: 135, description: "Cursors x1,5.", price: 10000000000000000000000000000, building: "Cursor", requiredCount: 500, multiplier: 1.5, requires: 134, bought: false },
 
   // Grandma upgrades
   "Forwards from grandma": { id: 3, description: "Grandmas x2.", price: 1000, building: "Grandma", requiredCount: 1, multiplier: 2, bought: false },
@@ -840,6 +856,7 @@ function getSaveData() {
     goldenCookieBuildingSpecialBuilding: goldenCookieBuildingSpecialBuilding,
     elderPledgeCount: elderPledge.count,
     cookiesBakedAllTime,
+    cookiesFromClicking,
   };
 }
 
@@ -857,6 +874,7 @@ function resetSaveString() {
     pledge: 0,
     grandmaAnger: 0,
     cookiesBakedAllTime,
+    cookiesFromClicking,
     buildings: {},
     upgrades: [],
     achievements: Object.keys(achievements)
@@ -883,6 +901,7 @@ function applySaveData(data) {
   pledge = Number.isFinite(data.pledge) ? data.pledge : 0;
   grandmaAnger = Number.isFinite(data.grandmaAnger) ? Math.max(0, data.grandmaAnger) : 0;
   cookiesBakedAllTime = Number.isFinite(data.cookiesBakedAllTime) ? data.cookiesBakedAllTime : 0;
+  cookiesFromClicking = Number.isFinite(data.cookiesFromClicking) ? data.cookiesFromClicking : 0;
   prestige = calculatePrestige();
 
   goldenCookieClickFrenzyTimer = Number.isFinite(data.goldenCookieClickFrenzyTimer)
@@ -1076,6 +1095,7 @@ function clickCookie() {
 
   cookies += amount;
   cookiesBakedAllTime += amount;
+  cookiesFromClicking += amount;
 
   if (pops.length < 260 && settings.numbersOn) {
     new Pop("cookie", "+" + beautify(amount));
@@ -1123,6 +1143,7 @@ function produceCursorCookies() {
   const perTick = cps / TICKS_PER_SECOND;
 
   addCookies(perTick, null);
+  cookiesFromClicking += perTick * getPrestigeMultiplier();
   accumulateProductionPop("cursor", "cookie", perTick * getPrestigeMultiplier());
 }
 
