@@ -120,6 +120,8 @@ const defaultSettings = {
 };
 const settings = { ...defaultSettings };
 
+const GRANDMA_WRATH_COOKIES = 100000;
+
 const elderPledge = {
   basePrice: 64,
   currentPrice: 64,
@@ -365,6 +367,8 @@ const achievements = {
   "Of Mice and Men": { id: 85, type: "buildings", target: "Cursor", requirement: 100, description: "Have 100 Cursors.", unlocked: false },
   "The Digital": { id: 97, type: "buildings", target: "Cursor", requirement: 200, description: "Have 200 Cursors.", unlocked: false },
   "Extreme polydactyly": { id: 98, type: "buildings", target: "Cursor", requirement: 300, description: "Have 300 Cursors.", unlocked: false },
+  "Dr. T": { id: 125, type: "buildings", target: "Cursor", requirement: 400, description: "Have 400 Cursors.", unlocked: false },
+  "Thumbs, phalanges, metacarpals": { id: 126, type: "buildings", target: "Cursor", requirement: 500, description: "Have 500 Cursors.", unlocked: false },
 
   "First grandma": { id: 11, type: "buildings", target: "Grandma", requirement: 1, description: "Have 1 Grandma.", unlocked: false },
   "Grandma's kitchen": { id: 12, type: "buildings", target: "Grandma", requirement: 5, description: "Have 5 Grandmas.", unlocked: false },
@@ -374,6 +378,8 @@ const achievements = {
   "Retirement home": { id: 86, type: "buildings", target: "Grandma", requirement: 100, description: "Have 100 Grandmas.", unlocked: false },
   "Ruler of the ancients": { id: 99, type: "buildings", target: "Grandma", requirement: 200, description: "Have 200 Grandmas.", unlocked: false },
   "The agemaster": { id: 100, type: "buildings", target: "Grandma", requirement: 300, description: "Have 300 Grandmas.", unlocked: false },
+  "Aged well": { id: 127, type: "buildings", target: "Grandma", requirement: 400, description: "Have 400 Grandmas.", unlocked: false },
+  "Defense of the ancients": { id: 128, type: "buildings", target: "Grandma", requirement: 500, description: "Have 500 Grandmas.", unlocked: false },
 
   "First harvest": { id: 16, type: "buildings", target: "Farm", requirement: 1, description: "Have 1 Farm.", unlocked: false },
   "Small farm": { id: 17, type: "buildings", target: "Farm", requirement: 5, description: "Have 5 Farms.", unlocked: false },
@@ -383,6 +389,8 @@ const achievements = {
   "Farm ill": { id: 87, type: "buildings", target: "Farm", requirement: 100, description: "Have 100 Farms.", unlocked: false },
   "Homegrown": { id: 101, type: "buildings", target: "Farm", requirement: 200, description: "Have 200 Farms.", unlocked: false },
   "Seedy business": { id: 102, type: "buildings", target: "Farm", requirement: 300, description: "Have 300 Farms.", unlocked: false },
+  "Harvest moon": { id: 129, type: "buildings", target: "Farm", requirement: 400, description: "Have 400 Farms.", unlocked: false },
+  "Sharpest tool in the shed": { id: 130, type: "buildings", target: "Farm", requirement: 500, description: "Have 500 Farms.", unlocked: false },
 
   "First mine": { id: 21, type: "buildings", target: "Mine", requirement: 1, description: "Have 1 Mine.", unlocked: false },
   "Small operation": { id: 22, type: "buildings", target: "Mine", requirement: 5, description: "Have 5 Mines.", unlocked: false },
@@ -392,6 +400,8 @@ const achievements = {
   "Hollow the planet": { id: 88, type: "buildings", target: "Mine", requirement: 100, description: "Have 100 Mines.", unlocked: false },
   "The center of the Earth": { id: 103, type: "buildings", target: "Mine", requirement: 200, description: "Have 200 Mines.", unlocked: false },
   "Freak fracking": { id: 104, type: "buildings", target: "Mine", requirement: 300, description: "Have 300 Mines.", unlocked: false },
+  "Mine?": { id: 131, type: "buildings", target: "Mine", requirement: 400, description: "Have 400 Mines.", unlocked: false },
+  "Hey now, you're a rock": { id: 132, type: "buildings", target: "Mine", requirement: 500, description: "Have 500 Mines.", unlocked: false },
 
   "First factory": { id: 26, type: "buildings", target: "Factory", requirement: 1, description: "Have 1 Factory.", unlocked: false },
   "Small industry": { id: 27, type: "buildings", target: "Factory", requirement: 5, description: "Have 5 Factories.", unlocked: false },
@@ -401,6 +411,8 @@ const achievements = {
   "Global warming": { id: 89, type: "buildings", target: "Factory", requirement: 100, description: "Have 100 Factories.", unlocked: false },
   "Technocracy": { id: 105, type: "buildings", target: "Factory", requirement: 200, description: "Have 200 Factories.", unlocked: false },
   "Modern times": { id: 106, type: "buildings", target: "Factory", requirement: 300, description: "Have 300 Factories.", unlocked: false },
+  "In full gear": { id: 133, type: "buildings", target: "Factory", requirement: 400, description: "Have 400 Factories.", unlocked: false },
+  "Break the mold": { id: 134, type: "buildings", target: "Factory", requirement: 500, description: "Have 500 Factories.", unlocked: false },
 
   "First investment": { id: 31, type: "buildings", target: "Bank", requirement: 1, description: "Have 1 Bank.", unlocked: false },
   "Small savings": { id: 32, type: "buildings", target: "Bank", requirement: 5, description: "Have 5 Banks.", unlocked: false },
@@ -410,6 +422,8 @@ const achievements = {
   "A loan in the dark": { id: 90, type: "buildings", target: "Bank", requirement: 100, description: "Have 100 Banks.", unlocked: false },
   "It's the economy, stupid": { id: 107, type: "buildings", target: "Bank", requirement: 200, description: "Have 200 Banks.", unlocked: false },
   "The nerve of war": { id: 108, type: "buildings", target: "Bank", requirement: 300, description: "Have 300 Banks.", unlocked: false },
+  "Treacle tart economics": { id: 135, type: "buildings", target: "Bank", requirement: 400, description: "Have 400 Banks.", unlocked: false },
+  "Get the show on, get paid": { id: 136, type: "buildings", target: "Bank", requirement: 500, description: "Have 500 Banks.", unlocked: false },
 
   "First temple": { id: 36, type: "buildings", target: "Temple", requirement: 1, description: "Have 1 Temple.", unlocked: false },
   "Sacred grounds": { id: 37, type: "buildings", target: "Temple", requirement: 5, description: "Have 5 Temples.", unlocked: false },
@@ -419,6 +433,8 @@ const achievements = {
   "New-age cult": { id: 91, type: "buildings", target: "Temple", requirement: 100, description: "Have 100 Temples.", unlocked: false },
   "Fanaticism": { id: 109, type: "buildings", target: "Temple", requirement: 200, description: "Have 200 Temples.", unlocked: false },
   "Wololo": { id: 110, type: "buildings", target: "Temple", requirement: 300, description: "Have 300 Temples.", unlocked: false },
+  "Holy cookies, grandma!": { id: 137, type: "buildings", target: "Temple", requirement: 400, description: "Have 400 Temples.", unlocked: false },
+  "My world's on fire, how about yours": { id: 138, type: "buildings", target: "Temple", requirement: 500, description: "Have 500 Temples.", unlocked: false },
 
   "First spell": { id: 41, type: "buildings", target: "Wizard tower", requirement: 1, description: "Have 1 Wizard Tower.", unlocked: false },
   "Apprentice wizard": { id: 42, type: "buildings", target: "Wizard tower", requirement: 5, description: "Have 5 Wizard Towers.", unlocked: false },
@@ -428,6 +444,8 @@ const achievements = {
   "Charms and enchantments": { id: 92, type: "buildings", target: "Wizard tower", requirement: 100, description: "Have 100 Wizard Towers.", unlocked: false },
   "Magic kingdom": { id: 111, type: "buildings", target: "Wizard tower", requirement: 200, description: "Have 200 Wizard Towers.", unlocked: false },
   "And now for my next trick, I'll need a volunteer from the audience": { id: 112, type: "buildings", target: "Wizard tower", requirement: 300, description: "Have 300 Wizard Towers.", unlocked: false },
+  "The Prestige": { id: 139, type: "buildings", target: "Wizard tower", requirement: 400, description: "Have 400 Wizard Towers.", unlocked: false },
+  "The meteor men beg to differ": { id: 140, type: "buildings", target: "Wizard tower", requirement: 500, description: "Have 500 Wizard Towers.", unlocked: false },
 
   "First shipment": { id: 46, type: "buildings", target: "Shipment", requirement: 1, description: "Have 1 Shipment.", unlocked: false },
   "Small fleet": { id: 47, type: "buildings", target: "Shipment", requirement: 5, description: "Have 5 Shipments.", unlocked: false },
@@ -437,6 +455,8 @@ const achievements = {
   "Far far away": { id: 93, type: "buildings", target: "Shipment", requirement: 100, description: "Have 100 Shipments.", unlocked: false },
   "We come in peace": { id: 113, type: "buildings", target: "Shipment", requirement: 200, description: "Have 200 Shipments.", unlocked: false },
   "It's not delivery": { id: 114, type: "buildings", target: "Shipment", requirement: 300, description: "Have 300 Shipments.", unlocked: false },
+  "That's just peanuts to space": { id: 141, type: "buildings", target: "Shipment", requirement: 400, description: "Have 400 Shipments.", unlocked: false },
+  "Only shooting stars": { id: 142, type: "buildings", target: "Shipment", requirement: 500, description: "Have 500 Shipments.", unlocked: false },
 
   "First experiment": { id: 51, type: "buildings", target: "Alchemy lab", requirement: 1, description: "Have 1 Alchemy Lab.", unlocked: false },
   "Amateur alchemist": { id: 52, type: "buildings", target: "Alchemy lab", requirement: 5, description: "Have 5 Alchemy Labs.", unlocked: false },
@@ -446,6 +466,8 @@ const achievements = {
   "Gold member": { id: 94, type: "buildings", target: "Alchemy lab", requirement: 100, description: "Have 100 Alchemy Labs.", unlocked: false },
   "The secrets of the universe": { id: 115, type: "buildings", target: "Alchemy lab", requirement: 200, description: "Have 200 Alchemy Labs.", unlocked: false },
   "Gold, Jerry! Gold!": { id: 116, type: "buildings", target: "Alchemy lab", requirement: 300, description: "Have 300 Alchemy Labs.", unlocked: false },
+  "Worth its weight in lead": { id: 143, type: "buildings", target: "Alchemy lab", requirement: 400, description: "Have 400 Alchemy Labs.", unlocked: false },
+  "We could all use a little change": { id: 144, type: "buildings", target: "Alchemy lab", requirement: 500, description: "Have 500 Alchemy Labs.", unlocked: false },
 
   "First portal": { id: 56, type: "buildings", target: "Portal", requirement: 1, description: "Have 1 Portal.", unlocked: false },
   "Portal network": { id: 57, type: "buildings", target: "Portal", requirement: 5, description: "Have 5 Portals.", unlocked: false },
@@ -455,6 +477,8 @@ const achievements = {
   "Dimensional shift": { id: 95, type: "buildings", target: "Portal", requirement: 100, description: "Have 100 Portals.", unlocked: false },
   "Realm of the Mad God": { id: 117, type: "buildings", target: "Portal", requirement: 200, description: "Have 200 Portals.", unlocked: false },
   "Forbidden zone": { id: 118, type: "buildings", target: "Portal", requirement: 300, description: "Have 300 Portals.", unlocked: false },
+  "What happens in the vortex stays in the vortex": { id: 145, type: "buildings", target: "Portal", requirement: 400, description: "Have 400 Portals.", unlocked: false },
+  "Your brain gets smart but your head gets dumb": { id: 146, type: "buildings", target: "Portal", requirement: 500, description: "Have 500 Portals.", unlocked: false },
 
   "First trip": { id: 61, type: "buildings", target: "Time machine", requirement: 1, description: "Have 1 Time Machine.", unlocked: false },
   "Time traveler": { id: 62, type: "buildings", target: "Time machine", requirement: 5, description: "Have 5 Time Machines.", unlocked: false },
@@ -464,6 +488,8 @@ const achievements = {
   "Rewriting history": { id: 96, type: "buildings", target: "Time machine", requirement: 100, description: "Have 100 Time Machines.", unlocked: false },
   "Forever and ever": { id: 119, type: "buildings", target: "Time machine", requirement: 200, description: "Have 200 Time Machines.", unlocked: false },
   "cookie clicker forever and forever a hundred years cookie clicker, all day long forever, forever a hundred times, over and over cookie clicker adventures dot com": { id: 120, type: "buildings", target: "Time machine", requirement: 300, description: "Have 300 Time Machines.", unlocked: false },
+  "Invited to yesterday's party": { id: 147, type: "buildings", target: "Time machine", requirement: 400, description: "Have 400 Time Machines.", unlocked: false },
+  "The years start coming": { id: 148, type: "buildings", target: "Time machine", requirement: 500, description: "Have 500 Time Machines.", unlocked: false },
 
   "Rebirth": { id: 66, type: "resets", requirement: 1, description: "Reset 1 time.", unlocked: false },
   "Renaissance": { id: 67, type: "resets", requirement: 5, description: "Reset 5 times.", unlocked: false },
@@ -1465,7 +1491,7 @@ function updateUpgradeAffordability() {
     if (name === "pledge") {
       element.classList.toggle(
         "grayed",
-        pledge > 0 || cookies < elderPledge.currentPrice
+        !grandmasAreAngry() || pledge > 0 || cookies < elderPledge.currentPrice
       );
       return;
     }
@@ -1482,7 +1508,7 @@ function updateUpgradeAffordability() {
 /* ---------------------------------------------------------------- */
 
 function buyElderPledge() {
-  if (!loaded || pledge > 0 || cookies < elderPledge.currentPrice) return;
+  if (!loaded || !grandmasAreAngry() || pledge > 0 || cookies < elderPledge.currentPrice) return;
 
   cookies -= elderPledge.currentPrice;
   elderPledge.count++;
@@ -2076,6 +2102,10 @@ function getComment(totalCookies) {
   return 'it\'s time to stop playing<br><span style="font-size:50%;">(more fun milestones in the next update I promise)</span>';
 }
 
+function grandmasAreAngry() {
+  return cookies >= GRANDMA_WRATH_COOKIES && pledge <= 0;
+}
+
 function applyFlashEffect() {
   const whole = getElement("whole");
   const backdrop = getElement("eldersBackdrop");
@@ -2083,8 +2113,8 @@ function applyFlashEffect() {
   whole.style.background = "#ccc";
   if (backdrop) backdrop.style.background = "";
 
-  if (cookies >= 1000000 && pledge <= 0 && settings.flashing) {
-    const intensity = (cookies - 1000000) / 2000000;
+  if (grandmasAreAngry() && settings.flashing) {
+    const intensity = (cookies - GRANDMA_WRATH_COOKIES) / 200000;
     const intensity2 = Math.max(0, (cookies - 100000000) / 400000000);
     let icon = "grandmaicon";
 
@@ -2148,7 +2178,7 @@ function initOverlay() {
 
 function renderChangelog() {
   const entries = [
-    { version: "0.138", date: "18/09/2026", notes: ["adding building upgrades up to 500 (wiki ladder) for all 12 buildings", "filling the cursor upgrade chain (25 to 500: Thousand to Decillion fingers)", "renaming two collision upgrades (Shipment 250, Time machine 500)"] },
+    { version: "0.138", date: "18/09/2026", notes: ["adding building upgrades up to 500 (wiki ladder) for all 12 buildings", "filling the cursor upgrade chain (25 to 500: Thousand to Decillion fingers)", "adding building achievements up to 500 (400 and 500 tiers) for all 12 buildings", "renaming two collision upgrades (Shipment 250, Time machine 500)"] },
     { version: "0.137", date: "18/09/2026", notes: ["fixing building production (no more 150 cap, real CpS now matches the display)", "prestige upgrades now unlock 25/50/75/100% of your prestige, at a monstrous price (1e15 to 1e24)", "building price multiplier raised from 1.1 to 1.15", "prestige gain no longer resets on page reload", "deploying the three walls (1t, 450 quadrillion, 4e19+) with prestige milestones", "adding prestige achievements (Heavenly crumb, Elder council, Demigod, Godhead)"] },
     { version: "0.136", date: "18/09/2026", notes: ["aligning prestige to the original game (1 trillion chips, 2% up to 5% power)", "reducing offline production to 25%", "pushing the left building column further left to clear the cookie"] },
     { version: "0.135", date: "18/09/2026", notes: ["adding Building special golden cookie buff", "rebalancing upgrade prices x100", "setting buildings base CpS to wiki values", "reworking Elder Pledge (64 base, x64 per purchase, 6 min)", "widening building display and reworking layout"] },
