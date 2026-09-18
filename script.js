@@ -13,6 +13,8 @@ const SAVE_INTERVAL_SECONDS = 30 * 60;
 
 const MAX_VISIBLE_UPGRADES = 5;
 
+const ASSET_PATH = "assets/";
+
 const MAX_OFFLINE_SECONDS = 24 * 60 * 60;
 
 /* ---------------------------------------------------------------- */
@@ -1205,7 +1207,7 @@ function rebuildStore() {
     const building = buildings[name];
 
     output += `
-      <div id="buy${name}" data-buy="${name}" style="background-image:url(${building.icon}.png);">
+      <div id="buy${name}" data-buy="${name}" style="background-image:url(${ASSET_PATH}${building.icon}.png);">
         <div class="tooltipStore">
           <div class="building-icon"></div>
           <b>${name}</b>
@@ -1457,14 +1459,14 @@ function rebuildUpgradesStore() {
 
       // Upgrade filtering
       if (upgrade.building === "GC") {
-        upgrade.icon = upgrade.building + "icon.png";
+        upgrade.icon = ASSET_PATH + upgrade.building + "icon.png";
       } else if (upgrade.building === "kitten") {
-        upgrade.icon = "kittensicon.png";
+        upgrade.icon = ASSET_PATH + "kittensicon.png";
       } else if (upgrade.building === "Alchemy lab") {
-        upgrade.icon = "labicon.png";
+        upgrade.icon = ASSET_PATH + "labicon.png";
       } else {
         upgrade.icon =
-          upgrade.building.replace(/\s/g, "").toLowerCase() + "icon.png";
+          ASSET_PATH + upgrade.building.replace(/\s/g, "").toLowerCase() + "icon.png";
       }
 
       if (!isUpgradeAvailable(upgrade)) return;
@@ -1485,7 +1487,7 @@ function rebuildUpgradesStore() {
     });
 
   output += `
-    <div id="buyElderPledge" style="${smallFont}background-image:url(pledgeicon.png);">
+    <div id="buyElderPledge" style="${smallFont}background-image:url(${ASSET_PATH}pledgeicon.png);">
       <div class="tooltipStore">
         <div class="building-icon"></div>
         <b>Elder Pledge</b>
@@ -1704,7 +1706,7 @@ function spawnGoldenCookie() {
   const cookie = document.createElement("img");
 
   cookie.id = "goldenCookie";
-  cookie.src = "goldencookie.png";
+  cookie.src = ASSET_PATH + "goldencookie.png";
   cookie.alt = "Golden Cookie";
 
   cookie.style.position = "fixed";
@@ -1955,7 +1957,7 @@ function getActiveBuffs() {
     buffs.push({
       id: "frenzy",
       name: "Frenzy",
-      icon: "frenzyicon.png",
+      icon: ASSET_PATH + "frenzyicon.png",
       description: "Cookie production x7.",
       timer: goldenCookieFrenzyTimer
     });
@@ -1965,7 +1967,7 @@ function getActiveBuffs() {
     buffs.push({
       id: "clickFrenzy",
       name: "Click Frenzy",
-      icon: "clickfrenzyicon.png",
+      icon: ASSET_PATH + "clickfrenzyicon.png",
       description: "Cookie clicking x777.",
       timer: goldenCookieClickFrenzyTimer
     });
@@ -1976,7 +1978,7 @@ function getActiveBuffs() {
     buffs.push({
       id: "buildingSpecial",
       name: "Building special",
-      icon: "buildingspecialicon.png",
+      icon: ASSET_PATH + "buildingspecialicon.png",
       description: `${goldenCookieBuildingSpecialBuilding ?? ""} x${multiplier} cookie production.`,
       timer: goldenCookieBuildingSpecialTimer
     });
@@ -2204,10 +2206,10 @@ function applyFlashEffect() {
 
   if (backdrop && angerLevel >= 3 && cookies >= 1000000000) {
     backdrop.style.background =
-      `url(kaleigrandma.png) ${Math.floor(ticks * 0.2)}px -${Math.floor(ticks * 0.1)}px`;
+      `url(${ASSET_PATH}kaleigrandma.png) ${Math.floor(ticks * 0.2)}px -${Math.floor(ticks * 0.1)}px`;
   } else if (backdrop && angerLevel >= 1 && Math.random() < intensity) {
     backdrop.style.background =
-      `url(${icon}.png) ${Math.floor(Math.random() * 4)}px ${Math.floor(Math.random() * 4)}px`;
+      `url(${ASSET_PATH}${icon}.png) ${Math.floor(Math.random() * 4)}px ${Math.floor(Math.random() * 4)}px`;
     backdrop.style.backgroundSize =
       `${Math.floor(intensity2 * Math.random() * 64 + 64)}px ` +
       `${Math.floor(intensity2 * Math.random() * 64 + 64)}px`;
@@ -2606,7 +2608,7 @@ function initialize() {
   ];
 
   getElement("hiddenLoader").innerHTML =
-    imageNames.map(name => `<img src="${name}.png">`).join("");
+    imageNames.map(name => `<img src="${ASSET_PATH}${name}.png">`).join("");
 
   getElement("cookie").addEventListener("mouseup", clickCookie);
   getElement("save").addEventListener("click", saveGame);
