@@ -607,10 +607,35 @@ const upgrades = {
   "Magical botany": { id: 103, description: "Farms gain +5% CpS per wizard tower. Wizard towers gain +0.1% CpS per farm. Already known in some newspapers as the wizard's GMOs.", price: 66002000000000000000, building: "synergies", requiredBuildings: { Farm: 75, "Wizard tower": 75 }, effect: { Farm: { "Wizard tower": 0.05 }, "Wizard tower": { Farm: 0.001 } }, requires: 89, bought: false },
   "Shipyards": { id: 104, description: "Factories gain +5% CpS per shipment. Shipments gain +0.1% CpS per factory. Carpentry, blind luck, and asbestos insulation unite.", price: 1020000000000000000000, building: "synergies", requiredBuildings: { Factory: 75, Shipment: 75 }, effect: { Factory: { Shipment: 0.05 }, Shipment: { Factory: 0.001 } }, requires: 89, bought: false },
   "Gold fund": { id: 105, description: "Banks gain +5% CpS per alchemy lab. Alchemy labs gain +0.1% CpS per bank. If gold is the economy's backbone, cookies are its hip joints.", price: 15003000000000000000000, building: "synergies", requiredBuildings: { Bank: 75, "Alchemy lab": 75 }, effect: { Bank: { "Alchemy lab": 0.05 }, "Alchemy lab": { Bank: 0.001 } }, requires: 89, bought: false },
+
+  // Prestige power upgrades
+  "Prestige power I": { id: 106, description: "Unlocks 25% of your prestige. Prestige x0.25.", price: 100000, building: "prestige", requiredPrestige: 1, bought: false },
+  "Prestige power II": { id: 107, description: "Unlocks 50% of your prestige. Prestige x0.5.", price: 10000000, building: "prestige", requiredPrestige: 300, requires: 106, bought: false },
+  "Prestige power III": { id: 108, description: "Unlocks 75% of your prestige. Prestige x0.75.", price: 1000000000, building: "prestige", requiredPrestige: 9000, requires: 107, bought: false },
+  "Prestige power IV": { id: 109, description: "Unlocks 100% of your prestige. Full prestige.", price: 100000000000, building: "prestige", requiredPrestige: 81000, requires: 108, bought: false },
 };
 
 const upgradeList = Object.values(upgrades);
 const buildingNames = Object.keys(buildings);
+
+const UPGRADE_PRICE_SCALE = 100;
+
+// Applying a global price multiplier to the current upgrades for balance.
+upgradeList.forEach(upgrade => {
+  if (upgrade.building !== "prestige") upgrade.price *= UPGRADE_PRICE_SCALE;
+});
+
+function getPrestigePowerRatio() {
+  if (upgrades["Prestige power IV"]?.bought) return 1;
+  if (upgrades["Prestige power III"]?.bought) return 0.75;
+  if (upgrades["Prestige power II"]?.bought) return 0.5;
+  if (upgrades["Prestige power I"]?.bought) return 0.25;
+  return resetCount > 0 ? 0.1 : 0;
+}
+
+function getPrestigeMultiplier() {
+  return prestige * getPrestigePowerRatio() + 1;
+}
 
 /* ---------------------------------------------------------------- */
 /* Building helpers                                                 */
@@ -889,13 +914,13 @@ function getCursorGain() {
 
 function getCursorClickGain() {
   return getCursorGain()
-    * (prestige + 1)
+    * getPrestigeMultiplier()
     * goldenCookieClickMultiplier;
 }
 
 function getCursorAutoClickGain() {
   return getCursorGain()
-    * (prestige + 1)
+    * getPrestigeMultiplier()
     * goldenCookieCpsMultiplier
     * goldenCookieBuildingSpecialMultiplier
     * globalMultiplier;
@@ -937,7 +962,7 @@ function getBuildingGain(name) {
 }
 
 function addCookies(amount, elementId) {
-  amount *= prestige + 1;
+  amount *= getPrestigeMultiplier();
   cookies += amount;
   cookiesBakedAllTime += amount;
 
@@ -1216,11 +1241,19 @@ function isUpgradeAvailable(upgrade) {
     }
   }
 
+  if (upgrade.requiredPrestige !== undefined && prestige < upgrade.requiredPrestige) {
+    return false;
+  }
+
   return true;
 }
 
 function applyUpgradeMultiplier(upgrade) {
-  if (upgrade.building === "GC" || upgrade.building === "synergies") return;
+  if (
+    upgrade.building === "GC" ||
+    upgrade.building === "synergies" ||
+    upgrade.building === "prestige"
+  ) return;
 
   if (upgrade.building === "kitten") {
     globalMultiplier *= upgrade.multiplier;
@@ -2305,6 +2338,7 @@ function main() {
 
   setElementText("prestigeDisplay", prestige);
   setElementText("prestigeGainDisplay", Math.max(0, calculatePrestige() - prestige));
+  setElementText("prestigeUnleashedDisplay", Math.round(getPrestigePowerRatio() * 100) + "%");
   setElementText("resetCounterDisplay", resetCount);
   setElementText("overlayAllTimeCookies", "Cookies baked (all time): " + beautify(cookiesBakedAllTime));
 
