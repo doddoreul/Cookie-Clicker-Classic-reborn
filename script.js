@@ -609,10 +609,10 @@ const upgrades = {
   "Gold fund": { id: 105, description: "Banks gain +5% CpS per alchemy lab. Alchemy labs gain +0.1% CpS per bank. If gold is the economy's backbone, cookies are its hip joints.", price: 15003000000000000000000, building: "synergies", requiredBuildings: { Bank: 75, "Alchemy lab": 75 }, effect: { Bank: { "Alchemy lab": 0.05 }, "Alchemy lab": { Bank: 0.001 } }, requires: 89, bought: false },
 
   // Prestige upgrades
-  "Prestige I": { id: 106, description: "Unlocks 2.5% of your prestige. Prestige x0.025.", price: 1000000, building: "prestige", requiredPrestige: 1, bought: false },
-  "Prestige II": { id: 107, description: "Unlocks 3% of your prestige. Prestige x0.03.", price: 1000000000000, building: "prestige", requiredPrestige: 300, requires: 106, bought: false },
-  "Prestige III": { id: 108, description: "Unlocks 4% of your prestige. Prestige x0.04.", price: 1000000000000000, building: "prestige", requiredPrestige: 9000, requires: 107, bought: false },
-  "Prestige IV": { id: 109, description: "Unlocks 5% of your prestige. Prestige x0.05.", price: 1000000000000000000, building: "prestige", requiredPrestige: 81000, requires: 108, bought: false },
+  "Prestige I": { id: 106, description: "Unlocks 25% of your prestige. Prestige x0.25.", price: 1000000000000000, building: "prestige", requiredPrestige: 1, bought: false },
+  "Prestige II": { id: 107, description: "Unlocks 50% of your prestige. Prestige x0.5.", price: 1000000000000000000, building: "prestige", requiredPrestige: 300, requires: 106, bought: false },
+  "Prestige III": { id: 108, description: "Unlocks 75% of your prestige. Prestige x0.75.", price: 1000000000000000000000, building: "prestige", requiredPrestige: 9000, requires: 107, bought: false },
+  "Prestige IV": { id: 109, description: "Unlocks 100% of your prestige. Prestige x1.0.", price: 1000000000000000000000000, building: "prestige", requiredPrestige: 81000, requires: 108, bought: false },
 };
 
 const upgradeList = Object.values(upgrades);
@@ -626,10 +626,10 @@ upgradeList.forEach(upgrade => {
 });
 
 function getPrestigePowerRatio() {
-  if (upgrades["Prestige IV"]?.bought) return 0.05;
-  if (upgrades["Prestige III"]?.bought) return 0.04;
-  if (upgrades["Prestige II"]?.bought) return 0.03;
-  if (upgrades["Prestige I"]?.bought) return 0.025;
+  if (upgrades["Prestige IV"]?.bought) return 1;
+  if (upgrades["Prestige III"]?.bought) return 0.75;
+  if (upgrades["Prestige II"]?.bought) return 0.5;
+  if (upgrades["Prestige I"]?.bought) return 0.25;
   return resetCount > 0 ? 0.02 : 0;
 }
 
@@ -652,7 +652,7 @@ function getBuildingCount(name) {
 function updateBuildingPrice(name) {
   const building = getBuilding(name);
   building.currentPrice = Math.ceil(
-    building.basePrice * Math.pow(1.1, building.count)
+    building.basePrice * Math.pow(1.15, building.count)
   );
   building.bulkPrice10 = getBulkBuildingPrice(name, 10);
   building.bulkPrice100 = getBulkBuildingPrice(name, 100);
@@ -914,20 +914,18 @@ function getCursorGain() {
 
 function getCursorClickGain() {
   return getCursorGain()
-    * getPrestigeMultiplier()
     * goldenCookieClickMultiplier;
 }
 
 function getCursorAutoClickGain() {
   return getCursorGain()
-    * getPrestigeMultiplier()
     * goldenCookieCpsMultiplier
     * goldenCookieBuildingSpecialMultiplier
     * globalMultiplier;
 }
 
 function clickCookie() {
-  const amount = getCursorClickGain();
+  const amount = getCursorClickGain() * getPrestigeMultiplier();
 
   cookies += amount;
   cookiesBakedAllTime += amount;
@@ -972,24 +970,40 @@ function addCookies(amount, elementId) {
 }
 
 function produceCursorCookies() {
-  const count = buildings.Cursor.count;
-  if (!count) return;
+  const cps = getCursorCps();
+  if (!cps) return;
 
-  const interval = Math.max(1, Math.ceil(150 / count));
+  const perTick = cps / TICKS_PER_SECOND;
 
-  if (ticks % interval === 0) {
-    addCookies(getCursorAutoClickGain(), "cookie");
-  }
+  addCookies(perTick, null);
+  accumulateProductionPop("cursor", "cookie", perTick * getPrestigeMultiplier());
 }
 
 function produceBuildingCookies(name, elementId) {
   const count = buildings[name].count;
   if (!count) return;
 
-  const interval = Math.max(1, Math.ceil(150 / count));
+  const perTick = count * getBuildingGain(name) / 5 / TICKS_PER_SECOND;
+  if (perTick <= 0) return;
 
-  if (ticks % interval === 0) {
-    addCookies(getBuildingGain(name), elementId);
+  addCookies(perTick, null);
+  accumulateProductionPop(name, elementId, perTick * getPrestigeMultiplier());
+}
+
+const PRODUCTION_POP_INTERVAL_TICKS = 15;
+
+const productionPopAccumulators = {};
+
+function accumulateProductionPop(key, elementId, amount) {
+  if (!settings.numbersOn) return;
+
+  const accumulator = productionPopAccumulators[key] ??= { sum: 0, lastTick: ticks };
+  accumulator.sum += amount;
+
+  if (ticks - accumulator.lastTick >= PRODUCTION_POP_INTERVAL_TICKS && accumulator.sum > 0) {
+    new Pop(elementId, "+" + beautify(accumulator.sum));
+    accumulator.sum = 0;
+    accumulator.lastTick = ticks;
   }
 }
 
@@ -1020,8 +1034,8 @@ function getCookiesPerSecond() {
     cps += count * getBuildingGain(name) / 5;
   });
 
-  cachedCps = cps;
-  return cps;
+  cachedCps = cps * getPrestigeMultiplier();
+  return cachedCps;
 }
 
 /* ---------------------------------------------------------------- */
@@ -1098,7 +1112,7 @@ function getBulkBuildingPrice(name, amount) {
   let total = 0;
   for (let i = 0; i < amount; i++) {
     total += Math.ceil(
-      building.basePrice * Math.pow(1.1, building.count + i)
+      building.basePrice * Math.pow(1.15, building.count + i)
     );
   }
 
