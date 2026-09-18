@@ -403,7 +403,7 @@ you **prestige**, a permanent meta-currency.
 ### Prestige formula
 
 ```
-prestige = floor(( -1 + sqrt(1 + 8 × (cookiesBakedAllTime / 10¹²)) ) / 2)
+prestige = floor( ∛(cookiesBakedAllTime / 10¹²) )
 ```
 
 Only your **all-time total cookies** (not current) matter. Examples:
@@ -411,10 +411,13 @@ Only your **all-time total cookies** (not current) matter. Examples:
 | All-time cookies | Prestige points |
 | ---------------- | --------------- |
 | 1 trillion (10¹²)   | 1 |
-| 1 quadrillion (10¹⁵) | ~44 |
-| 1 quintillion (10¹⁸) | ~1 414 |
-| 1 sextillion (10²¹)  | ~44 721 |
-| 1 septillion (10²⁴)  | ~1 414 213 |
+| 1 quadrillion (10¹⁵) | 10 |
+| 1 quintillion (10¹⁸) | 100 |
+| 1 sextillion (10²¹)  | 1 000 |
+| 1 septillion (10²⁴)  | 10 000 |
+
+*Aligned with current Cookie Clicker (v2+): 1 point per 10¹² baked, cube-root curve
+— every factor of 1 000 in all-time cookies multiplies your prestige by 10.*
 
 ### Prestige power
 
@@ -440,11 +443,11 @@ So with 1 000 prestige and Prestige I, your multiplier is `1 + 1000 × 0.25 =
 
 Long-time players recognise the famous difficulty walls:
 
-1. **The first wall (~1 T total)** — unlocking your first prestige point.
-2. **Elder council (~450 Qa total, 300 prestige)** — the second prestige
-   upgrade becomes reachable.
-3. **The third wall (4e19+ total, 9 000 prestige)** — Demigod territory, on the
-   road to Prestige III/IV.
+1. **The first wall (10¹² total)** — unlocking your first prestige point.
+2. **Second wall (2,7·10¹⁹ total, 300 prestige)** — the second prestige upgrade
+   becomes reachable (`∛300³·10¹²`).
+3. **The third wall (7,29·10²⁰ total, 9 000 prestige)** — Demigod territory, on
+   the road to Prestige III/IV.
 
 ### Resetting
 

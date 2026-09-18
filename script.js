@@ -871,11 +871,11 @@ function applySaveData(data) {
   if (data.formatVersion !== SAVE_FORMAT_VERSION) return false;
 
   cookies = Number.isFinite(data.cookies) ? data.cookies : 0;
-  prestige = Number.isFinite(data.prestige) ? data.prestige : 0;
   resetCount = Number.isFinite(data.resetCount) ? data.resetCount : 0;
   pledge = Number.isFinite(data.pledge) ? data.pledge : 0;
   grandmaAnger = Number.isFinite(data.grandmaAnger) ? Math.max(0, data.grandmaAnger) : 0;
   cookiesBakedAllTime = Number.isFinite(data.cookiesBakedAllTime) ? data.cookiesBakedAllTime : 0;
+  prestige = calculatePrestige();
 
   goldenCookieClickFrenzyTimer = Number.isFinite(data.goldenCookieClickFrenzyTimer)
     ? Math.max(0, data.goldenCookieClickFrenzyTimer)
@@ -1184,9 +1184,7 @@ function getCookiesPerSecond() {
 function calculatePrestige() {
   return Math.max(
     0,
-    Math.floor(
-      (-1 + Math.sqrt(1 + 8 * (cookiesBakedAllTime / 1000000000000))) / 2
-    )
+    Math.floor(Math.cbrt(cookiesBakedAllTime / 1000000000000))
   );
 }
 
@@ -1517,7 +1515,9 @@ function updateUpgradeAffordability() {
     if (name === "pledge") {
       element.classList.toggle(
         "grayed",
-        !grandmasAreAngry() || pledge > 0 || cookies < elderPledge.currentPrice
+        getGrandmaAngerLevel() <= 0 ||
+          pledge > 0 ||
+          cookies < elderPledge.currentPrice
       );
       return;
     }
@@ -1534,7 +1534,7 @@ function updateUpgradeAffordability() {
 /* ---------------------------------------------------------------- */
 
 function buyElderPledge() {
-  if (!loaded || !grandmasAreAngry() || pledge > 0 || cookies < elderPledge.currentPrice) return;
+  if (!loaded || getGrandmaAngerLevel() <= 0 || pledge > 0 || cookies < elderPledge.currentPrice) return;
 
   cookies -= elderPledge.currentPrice;
   elderPledge.count++;

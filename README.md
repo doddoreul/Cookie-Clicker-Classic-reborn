@@ -75,7 +75,7 @@ Buff icons with live countdowns appear top-left.
 Reset your run to earn **prestige points** from your all-time cookies:
 
 ```
-prestige = floor(( -1 + sqrt(1 + 8 × allTime/10¹²) ) / 2)
+prestige = floor( ∛(allTime / 10¹²) )
 ```
 
 Unlock them with **Prestige I–IV** (25 → 100% of your prestige) for a permanent
