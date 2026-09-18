@@ -737,8 +737,6 @@ function applySaveData(data) {
   pledge = Number.isFinite(data.pledge) ? data.pledge : 0;
   cookiesBakedAllTime = Number.isFinite(data.cookiesBakedAllTime) ? data.cookiesBakedAllTime : 0;
 
-  prestige = calculatePrestige();
-
   goldenCookieClickFrenzyTimer = Number.isFinite(data.goldenCookieClickFrenzyTimer)
     ? Math.max(0, data.goldenCookieClickFrenzyTimer)
     : 0;
