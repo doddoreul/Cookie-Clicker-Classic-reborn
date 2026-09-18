@@ -4,7 +4,7 @@
 /* Constants                                                        */
 /* ---------------------------------------------------------------- */
 
-const VERSION = "0.138";
+const VERSION = "0.139";
 const SAVE_KEY = "CookieClickerClassic_Reborn_Save";
 const SETTINGS_KEY = "CookieClickerClassic_Reborn_Settings";
 const SAVE_FORMAT_VERSION = 2;
@@ -22,6 +22,8 @@ function getElement(id) {
 }
 
 const lastRenderedText = {};
+
+let cachedAngerDisplayElement = null;
 
 function setElementText(id, text) {
   if (lastRenderedText[id] === text) return;
@@ -122,6 +124,18 @@ const settings = { ...defaultSettings };
 
 const GRANDMA_WRATH_COOKIES = 100000;
 
+/* Grandma anger - rudimentary Grandmapocalypse.
+   The tier thresholds reuse the applyFlashEffect() cookie amounts
+   (grandmas appear / icons change / skellington), so both systems
+   stay coherent. All values are easy to tweak. */
+const GRANDMA_ANGER_THRESHOLD_ANGERED = 100000;
+const GRANDMA_ANGER_THRESHOLD_FURIOUS = 2000000;
+const GRANDMA_ANGER_THRESHOLD_APOCALYPSE = 10000000;
+const GRANDMA_ANGER_PER_SECOND = 800;
+const GRANDMA_ANGER_ACCELERATION = [1, 4, 15, 60];
+const GRANDMA_ANGER_MULTIPLIERS = [1.00, 0.90, 0.80, 0.70];
+const GRANDMA_ANGER_LABELS = ["Calm", "Angered", "Furious", "Apocalypse"];
+
 const elderPledge = {
   basePrice: 64,
   currentPrice: 64,
@@ -140,6 +154,7 @@ let cookiesDisplay = 0;
 let ticks = 0;
 let prestige = 0;
 let pledge = 0;
+let grandmaAnger = 0;
 let saveTimer = SAVE_INTERVAL_SECONDS;
 let resetCount = 0;
 let globalMultiplier = 1;
@@ -151,6 +166,13 @@ let cachedCps = null;
 
 function invalidateGainCache() {
   gainCacheDirty = true;
+}
+
+// Refreshes only the per-second display value; synergy multipliers are kept,
+// since their only inputs (upgrades bought, building counts, buffs) all go
+// through invalidateGainCache() on change.
+function invalidateCpsCache() {
+  cachedCps = null;
 }
 
 function ensureGainCache() {
@@ -798,6 +820,7 @@ function getSaveData() {
     prestige,
     resetCount,
     pledge,
+    grandmaAnger,
     buildings: buildingData,
     upgrades: Object.keys(upgrades).filter(name => upgrades[name].bought),
     achievements: Object.keys(achievements)
@@ -824,6 +847,7 @@ function resetSaveString() {
     prestige,
     resetCount,
     pledge: 0,
+    grandmaAnger: 0,
     cookiesBakedAllTime,
     buildings: {},
     upgrades: [],
@@ -850,6 +874,7 @@ function applySaveData(data) {
   prestige = Number.isFinite(data.prestige) ? data.prestige : 0;
   resetCount = Number.isFinite(data.resetCount) ? data.resetCount : 0;
   pledge = Number.isFinite(data.pledge) ? data.pledge : 0;
+  grandmaAnger = Number.isFinite(data.grandmaAnger) ? Math.max(0, data.grandmaAnger) : 0;
   cookiesBakedAllTime = Number.isFinite(data.cookiesBakedAllTime) ? data.cookiesBakedAllTime : 0;
 
   goldenCookieClickFrenzyTimer = Number.isFinite(data.goldenCookieClickFrenzyTimer)
@@ -1034,7 +1059,8 @@ function getCursorAutoClickGain() {
   return getCursorGain()
     * goldenCookieCpsMultiplier
     * goldenCookieBuildingSpecialMultiplier
-    * globalMultiplier;
+    * globalMultiplier
+    * getGrandmaAngerMultiplier();
 }
 
 function clickCookie() {
@@ -1069,7 +1095,7 @@ function getSynergyMultiplier(name) {
 }
 
 function getBuildingGain(name) {
-  return buildings[name].gain * multipliers[name] * getSynergyMultiplier(name) * goldenCookieCpsMultiplier * goldenCookieBuildingSpecialMultiplier * globalMultiplier;
+  return buildings[name].gain * multipliers[name] * getSynergyMultiplier(name) * goldenCookieCpsMultiplier * goldenCookieBuildingSpecialMultiplier * globalMultiplier * getGrandmaAngerMultiplier();
 }
 
 function addCookies(amount, elementId) {
@@ -1515,6 +1541,7 @@ function buyElderPledge() {
   elderPledge.currentPrice = Math.ceil(elderPledge.basePrice * Math.pow(64, elderPledge.count));
 
   pledge += 6 * 60 * TICKS_PER_SECOND;
+  grandmaAnger = 0;
 
   refreshGrandmas();
   invalidateGainCache();
@@ -1531,9 +1558,9 @@ function updatePledgeTimer() {
 
     if (seconds < 10) seconds = "0" + seconds;
 
-    getElement("pledgeTimer").innerHTML = minutes + ":" + seconds;
+    setElementText("pledgeTimer", minutes + ":" + seconds);
   } else {
-    getElement("pledgeTimer").innerHTML = "666";
+    setElementText("pledgeTimer", "666");
   }
 }
 
@@ -2106,35 +2133,66 @@ function grandmasAreAngry() {
   return cookies >= GRANDMA_WRATH_COOKIES && pledge <= 0;
 }
 
+function getGrandmaAngerLevel() {
+  if (grandmaAnger >= GRANDMA_ANGER_THRESHOLD_APOCALYPSE) return 3;
+  if (grandmaAnger >= GRANDMA_ANGER_THRESHOLD_FURIOUS) return 2;
+  if (grandmaAnger >= GRANDMA_ANGER_THRESHOLD_ANGERED) return 1;
+  return 0;
+}
+
+function getGrandmaAngerMultiplier() {
+  return GRANDMA_ANGER_MULTIPLIERS[getGrandmaAngerLevel()];
+}
+
+function getGrandmaAngerStatusText() {
+  const level = getGrandmaAngerLevel();
+  const label = GRANDMA_ANGER_LABELS[level];
+  const malus = Math.round((1 - GRANDMA_ANGER_MULTIPLIERS[level]) * 100);
+  return malus > 0
+    ? `Grandmas: ${label} (-${malus}%)`
+    : `Grandmas: ${label}`;
+}
+
+function advanceGrandmaAnger(ticksToSimulate) {
+  if (pledge > 0 || cookies < GRANDMA_WRATH_COOKIES || ticksToSimulate <= 0) return;
+
+  const level = getGrandmaAngerLevel();
+  const ratePerSecond =
+    GRANDMA_ANGER_PER_SECOND * GRANDMA_ANGER_ACCELERATION[level];
+  grandmaAnger += (ratePerSecond * ticksToSimulate) / TICKS_PER_SECOND;
+  if (getGrandmaAngerLevel() !== level) invalidateGainCache();
+}
+
 function applyFlashEffect() {
   const whole = getElement("whole");
   const backdrop = getElement("eldersBackdrop");
 
-  whole.style.background = "#ccc";
-  if (backdrop) backdrop.style.background = "";
+  if (whole.style.background !== "#ccc") whole.style.background = "#ccc";
+  if (backdrop && backdrop.style.background !== "") backdrop.style.background = "";
 
-  if (grandmasAreAngry() && settings.flashing) {
-    const intensity = (cookies - GRANDMA_WRATH_COOKIES) / 200000;
-    const intensity2 = Math.max(0, (cookies - 100000000) / 400000000);
-    let icon = "grandmaicon";
+  if (!grandmasAreAngry() || !settings.flashing) return;
 
-    if (cookies >= 2000000) {
-      if (Math.random() < 0.02) icon = "grandmaiconinvert";
-      else if (Math.random() < 0.02) icon = "grandmaiconlustful";
-    }
+  const angerLevel = getGrandmaAngerLevel();
+  const intensity = (cookies - GRANDMA_WRATH_COOKIES) / 200000;
+  const intensity2 = Math.max(0, (cookies - 100000000) / 400000000);
+  let icon = "grandmaicon";
 
-    if (cookies >= 10000000 && Math.random() < 0.02) icon = "skellington";
+  if (angerLevel >= 2) {
+    if (Math.random() < 0.02) icon = "grandmaiconinvert";
+    else if (Math.random() < 0.02) icon = "grandmaiconlustful";
+  }
 
-    if (backdrop && cookies >= 1000000000) {
-      backdrop.style.background =
-        `url(kaleigrandma.png) ${Math.floor(ticks * 0.2)}px -${Math.floor(ticks * 0.1)}px`;
-    } else if (backdrop && Math.random() < intensity) {
-      backdrop.style.background =
-        `url(${icon}.png) ${Math.floor(Math.random() * 4)}px ${Math.floor(Math.random() * 4)}px`;
-      backdrop.style.backgroundSize =
-        `${Math.floor(intensity2 * Math.random() * 64 + 64)}px ` +
-        `${Math.floor(intensity2 * Math.random() * 64 + 64)}px`;
-    }
+  if (angerLevel >= 3 && Math.random() < 0.02) icon = "skellington";
+
+  if (backdrop && angerLevel >= 3 && cookies >= 1000000000) {
+    backdrop.style.background =
+      `url(kaleigrandma.png) ${Math.floor(ticks * 0.2)}px -${Math.floor(ticks * 0.1)}px`;
+  } else if (backdrop && angerLevel >= 1 && Math.random() < intensity) {
+    backdrop.style.background =
+      `url(${icon}.png) ${Math.floor(Math.random() * 4)}px ${Math.floor(Math.random() * 4)}px`;
+    backdrop.style.backgroundSize =
+      `${Math.floor(intensity2 * Math.random() * 64 + 64)}px ` +
+      `${Math.floor(intensity2 * Math.random() * 64 + 64)}px`;
   }
 }
 
@@ -2178,6 +2236,7 @@ function initOverlay() {
 
 function renderChangelog() {
   const entries = [
+    { version: "0.139", date: "18/09/2026", notes: ["adding a rudimentary Grandmapocalypse : grandmas get angry over time (Calm to Apocalypse, 4 stages) and cut your production by up to 30%", "Elder Pledge now instantly calms grandmas for 6 minutes, then the anger resumes from zero", "syncing the background flashing with the grandmas' anger level", "optimizing the runtime : the gain/synergy cache is no longer flushed every tick, and redundant DOM writes were removed"] },
     { version: "0.138", date: "18/09/2026", notes: ["adding building upgrades up to 500 (wiki ladder) for all 12 buildings", "filling the cursor upgrade chain (25 to 500: Thousand to Decillion fingers)", "adding building achievements up to 500 (400 and 500 tiers) for all 12 buildings", "renaming two collision upgrades (Shipment 250, Time machine 500)"] },
     { version: "0.137", date: "18/09/2026", notes: ["fixing building production (no more 150 cap, real CpS now matches the display)", "prestige upgrades now unlock 25/50/75/100% of your prestige, at a monstrous price (1e15 to 1e24)", "building price multiplier raised from 1.1 to 1.15", "prestige gain no longer resets on page reload", "deploying the three walls (1t, 450 quadrillion, 4e19+) with prestige milestones", "adding prestige achievements (Heavenly crumb, Elder council, Demigod, Godhead)"] },
     { version: "0.136", date: "18/09/2026", notes: ["aligning prestige to the original game (1 trillion chips, 2% up to 5% power)", "reducing offline production to 25%", "pushing the left building column further left to clear the cookie"] },
@@ -2350,7 +2409,10 @@ function catchUpIdleTime() {
   cookiesBakedAllTime += gained;
   ticks += missedTicks;
   saveTimer -= missedTicks;
+  const pledgeBefore = pledge;
   pledge = Math.max(0, pledge - missedTicks);
+  const angryTicks = Math.max(0, missedTicks - pledgeBefore);
+  if (angryTicks > 0) advanceGrandmaAnger(angryTicks);
   goldenCookieFrenzyTimer = Math.max(0, goldenCookieFrenzyTimer - missedTicks);
   goldenCookieClickFrenzyTimer = Math.max(0, goldenCookieClickFrenzyTimer - missedTicks);
 
@@ -2387,8 +2449,9 @@ function handleVisibilityChange() {
 /* ---------------------------------------------------------------- */
 
 function main() {
-  invalidateGainCache();
+  invalidateCpsCache();
   catchUpIdleTime();
+  advanceGrandmaAnger(1);
 
   if (cameBackFromIdle) {
     cameBackFromIdle = false;
@@ -2478,6 +2541,15 @@ function main() {
   setElementText("prestigeUnleashedDisplay", Math.round(getPrestigePowerRatio() * 1000) / 10 + "%");
   setElementText("resetCounterDisplay", resetCount);
   setElementText("overlayAllTimeCookies", "Cookies baked (all time): " + beautify(cookiesBakedAllTime));
+  setElementText("grandmaAngerDisplay", getGrandmaAngerStatusText());
+
+  if (!cachedAngerDisplayElement) {
+    cachedAngerDisplayElement = getElement("grandmaAngerDisplay");
+  }
+
+  if (cachedAngerDisplayElement) {
+    cachedAngerDisplayElement.classList.toggle("angry", getGrandmaAngerLevel() > 0);
+  }
 
   applyFlashEffect();
 

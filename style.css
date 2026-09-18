@@ -159,6 +159,9 @@ body::selection { background:transparent; }
   color:#000; font-size:15px;
   white-space:nowrap;
 }
+#saveMenu #grandmaAngerDisplay.angry {
+  color:#c00;
+}
 #saveMenu .button {
   text-decoration:underline;
   cursor:pointer; font-size:14px;
@@ -419,7 +422,7 @@ moni {
 #buffs {
   position: absolute;
   left: 0;
-  top: 275px;
+  top: 290px;
 
   margin: 10px 16px;
 
