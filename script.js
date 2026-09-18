@@ -4,7 +4,7 @@
 /* Constants                                                        */
 /* ---------------------------------------------------------------- */
 
-const VERSION = "0.136";
+const VERSION = "0.137";
 const SAVE_KEY = "CookieClickerClassic_Reborn_Save";
 const SETTINGS_KEY = "CookieClickerClassic_Reborn_Settings";
 const SAVE_FORMAT_VERSION = 2;
@@ -2071,6 +2071,7 @@ function initOverlay() {
 
 function renderChangelog() {
   const entries = [
+    { version: "0.137", date: "18/09/2026", notes: ["fixing building production (no more 150 cap, real CpS now matches the display)", "prestige upgrades now unlock 25/50/75/100% of your prestige, at a monstrous price (1e15 to 1e24)", "building price multiplier raised from 1.1 to 1.15", "prestige gain no longer resets on page reload", "deploying the three walls (1t, 450 quadrillion, 4e19+) with prestige milestones", "adding prestige achievements (Heavenly crumb, Elder council, Demigod, Godhead)"] },
     { version: "0.136", date: "18/09/2026", notes: ["aligning prestige to the original game (1 trillion chips, 2% up to 5% power)", "reducing offline production to 25%", "pushing the left building column further left to clear the cookie"] },
     { version: "0.135", date: "18/09/2026", notes: ["adding Building special golden cookie buff", "rebalancing upgrade prices x100", "setting buildings base CpS to wiki values", "reworking Elder Pledge (64 base, x64 per purchase, 6 min)", "widening building display and reworking layout"] },
     { version: "0.134", date: "17/09/2026", notes: ["optimizing runtime and adding a few tweaks"] },
