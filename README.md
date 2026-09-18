@@ -4,13 +4,17 @@
 
 A refreshed and expanded version of **Orteil's classic Cookie Clicker**, rebuilt with new content, gameplay improvements, bug fixes, and questionable amounts of cookies.
 
-The goal is simple: **make cookies, buy buildings, unlock upgrades, click Golden Cookies, fix things, and add stuff that probably didn't need to exist.**
+The goal is simple: **make cookies, buy buildings, unlock upgrades, click Golden Cookies, ascend to godhood, fix things, and add stuff that probably didn't need to exist.**
 
-## ✨ What's New?
+> 📖 **Looking for the full reference?** The complete [**DOCS.md**](DOCS.md) documents every system: buildings, upgrades, Golden Cookies, achievements, the Grandmapocalypse, Elder Pledge, prestige, and the save format.
+
+---
+
+## ✨ What's in the game?
 
 ### 🏭 Buildings
 
-The classic production system has been expanded with **12 buildings**:
+The classic production system has been expanded with **12 buildings**, each with its own upgrade ladder up to **500 units**:
 
 * 🖱️ Cursor
 * 👵 Grandma
@@ -25,70 +29,81 @@ The classic production system has been expanded with **12 buildings**:
 * 🌀 Portal
 * ⏳ Time Machine
 
-Each building contributes to your automatic cookie production, with upgrades that increase their effectiveness.
+Building prices scale with the classic **×1.15** growth, and support **×1 / ×10 / ×100** purchases.
+
+### 👹 Grandmapocalypse
+
+New in recent versions — the grandmas don't like being overworked. Once you hold **100,000 cookies**, their **wrath** builds up over time across **4 stages**:
+
+* 😌 **Calm** — production ×1.00
+* 😠 **Angered** — production ×0.90
+* 😡 **Furious** — production ×0.80
+* 👹 **Apocalypse** — production ×0.70
+
+The anger accelerates with each stage (×1 → ×4 → ×15 → ×60), the background starts flashing, and the grandmas get progressively more unsettling. Calm them back down with an **Elder Pledge**.
+
+### ✋ Elder Pledge
+
+A one-time purchase that instantly resets the anger and keeps the grandmas calm for **6 minutes** — during which they help you click (cursor clicks gain `count × 1.5`). Each pledge costs **64 cookies × 64 per pledge**.
 
 ### 🆙 Upgrades
 
-A growing upgrade system adds new ways to improve your cookie production.
+A comprehensive upgrade system — **187 upgrades** in total:
 
-Upgrades can include:
+* **Building upgrades** — ×2 multipliers per building (13 tiers each, up to 500 units)
+* **Golden Cookie upgrades** — more frequent & longer-lasting cookies
+* **Kitten upgrades** — global production multipliers gated by achievement count
+* **Synergy upgrades** — cross-building boosts (+5% CpS per partner building), gated behind 15 and 75-unit pairs
+* **Prestige upgrades** — unleash 25 → 100% of your prestige
 
-* Building-specific bonuses
-* Cursor improvements
-* Golden Cookie upgrades
-* Production multipliers
-* Manual clicking bonuses
-* Upgrade dependencies and unlock requirements
-
-Some upgrades require previous upgrades or a certain number of buildings before becoming available.
-
-The upgrade system is designed to be expandable, so adding new upgrade types and dependencies doesn't require rewriting the entire system.
+Upgrades have real dependencies: previous upgrades, building counts, achievement counts, and prestige thresholds.
 
 ### 🍪 Golden Cookies
 
-Golden Cookies bring temporary effects and a little more chaos to the game.
+Golden Cookies spawn randomly (5–15 min base) and grant one of five outcomes:
 
-Current effects include:
+* 🍀 **Lucky** — instant cookie windfall
+* ⚡ **Frenzy** — production ×7 for 77s
+* 👆 **Click Frenzy** — clicking ×777 for 13s
+* 🏗️ **Building special** — one building ×(count/10+1) for 30s
+* 🩸 **Clot** — (nothing yet)
 
-* ⚡ **Frenzy** — increases building production
-* 👆 **Click Frenzy** — massively increases manual cookie clicking
+Buff icons with live countdowns appear top-left.
 
-Golden Cookie effects have their own timers and visual indicators.
+### 💎 Prestige & reset
 
-Additional Golden Cookie upgrades are also being added to improve their frequency and duration.
+Reset your run to earn **prestige points** from your all-time cookies:
 
-### 🖱️ Cursor & Clicking
+```
+prestige = floor(( -1 + sqrt(1 + 8 × allTime/10¹²) ) / 2)
+```
 
-Cursors now have their own automatic production system while still interacting with manual clicking mechanics.
+Unlock them with **Prestige I–IV** (25 → 100% of your prestige) for a permanent
+`× (1 + prestige × ratio)` multiplier. Classic **three walls** and prestige
+achievements included.
 
-Manual clicks and automatic production are treated separately so that temporary effects affect the appropriate systems.
+### 📈 Achievements
 
-This allows effects such as **Click Frenzy** to boost manual clicking without incorrectly affecting automatic production.
+**149 achievements** across every playstyle: CpS milestones, building counts
+(up to 500 each), golden cookies, resets, and prestige. They're not just for
+show — they unlock the **Kitten** upgrades.
+
+### ⏰ Idle-friendly
+
+Closing the tab earns **25% of your CpS** offline (capped at 24h). Buff and
+wrath timers fast-forward correctly.
 
 ### 💾 Save System
 
-The game includes a versioned save system designed to preserve game progress across updates.
+Versioned saves (format v2) with **export/import**, manual save (**Ctrl+S**),
+and auto-save every 30 minutes. Prestige and achievements survive resets;
+legacy saves are handled.
 
-The project also includes handling for older save data and compatibility fixes as the game evolves.
-
-## 🛠️ Improvements
-
-A number of systems have been cleaned up and refactored:
-
-* Improved upgrade availability checks
-* Generic upgrade dependencies
-* Building requirement handling
-* Better Golden Cookie state management
-* Improved buff display
-* Improved save/load reliability
-* Various UI and gameplay fixes
-* General code cleanup and refactoring
-
-The goal is to make the codebase easier to expand without turning every new feature into a completely separate system.
+---
 
 ## 🚧 Status
 
-**Work in progress — v0.131**
+**Work in progress — v0.139**
 
 The game is playable, but development is ongoing.
 
@@ -102,11 +117,12 @@ If you find a really funny bug, **definitely** open an issue.
 
 This project is **100% vibe coded**.
 
-No grand software architecture.
-No elaborate development methodology.
-Just vibes, cookies, and the occasional realization that something has been broken.
+No grand software architecture. No elaborate development methodology. Just vibes, cookies, and the occasional realization that something has been broken.
 
 > **I don't care. I just want more cookies.**
+
+The entire game logic lives in a single `script.js` (~2 600 lines) with no
+external dependencies.
 
 ## 📜 Credits
 
