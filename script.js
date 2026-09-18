@@ -4,7 +4,7 @@
 /* Constants                                                        */
 /* ---------------------------------------------------------------- */
 
-const VERSION = "0.137";
+const VERSION = "0.138";
 const SAVE_KEY = "CookieClickerClassic_Reborn_Save";
 const SETTINGS_KEY = "CookieClickerClassic_Reborn_Settings";
 const SAVE_FORMAT_VERSION = 2;
@@ -473,10 +473,10 @@ const achievements = {
   "Reincarnation": { id: 71, type: "resets", requirement: 100, description: "Reset 100 times.", unlocked: false },
 
   // Prestige milestones — the three walls
-  "Heavenly crumb": { id: 121, type: "prestige", requirement: 1, description: "Own 1 heavenly chip. Past the first wall.", unlocked: false },
-  "Elder council": { id: 122, type: "prestige", requirement: 300, description: "Own 300 heavenly chips. The ancients gather.", unlocked: false },
-  "Demigod": { id: 123, type: "prestige", requirement: 9000, description: "Own 9,000 heavenly chips. Halfway to godhood.", unlocked: false },
-  "Godhead": { id: 124, type: "prestige", requirement: 81000, description: "Own 81,000 heavenly chips. Beyond the third wall.", unlocked: false }
+  "First prestige": { id: 121, type: "prestige", requirement: 1, description: "Own 1 prestige. Past the first wall.", unlocked: false },
+  "Elder council": { id: 122, type: "prestige", requirement: 300, description: "Own 300 prestige. The ancients gather.", unlocked: false },
+  "Demigod": { id: 123, type: "prestige", requirement: 9000, description: "Own 9,000 prestige. Halfway to godhood.", unlocked: false },
+  "Godhead": { id: 124, type: "prestige", requirement: 81000, description: "Own 81,000 prestige. Beyond the third wall.", unlocked: false }
 };
 
 /* ---------------------------------------------------------------- */
@@ -488,6 +488,17 @@ const upgrades = {
   "Reinforced index finger": { id: 0, description: "Cursors x2.", price: 100, building: "Cursor", requiredCount: 1, multiplier: 2, bought: false },
   "Carpal tunnel prevention cream": { id: 1, description: "Cursors x2.", price: 500, building: "Cursor", requiredCount: 1, multiplier: 2, requires: 0, bought: false },
   "Ambidextrous": { id: 2, description: "Cursors x2.", price: 10000, building: "Cursor", requiredCount: 10, multiplier: 2, requires: 1, bought: false },
+  "Thousand fingers": { id: 125, description: "Cursors x2.", price: 100000, building: "Cursor", requiredCount: 25, multiplier: 2, requires: 2, bought: false },
+  "Million fingers": { id: 126, description: "Cursors x2.", price: 10000000, building: "Cursor", requiredCount: 50, multiplier: 2, requires: 125, bought: false },
+  "Billion fingers": { id: 127, description: "Cursors x2.", price: 100000000, building: "Cursor", requiredCount: 100, multiplier: 2, requires: 126, bought: false },
+  "Trillion fingers": { id: 128, description: "Cursors x2.", price: 1000000000, building: "Cursor", requiredCount: 150, multiplier: 2, requires: 127, bought: false },
+  "Quadrillion fingers": { id: 129, description: "Cursors x2.", price: 10000000000, building: "Cursor", requiredCount: 200, multiplier: 2, requires: 128, bought: false },
+  "Quintillion fingers": { id: 130, description: "Cursors x2.", price: 10000000000000, building: "Cursor", requiredCount: 250, multiplier: 2, requires: 129, bought: false },
+  "Sextillion fingers": { id: 131, description: "Cursors x2.", price: 10000000000000000, building: "Cursor", requiredCount: 300, multiplier: 2, requires: 130, bought: false },
+  "Septillion fingers": { id: 132, description: "Cursors x2.", price: 10000000000000000000, building: "Cursor", requiredCount: 350, multiplier: 2, requires: 131, bought: false },
+  "Octillion fingers": { id: 133, description: "Cursors x2.", price: 10000000000000000000000, building: "Cursor", requiredCount: 400, multiplier: 2, requires: 132, bought: false },
+  "Nonillion fingers": { id: 134, description: "Cursors x2.", price: 10000000000000000000000000, building: "Cursor", requiredCount: 450, multiplier: 2, requires: 133, bought: false },
+  "Decillion fingers": { id: 135, description: "Cursors x2.", price: 10000000000000000000000000000, building: "Cursor", requiredCount: 500, multiplier: 2, requires: 134, bought: false },
 
   // Grandma upgrades
   "Forwards from grandma": { id: 3, description: "Grandmas x2.", price: 1000, building: "Grandma", requiredCount: 1, multiplier: 2, bought: false },
@@ -497,6 +508,12 @@ const upgrades = {
   "Double-thick glasses": { id: 7, description: "Grandmas x2.", price: 500000000, building: "Grandma", requiredCount: 100, multiplier: 2, requires: 6, bought: false },
   "Aging agents": { id: 8, description: "Grandmas x2.", price: 50000000000, building: "Grandma", requiredCount: 150, multiplier: 2, requires: 7, bought: false },
   "Xtreme walkers": { id: 9, description: "Grandmas x2.", price: 50000000000000, building: "Grandma", requiredCount: 200, multiplier: 2, requires: 8, bought: false },
+  "The Unbridling": { id: 136, description: "Grandmas x2.", price: 50000000000000000, building: "Grandma", requiredCount: 250, multiplier: 2, requires: 9, bought: false },
+  "Reverse dementia": { id: 137, description: "Grandmas x2.", price: 50000000000000000000, building: "Grandma", requiredCount: 300, multiplier: 2, requires: 136, bought: false },
+  "Timeproof hair dyes": { id: 138, description: "Grandmas x2.", price: 50000000000000000000000, building: "Grandma", requiredCount: 350, multiplier: 2, requires: 137, bought: false },
+  "Good manners": { id: 139, description: "Grandmas x2.", price: 500000000000000000000000000, building: "Grandma", requiredCount: 400, multiplier: 2, requires: 138, bought: false },
+  "Generation degeneration": { id: 140, description: "Grandmas x2.", price: 5000000000000000000000000000000, building: "Grandma", requiredCount: 450, multiplier: 2, requires: 139, bought: false },
+  "Visits": { id: 141, description: "Grandmas x2.", price: 50000000000000000000000000000000000, building: "Grandma", requiredCount: 500, multiplier: 2, requires: 140, bought: false },
 
   // Farm upgrades
   "Cheap hoes": { id: 10, description: "Farms x2.", price: 11000, building: "Farm", requiredCount: 1, multiplier: 2, bought: false },
@@ -506,6 +523,12 @@ const upgrades = {
   "Gingerbread scarecrows": { id: 14, description: "Farms x2.", price: 5500000000, building: "Farm", requiredCount: 100, multiplier: 2, requires: 13, bought: false },
   "Pulsar sprinklers": { id: 15, description: "Farms x2.", price: 550000000000, building: "Farm", requiredCount: 150, multiplier: 2, requires: 14, bought: false },
   "Fudge fungus": { id: 16, description: "Farms x2.", price: 550000000000000, building: "Farm", requiredCount: 200, multiplier: 2, requires: 15, bought: false },
+  "Wheat triffids": { id: 142, description: "Farms x2.", price: 550000000000000000, building: "Farm", requiredCount: 250, multiplier: 2, requires: 16, bought: false },
+  "Humane pesticides": { id: 143, description: "Farms x2.", price: 550000000000000000000, building: "Farm", requiredCount: 300, multiplier: 2, requires: 142, bought: false },
+  "Barnstars": { id: 144, description: "Farms x2.", price: 550000000000000000000000, building: "Farm", requiredCount: 350, multiplier: 2, requires: 143, bought: false },
+  "Lindworms": { id: 145, description: "Farms x2.", price: 5500000000000000000000000000, building: "Farm", requiredCount: 400, multiplier: 2, requires: 144, bought: false },
+  "Global seed vault": { id: 146, description: "Farms x2.", price: 55000000000000000000000000000000, building: "Farm", requiredCount: 450, multiplier: 2, requires: 145, bought: false },
+  "Reverse-veganism": { id: 147, description: "Farms x2.", price: 550000000000000000000000000000000000, building: "Farm", requiredCount: 500, multiplier: 2, requires: 146, bought: false },
 
   // Mine upgrades
   "Sugar gas": { id: 17, description: "Mines x2.", price: 120000, building: "Mine", requiredCount: 1, multiplier: 2, bought: false },
@@ -515,6 +538,12 @@ const upgrades = {
   "H-bomb mining": { id: 21, description: "Mines x2.", price: 60000000000, building: "Mine", requiredCount: 100, multiplier: 2, requires: 20, bought: false },
   "Coreforge": { id: 22, description: "Mines x2.", price: 6000000000000, building: "Mine", requiredCount: 150, multiplier: 2, requires: 21, bought: false },
   "Planetsplitters": { id: 23, description: "Mines x2.", price: 6000000000000000, building: "Mine", requiredCount: 200, multiplier: 2, requires: 22, bought: false },
+  "Canola oil wells": { id: 148, description: "Mines x2.", price: 6000000000000000000, building: "Mine", requiredCount: 250, multiplier: 2, requires: 23, bought: false },
+  "Mole people": { id: 149, description: "Mines x2.", price: 6000000000000000000000, building: "Mine", requiredCount: 300, multiplier: 2, requires: 148, bought: false },
+  "Mine canaries": { id: 150, description: "Mines x2.", price: 6000000000000000000000000, building: "Mine", requiredCount: 350, multiplier: 2, requires: 149, bought: false },
+  "Bore again": { id: 151, description: "Mines x2.", price: 60000000000000000000000000000, building: "Mine", requiredCount: 400, multiplier: 2, requires: 150, bought: false },
+  "Air mining": { id: 152, description: "Mines x2.", price: 600000000000000000000000000000000, building: "Mine", requiredCount: 450, multiplier: 2, requires: 151, bought: false },
+  "Caramel alloys": { id: 153, description: "Mines x2.", price: 6000000000000000000000000000000000000, building: "Mine", requiredCount: 500, multiplier: 2, requires: 152, bought: false },
 
   // Factory upgrades
   "Sturdier conveyor belts": { id: 24, description: "Factories x2.", price: 1300000, building: "Factory", requiredCount: 1, multiplier: 2, bought: false },
@@ -524,6 +553,12 @@ const upgrades = {
   "Recombobulators": { id: 28, description: "Factories x2.", price: 650000000000, building: "Factory", requiredCount: 100, multiplier: 2, requires: 27, bought: false },
   "Deep-bake process": { id: 29, description: "Factories x2.", price: 65000000000000, building: "Factory", requiredCount: 150, multiplier: 2, requires: 28, bought: false },
   "Cyborg workforce": { id: 30, description: "Factories x2.", price: 65000000000000000, building: "Factory", requiredCount: 200, multiplier: 2, requires: 29, bought: false },
+  "78-hour days": { id: 154, description: "Factories x2.", price: 65000000000000000000, building: "Factory", requiredCount: 250, multiplier: 2, requires: 30, bought: false },
+  "Machine learning": { id: 155, description: "Factories x2.", price: 65000000000000000000000, building: "Factory", requiredCount: 300, multiplier: 2, requires: 154, bought: false },
+  "Brownie point system": { id: 156, description: "Factories x2.", price: 65000000000000000000000000, building: "Factory", requiredCount: 350, multiplier: 2, requires: 155, bought: false },
+  "Volunteer interns": { id: 157, description: "Factories x2.", price: 650000000000000000000000000000, building: "Factory", requiredCount: 400, multiplier: 2, requires: 156, bought: false },
+  "Behavioral reframing": { id: 158, description: "Factories x2.", price: 6500000000000000000000000000000000, building: "Factory", requiredCount: 450, multiplier: 2, requires: 157, bought: false },
+  "The infinity engine": { id: 159, description: "Factories x2.", price: 65000000000000000000000000000000000000, building: "Factory", requiredCount: 500, multiplier: 2, requires: 158, bought: false },
 
   // Bank upgrades
   "Dizzy miss lizzy": { id: 31, description: "Banks x2.", price: 14000000, building: "Bank", requiredCount: 1, multiplier: 2, bought: false },
@@ -533,6 +568,12 @@ const upgrades = {
   "Taller vaults": { id: 35, description: "Banks x2.", price: 7000000000000, building: "Bank", requiredCount: 100, multiplier: 2, requires: 34, bought: false },
   "Sugar gas bank": { id: 36, description: "Banks x2.", price: 700000000000000, building: "Bank", requiredCount: 150, multiplier: 2, requires: 35, bought: false },
   "Snack production": { id: 37, description: "Banks x2.", price: 700000000000000000, building: "Bank", requiredCount: 200, multiplier: 2, requires: 36, bought: false },
+  "The stuff rationale": { id: 160, description: "Banks x2.", price: 700000000000000000000, building: "Bank", requiredCount: 250, multiplier: 2, requires: 37, bought: false },
+  "Edible money": { id: 161, description: "Banks x2.", price: 700000000000000000000000, building: "Bank", requiredCount: 300, multiplier: 2, requires: 160, bought: false },
+  "Grand supercycle": { id: 162, description: "Banks x2.", price: 700000000000000000000000000, building: "Bank", requiredCount: 350, multiplier: 2, requires: 161, bought: false },
+  "Rules of acquisition": { id: 163, description: "Banks x2.", price: 7000000000000000000000000000000, building: "Bank", requiredCount: 400, multiplier: 2, requires: 162, bought: false },
+  "Altruistic loop": { id: 164, description: "Banks x2.", price: 70000000000000000000000000000000000, building: "Bank", requiredCount: 450, multiplier: 2, requires: 163, bought: false },
+  "Diminishing tax returns": { id: 165, description: "Banks x2.", price: 700000000000000000000000000000000000000, building: "Bank", requiredCount: 500, multiplier: 2, requires: 164, bought: false },
 
   // Temple upgrades
   "Golden idols": { id: 38, description: "Temples x2.", price: 200000000, building: "Temple", requiredCount: 1, multiplier: 2, bought: false },
@@ -542,6 +583,12 @@ const upgrades = {
   "Theoretic chocolate": { id: 42, description: "Temples x2.", price: 100000000000000, building: "Temple", requiredCount: 100, multiplier: 2, requires: 41, bought: false },
   "Temple kneading": { id: 43, description: "Temples x2.", price: 10000000000000000, building: "Temple", requiredCount: 150, multiplier: 2, requires: 42, bought: false },
   "Patience abolished": { id: 44, description: "Temples x2.", price: 1000000000000000000, building: "Temple", requiredCount: 200, multiplier: 2, requires: 43, bought: false },
+  "Theocracy": { id: 166, description: "Temples x2.", price: 10000000000000000000000, building: "Temple", requiredCount: 250, multiplier: 2, requires: 44, bought: false },
+  "Sick rap prayers": { id: 167, description: "Temples x2.", price: 10000000000000000000000000, building: "Temple", requiredCount: 300, multiplier: 2, requires: 166, bought: false },
+  "Psalm-reading": { id: 168, description: "Temples x2.", price: 10000000000000000000000000000, building: "Temple", requiredCount: 350, multiplier: 2, requires: 167, bought: false },
+  "War of the gods": { id: 169, description: "Temples x2.", price: 100000000000000000000000000000000, building: "Temple", requiredCount: 400, multiplier: 2, requires: 168, bought: false },
+  "A novel idea": { id: 170, description: "Temples x2.", price: 1000000000000000000000000000000000000, building: "Temple", requiredCount: 450, multiplier: 2, requires: 169, bought: false },
+  "Apparitions": { id: 171, description: "Temples x2.", price: 10000000000000000000000000000000000000000, building: "Temple", requiredCount: 500, multiplier: 2, requires: 170, bought: false },
 
   // Wizard Tower upgrades
   "Pointier hats": { id: 45, description: "Wizard towers x2.", price: 3300000000, building: "Wizard tower", requiredCount: 1, multiplier: 2, bought: false },
@@ -551,6 +598,12 @@ const upgrades = {
   "School of sorcery": { id: 49, description: "Wizard towers x2.", price: 1650000000000000, building: "Wizard tower", requiredCount: 100, multiplier: 2, requires: 48, bought: false },
   "Dark magic": { id: 50, description: "Wizard towers x2.", price: 165000000000000000, building: "Wizard tower", requiredCount: 150, multiplier: 2, requires: 49, bought: false },
   "Primal chocolate": { id: 51, description: "Wizard towers x2.", price: 16500000000000000000, building: "Wizard tower", requiredCount: 200, multiplier: 2, requires: 50, bought: false },
+  "Rabbit trick": { id: 172, description: "Wizard towers x2.", price: 165000000000000000000000, building: "Wizard tower", requiredCount: 250, multiplier: 2, requires: 51, bought: false },
+  "Deluxe tailored wands": { id: 173, description: "Wizard towers x2.", price: 165000000000000000000000000, building: "Wizard tower", requiredCount: 300, multiplier: 2, requires: 172, bought: false },
+  "Immobile spellcasting": { id: 174, description: "Wizard towers x2.", price: 165000000000000000000000000000, building: "Wizard tower", requiredCount: 350, multiplier: 2, requires: 173, bought: false },
+  "Electricity": { id: 175, description: "Wizard towers x2.", price: 1650000000000000000000000000000000, building: "Wizard tower", requiredCount: 400, multiplier: 2, requires: 174, bought: false },
+  "Spelling bees": { id: 176, description: "Wizard towers x2.", price: 16500000000000000000000000000000000000, building: "Wizard tower", requiredCount: 450, multiplier: 2, requires: 175, bought: false },
+  "Wizard basements": { id: 177, description: "Wizard towers x2.", price: 165000000000000000000000000000000000000000, building: "Wizard tower", requiredCount: 500, multiplier: 2, requires: 176, bought: false },
 
   // Shipment upgrades
   "Vanilla nebulae": { id: 52, description: "Shipments x2.", price: 102000000000, building: "Shipment", requiredCount: 1, multiplier: 2, bought: false },
@@ -560,6 +613,12 @@ const upgrades = {
   "Chocolate monoliths": { id: 56, description: "Shipments x2.", price: 51000000000000000, building: "Shipment", requiredCount: 100, multiplier: 2, requires: 55, bought: false },
   "Generation ship": { id: 57, description: "Shipments x2.", price: 5100000000000000000, building: "Shipment", requiredCount: 150, multiplier: 2, requires: 56, bought: false },
   "Dyson sphere": { id: 58, description: "Shipments x2.", price: 510000000000000000000, building: "Shipment", requiredCount: 200, multiplier: 2, requires: 57, bought: false },
+  "Beyond the final frontier": { id: 178, description: "Shipments x2.", price: 2550000000000000000000000, building: "Shipment", requiredCount: 250, multiplier: 2, requires: 58, bought: false },
+  "Autopilot": { id: 179, description: "Shipments x2.", price: 2550000000000000000000000000, building: "Shipment", requiredCount: 300, multiplier: 2, requires: 178, bought: false },
+  "Restaurants at the end of the universe": { id: 180, description: "Shipments x2.", price: 2550000000000000000000000000000, building: "Shipment", requiredCount: 350, multiplier: 2, requires: 179, bought: false },
+  "Universal alphabet": { id: 181, description: "Shipments x2.", price: 25500000000000000000000000000000000, building: "Shipment", requiredCount: 400, multiplier: 2, requires: 180, bought: false },
+  "Toroid universe": { id: 182, description: "Shipments x2.", price: 255000000000000000000000000000000000000, building: "Shipment", requiredCount: 450, multiplier: 2, requires: 181, bought: false },
+  "Prime directive": { id: 183, description: "Shipments x2.", price: 2550000000000000000000000000000000000000000, building: "Shipment", requiredCount: 500, multiplier: 2, requires: 182, bought: false },
 
   // Alchemy Lab upgrades
   "Antimony": { id: 59, description: "Alchemy labs x2.", price: 1500000000000, building: "Alchemy lab", requiredCount: 1, multiplier: 2, bought: false },
@@ -568,6 +627,12 @@ const upgrades = {
   "Ambrosia": { id: 62, description: "Alchemy labs x2.", price: 7500000000000000, building: "Alchemy lab", requiredCount: 50, multiplier: 2, requires: 61, bought: false },
   "Aqua crustulae": { id: 63, description: "Alchemy labs x2.", price: 750000000000000000, building: "Alchemy lab", requiredCount: 100, multiplier: 2, requires: 62, bought: false },
   "Origin crucible": { id: 64, description: "Alchemy labs x2.", price: 7500000000000000000000, building: "Alchemy lab", requiredCount: 200, multiplier: 2, requires: 63, bought: false },
+  "Beige goo": { id: 184, description: "Alchemy labs x2.", price: 37500000000000000000000000, building: "Alchemy lab", requiredCount: 250, multiplier: 2, requires: 64, bought: false },
+  "The advent of chemistry": { id: 185, description: "Alchemy labs x2.", price: 37500000000000000000000000000, building: "Alchemy lab", requiredCount: 300, multiplier: 2, requires: 184, bought: false },
+  "On second thought": { id: 186, description: "Alchemy labs x2.", price: 37500000000000000000000000000000, building: "Alchemy lab", requiredCount: 350, multiplier: 2, requires: 185, bought: false },
+  "Public betterment": { id: 187, description: "Alchemy labs x2.", price: 375000000000000000000000000000000000, building: "Alchemy lab", requiredCount: 400, multiplier: 2, requires: 186, bought: false },
+  "Hermetic reconciliation": { id: 188, description: "Alchemy labs x2.", price: 3750000000000000000000000000000000000000, building: "Alchemy lab", requiredCount: 450, multiplier: 2, requires: 187, bought: false },
+  "Chromatic cycling": { id: 189, description: "Alchemy labs x2.", price: 37500000000000000000000000000000000000000000, building: "Alchemy lab", requiredCount: 500, multiplier: 2, requires: 188, bought: false },
 
   // Portal upgrades
   "Elder pact": { id: 65, description: "Portals x2.", price: 1500000000000, building: "Portal", requiredCount: 1, multiplier: 2, bought: false },
@@ -577,6 +642,12 @@ const upgrades = {
   "Arcane aura": { id: 69, description: "Portals x2.", price: 750000000000000000, building: "Portal", requiredCount: 100, multiplier: 2, requires: 68, bought: false },
   "The final frontier": { id: 70, description: "Portals x2.", price: 75000000000000000000, building: "Portal", requiredCount: 150, multiplier: 2, requires: 69, bought: false },
   "Cookie dimensionality": { id: 71, description: "Portals x2.", price: 7500000000000000000000, building: "Portal", requiredCount: 200, multiplier: 2, requires: 70, bought: false },
+  "Maddening chants": { id: 190, description: "Portals x2.", price: 500000000000000000000000000, building: "Portal", requiredCount: 250, multiplier: 2, requires: 71, bought: false },
+  "The real world": { id: 191, description: "Portals x2.", price: 500000000000000000000000000000, building: "Portal", requiredCount: 300, multiplier: 2, requires: 190, bought: false },
+  "Dimensional garbage gulper": { id: 192, description: "Portals x2.", price: 500000000000000000000000000000000, building: "Portal", requiredCount: 350, multiplier: 2, requires: 191, bought: false },
+  "Embedded microportals": { id: 193, description: "Portals x2.", price: 5000000000000000000000000000000000000, building: "Portal", requiredCount: 400, multiplier: 2, requires: 192, bought: false },
+  "His advent": { id: 194, description: "Portals x2.", price: 50000000000000000000000000000000000000000, building: "Portal", requiredCount: 450, multiplier: 2, requires: 193, bought: false },
+  "Domestic rifts": { id: 195, description: "Portals x2.", price: 500000000000000000000000000000000000000000000, building: "Portal", requiredCount: 500, multiplier: 2, requires: 194, bought: false },
 
   // Time Machine upgrades
   "Flux capacitor": { id: 72, description: "Time machines x2.", price: 14000000000000, building: "Time machine", requiredCount: 1, multiplier: 2, bought: false },
@@ -586,6 +657,12 @@ const upgrades = {
   "Golden verse": { id: 76, description: "Time machines x2.", price: 7000000000000000000, building: "Time machine", requiredCount: 100, multiplier: 2, requires: 75, bought: false },
   "Eternal cycle": { id: 77, description: "Time machines x2.", price: 700000000000000000000, building: "Time machine", requiredCount: 150, multiplier: 2, requires: 76, bought: false },
   "Recursive causality": { id: 78, description: "Time machines x2.", price: 70000000000000000000000, building: "Time machine", requiredCount: 200, multiplier: 2, requires: 77, bought: false },
+  "Cookietopian moments of maybe": { id: 196, description: "Time machines x2.", price: 7000000000000000000000000000, building: "Time machine", requiredCount: 250, multiplier: 2, requires: 78, bought: false },
+  "Second seconds": { id: 197, description: "Time machines x2.", price: 7000000000000000000000000000000, building: "Time machine", requiredCount: 300, multiplier: 2, requires: 196, bought: false },
+  "Additional clock hands": { id: 198, description: "Time machines x2.", price: 7000000000000000000000000000000000, building: "Time machine", requiredCount: 350, multiplier: 2, requires: 197, bought: false },
+  "Nostalgia": { id: 199, description: "Time machines x2.", price: 70000000000000000000000000000000000000, building: "Time machine", requiredCount: 400, multiplier: 2, requires: 198, bought: false },
+  "Split seconds": { id: 200, description: "Time machines x2.", price: 700000000000000000000000000000000000000000, building: "Time machine", requiredCount: 450, multiplier: 2, requires: 199, bought: false },
+  "Patience, abolished": { id: 201, description: "Time machines x2.", price: 7000000000000000000000000000000000000000000000, building: "Time machine", requiredCount: 500, multiplier: 2, requires: 200, bought: false },
 
   // Golden Cookies upgrades
   "Golden Cookies": { id: 79, description: "Randomly spawns a Golden Cookie", price: 100000, building: "GC", requiredCount: 1, multiplier: 1, bought: false },
@@ -2071,6 +2148,7 @@ function initOverlay() {
 
 function renderChangelog() {
   const entries = [
+    { version: "0.138", date: "18/09/2026", notes: ["adding building upgrades up to 500 (wiki ladder) for all 12 buildings", "filling the cursor upgrade chain (25 to 500: Thousand to Decillion fingers)", "renaming two collision upgrades (Shipment 250, Time machine 500)"] },
     { version: "0.137", date: "18/09/2026", notes: ["fixing building production (no more 150 cap, real CpS now matches the display)", "prestige upgrades now unlock 25/50/75/100% of your prestige, at a monstrous price (1e15 to 1e24)", "building price multiplier raised from 1.1 to 1.15", "prestige gain no longer resets on page reload", "deploying the three walls (1t, 450 quadrillion, 4e19+) with prestige milestones", "adding prestige achievements (Heavenly crumb, Elder council, Demigod, Godhead)"] },
     { version: "0.136", date: "18/09/2026", notes: ["aligning prestige to the original game (1 trillion chips, 2% up to 5% power)", "reducing offline production to 25%", "pushing the left building column further left to clear the cookie"] },
     { version: "0.135", date: "18/09/2026", notes: ["adding Building special golden cookie buff", "rebalancing upgrade prices x100", "setting buildings base CpS to wiki values", "reworking Elder Pledge (64 base, x64 per purchase, 6 min)", "widening building display and reworking layout"] },
