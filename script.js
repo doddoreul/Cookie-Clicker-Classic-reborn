@@ -10,7 +10,9 @@ const SETTINGS_KEY = "CookieClickerClassic_Reborn_Settings";
 const SAVE_FORMAT_VERSION = 2;
 const TICKS_PER_SECOND = 30;
 const SAVE_INTERVAL_SECONDS = 30 * 60;
+
 const MAX_VISIBLE_UPGRADES = 5;
+
 const MAX_OFFLINE_SECONDS = 24 * 60 * 60;
 
 /* ---------------------------------------------------------------- */
@@ -520,7 +522,7 @@ const achievements = {
   "Apotheosis": { id: 70, type: "resets", requirement: 50, description: "Reset 50 times.", unlocked: false },
   "Reincarnation": { id: 71, type: "resets", requirement: 100, description: "Reset 100 times.", unlocked: false },
 
-  // Prestige milestones — the three walls
+  // Prestige milestones — the five walls
   "First prestige": { id: 121, type: "prestige", requirement: 1, description: "Own 1 prestige. Past the first wall.", unlocked: false },
   "Elder council": { id: 122, type: "prestige", requirement: 300, description: "Own 300 prestige. The ancients gather.", unlocked: false },
   "Demigod": { id: 123, type: "prestige", requirement: 9000, description: "Own 9,000 prestige. Halfway to godhood.", unlocked: false },
@@ -746,10 +748,12 @@ const upgrades = {
   "Gold fund": { id: 105, description: "Banks gain +5% CpS per alchemy lab. Alchemy labs gain +0.1% CpS per bank. If gold is the economy's backbone, cookies are its hip joints.", price: 15003000000000000000000, building: "synergies", requiredBuildings: { Bank: 75, "Alchemy lab": 75 }, effect: { Bank: { "Alchemy lab": 0.05 }, "Alchemy lab": { Bank: 0.001 } }, requires: 89, bought: false },
 
   // Prestige upgrades
-  "Prestige I": { id: 106, description: "Unlocks 25% of your prestige. Prestige x0.25.", price: 1000000000000000, building: "prestige", requiredPrestige: 1, bought: false },
-  "Prestige II": { id: 107, description: "Unlocks 50% of your prestige. Prestige x0.5.", price: 1000000000000000000, building: "prestige", requiredPrestige: 300, requires: 106, bought: false },
-  "Prestige III": { id: 108, description: "Unlocks 75% of your prestige. Prestige x0.75.", price: 1000000000000000000000, building: "prestige", requiredPrestige: 9000, requires: 107, bought: false },
-  "Prestige IV": { id: 109, description: "Unlocks 100% of your prestige. Prestige x1.0.", price: 1000000000000000000000000, building: "prestige", requiredPrestige: 81000, requires: 108, bought: false },
+  "Prestige I": { id: 106, description: "Unlocks 20% of your prestige. Prestige x0.2.", price: 1000000, building: "prestige", requiredPrestige: 1, bought: false },
+  "Prestige II": { id: 107, description: "Unlocks 40% of your prestige. Prestige x0.4.", price: 1000000000, building: "prestige", requiredPrestige: 300, requires: 106, bought: false },
+  "Prestige III": { id: 108, description: "Unlocks 60% of your prestige. Prestige x0.6.", price: 1000000000000, building: "prestige", requiredPrestige: 9000, requires: 107, bought: false },
+  "Prestige IV": { id: 109, description: "Unlocks 80% of your prestige. Prestige x0.8.", price: 1000000000000000, building: "prestige", requiredPrestige: 81000, requires: 108, bought: false },
+  "Prestige V": { id: 110, description: "Unlocks 100% of your prestige. Prestige x1.0.", price: 1000000000000000000, building: "prestige", requiredPrestige: 729000, requires: 109, bought: false },
+  "Prestige VI": { id: 111, description: "Unlocks 100% of your prestige. Prestige x1.0.", price: 1000000000000000000000, building: "prestige", requiredPrestige: 6561000, requires: 110, bought: false },
 };
 
 const upgradeList = Object.values(upgrades);
@@ -763,10 +767,12 @@ upgradeList.forEach(upgrade => {
 });
 
 function getPrestigePowerRatio() {
-  if (upgrades["Prestige IV"]?.bought) return 1;
-  if (upgrades["Prestige III"]?.bought) return 0.75;
-  if (upgrades["Prestige II"]?.bought) return 0.5;
-  if (upgrades["Prestige I"]?.bought) return 0.25;
+  if (upgrades["Prestige VI"]?.bought) return 1;
+  if (upgrades["Prestige V"]?.bought) return 1;
+  if (upgrades["Prestige IV"]?.bought) return 0.8;
+  if (upgrades["Prestige III"]?.bought) return 0.6;
+  if (upgrades["Prestige II"]?.bought) return 0.4;
+  if (upgrades["Prestige I"]?.bought) return 0.2;
   return resetCount > 0 ? 0.02 : 0;
 }
 
@@ -1441,7 +1447,12 @@ function rebuildUpgradesStore() {
   const smallFont = "font-size:80%;";
 
   Object.entries(upgrades)
-    .sort(([, a], [, b]) => a.price - b.price)
+    .sort(([, a], [, b]) => {
+      const aBuyable = !a.bought && cookies >= a.price;
+      const bBuyable = !b.bought && cookies >= b.price;
+      if (aBuyable !== bBuyable) return aBuyable ? -1 : 1;
+      return a.price - b.price;
+    })
     .forEach(([name, upgrade]) => {
 
       // Upgrade filtering
@@ -1508,6 +1519,8 @@ function setupStoreUpgradesDelegation() {
 }
 
 function updateUpgradeAffordability() {
+  let becameBuyable = false;
+
   Object.keys(upgradeRowElements).forEach(name => {
     const element = upgradeRowElements[name];
     if (!element) return;
@@ -1525,8 +1538,13 @@ function updateUpgradeAffordability() {
     const upgrade = upgrades[name];
     if (!upgrade || upgrade.bought || element.classList.contains("hidden")) return;
 
-    element.classList.toggle("grayed", cookies < upgrade.price);
+    const wasGrayed = element.classList.contains("grayed");
+    const isGrayed = cookies < upgrade.price;
+    element.classList.toggle("grayed", isGrayed);
+    if (wasGrayed && !isGrayed) becameBuyable = true;
   });
+
+  if (becameBuyable) upgradesToRebuild = true;
 }
 
 /* ---------------------------------------------------------------- */

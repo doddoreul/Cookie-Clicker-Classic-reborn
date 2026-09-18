@@ -48,13 +48,13 @@ A one-time purchase that instantly resets the anger and keeps the grandmas calm 
 
 ### 🆙 Upgrades
 
-A comprehensive upgrade system — **187 upgrades** in total:
+A comprehensive upgrade system — **189 upgrades** in total:
 
 * **Building upgrades** — ×2 multipliers per building (13 tiers each, up to 500 units)
 * **Golden Cookie upgrades** — more frequent & longer-lasting cookies
 * **Kitten upgrades** — global production multipliers gated by achievement count
 * **Synergy upgrades** — cross-building boosts (+5% CpS per partner building), gated behind 15 and 75-unit pairs
-* **Prestige upgrades** — unleash 25 → 100% of your prestige
+* **Prestige upgrades** — unleash 20 → 100% of your prestige (I–VI)
 
 Upgrades have real dependencies: previous upgrades, building counts, achievement counts, and prestige thresholds.
 
@@ -78,7 +78,7 @@ Reset your run to earn **prestige points** from your all-time cookies:
 prestige = floor( ∛(allTime / 10¹²) )
 ```
 
-Unlock them with **Prestige I–IV** (25 → 100% of your prestige) for a permanent
+Unlock them with **Prestige I–VI** (20 → 100% of your prestige) for a permanent
 `× (1 + prestige × ratio)` multiplier. Classic **three walls** and prestige
 achievements included.
 

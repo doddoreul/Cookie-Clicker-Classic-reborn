@@ -151,7 +151,7 @@ pledged), and they are the centerpiece of the [Grandmapocalypse](#8-grandmapocal
 
 ## 6. Upgrades
 
-There are **187 upgrades** (excluding Elder Pledge). They are unlockable when the
+There are **189 upgrades** (excluding Elder Pledge). They are unlockable when the
 game shows them in the **Upgrade store** (top of the right panel). An upgrade
 becomes available when its requirements are met, and is bought once. Buy order
 matters — most upgrades chain into the next one.
@@ -255,10 +255,12 @@ These unlock your prestige power (see [Prestige](#11-prestige)). Prices here are
 
 | Upgrade   | Price        | Required prestige | Unlocks    |
 | --------- | ------------ | ----------------- | ---------- |
-| Prestige I   | 1 quadrillion (10¹⁵) | 1     | 25% of your prestige (ratio ×0.25) |
-| Prestige II  | 1 quintillion (10¹⁸) | 300   | 50% of your prestige (×0.5) |
-| Prestige III | 1 sextillion (10²¹)  | 9 000 | 75% of your prestige (×0.75) |
-| Prestige IV  | 1 septillion (10²⁴)  | 81 000 | 100% of your prestige (×1.0) |
+| Prestige I   | 1 million (10⁶)  | 1     | 20% of your prestige (ratio ×0.2) |
+| Prestige II  | 1 billion (10⁹)  | 300   | 40% of your prestige (×0.4) |
+| Prestige III | 1 trillion (10¹²) | 9 000 | 60% of your prestige (×0.6) |
+| Prestige IV  | 1 quadrillion (10¹⁵) | 81 000 | 80% of your prestige (×0.8) |
+| Prestige V   | 1 quintillion (10¹⁸) | 729 000 | 100% of your prestige (×1.0) |
+| Prestige VI  | 1 sextillion (10²¹) | 6 561 000 | 100% of your prestige (×1.0) |
 
 ---
 
@@ -431,23 +433,28 @@ prestigeMultiplier = 1 + prestige × powerRatio
 | ----------------------------- | ----------- |
 | Never reset                   | 0%          |
 | After a first reset           | 2%          |
-| **Prestige I** bought (1 point) | 25%       |
-| **Prestige II** (300)         | 50%         |
-| **Prestige III** (9 000)      | 75%         |
-| **Prestige IV** (81 000)      | 100%        |
+| **Prestige I** bought (1 point) | 20%       |
+| **Prestige II** (300)         | 40%         |
+| **Prestige III** (9 000)      | 60%         |
+| **Prestige IV** (81 000)      | 80%         |
+| **Prestige V/VI** (729 000 / 6 561 000) | 100% |
 
-So with 1 000 prestige and Prestige I, your multiplier is `1 + 1000 × 0.25 =
-251×`. This multiplier applies to **manual clicks and all production**.
+So with 1 000 prestige and Prestige I, your multiplier is `1 + 1000 × 0.2 =
+201×`. This multiplier applies to **manual clicks and all production**.
 
-### The three walls
+### The five walls
 
 Long-time players recognise the famous difficulty walls:
 
 1. **The first wall (10¹² total)** — unlocking your first prestige point.
 2. **Second wall (2,7·10¹⁹ total, 300 prestige)** — the second prestige upgrade
    becomes reachable (`∛300³·10¹²`).
-3. **The third wall (7,29·10²⁰ total, 9 000 prestige)** — Demigod territory, on
+3. **The third wall (7,29·10²³ total, 9 000 prestige)** — Demigod territory, on
    the road to Prestige III/IV.
+4. **The fourth wall (3,87·10²⁹ total, 729 000 prestige)** — the road to
+   Prestige V (100% of your prestige).
+5. **The fifth wall (2,82·10³² total, 6 561 000 prestige)** — the final
+   prestige upgrade, Prestige VI.
 
 ### Resetting
 
