@@ -634,7 +634,7 @@ moni {
   display: none;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.75);
 }
 
 #overlayBackdrop.visible {
@@ -768,4 +768,63 @@ moni {
   border: #000 1px solid;
   font-weight: bold;
   text-align: center;
+}
+
+/* --------------------------------------------------------------------------
+   The Box mini-game
+   -------------------------------------------------------------------------- */
+
+#theBoxBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 6000000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.75);
+}
+
+#theBoxBackdrop.visible {
+  display: flex;
+}
+
+#theBoxModal {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: #eee;
+  color: #000;
+  border: #000 2px solid;
+  border-radius: 8px;
+  font-family: "Courier New", monospace;
+}
+
+#theBoxClose {
+  position: absolute;
+  right: 10px;
+  top: 4px;
+  color: #000;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#theBoxClose:hover {
+  color: #f00;
+}
+
+#theBoxTitle {
+  padding: 10px 16px 4px;
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+}
+
+#theBoxContent {
+  min-width: 400px;
+  max-width: 90vw;
+  min-height: 300px;
+  max-height: 70vh;
+  padding: 16px;
+  overflow-y: auto;
 }

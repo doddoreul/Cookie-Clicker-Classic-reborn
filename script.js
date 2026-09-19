@@ -2134,6 +2134,8 @@ function renderPops() {
 /* ---------------------------------------------------------------- */
 
 function getComment(totalCookies) {
+  if (isTheBoxUnlocked()) return "Maybe you should try The Box";
+
   const milestones = [
     [5, "Your first batch goes in the trash.<br>The neighborhood raccoon barely touches it."],
     [50, "Your family accepts to try some of your cookies."],
@@ -2355,6 +2357,85 @@ function renderOverlayAchievements() {
 }
 
 /* ---------------------------------------------------------------- */
+/* The Box mini-game                                                */
+/* ---------------------------------------------------------------- */
+
+const THE_BOX_UNLOCK_COUNT = 500;
+
+let theBoxButtonElement = null;
+let theBoxScriptLoaded = false;
+let theBoxScriptLoading = false;
+
+// The Box is reachable once every building has reached 500.
+function isTheBoxUnlocked() {
+  return buildingNames.every(name => getBuildingCount(name) >= THE_BOX_UNLOCK_COUNT);
+}
+
+function updateTheBoxButton() {
+  if (!theBoxButtonElement) {
+    const element = getElement("theBoxButton");
+    if (!element) return;
+    theBoxButtonElement = element;
+  }
+
+  theBoxButtonElement.style.display = isTheBoxUnlocked() ? "" : "none";
+}
+
+function loadTheBoxScript() {
+  if (theBoxScriptLoaded || theBoxScriptLoading) return;
+
+  theBoxScriptLoading = true;
+
+  const script = document.createElement("script");
+  script.src = "thebox.js";
+  script.onload = () => {
+    theBoxScriptLoaded = true;
+    theBoxScriptLoading = false;
+    if (typeof initTheBox === "function") initTheBox();
+  };
+  script.onerror = () => {
+    theBoxScriptLoading = false;
+    const content = getElement("theBoxContent");
+    if (content) content.innerHTML = "Failed to load The Box.";
+  };
+
+  document.head.appendChild(script);
+}
+
+function openTheBox() {
+  if (!isTheBoxUnlocked()) return;
+
+  const backdrop = getElement("theBoxBackdrop");
+  if (!backdrop) return;
+
+  const settingsBackdrop = getElement("overlayBackdrop");
+  if (settingsBackdrop) settingsBackdrop.classList.remove("visible");
+
+  backdrop.classList.add("visible");
+  loadTheBoxScript();
+}
+
+function closeTheBox() {
+  const backdrop = getElement("theBoxBackdrop");
+  if (backdrop) backdrop.classList.remove("visible");
+}
+
+function initTheBoxButton() {
+  const button = getElement("theBoxButton");
+  if (button) button.addEventListener("click", openTheBox);
+
+  const backdrop = getElement("theBoxBackdrop");
+  if (backdrop) {
+    getElement("theBoxClose").addEventListener("click", closeTheBox);
+    backdrop.addEventListener("click", event => {
+      if (event.target === backdrop) closeTheBox();
+    });
+  }
+
+  updateTheBoxButton();
+}
+
+/* ---------------------------------------------------------------- */
 /* UI controls                                                      */
 /* ---------------------------------------------------------------- */
 
@@ -2570,6 +2651,7 @@ function main() {
 
   updateStoreAffordability();
   updateUpgradeAffordability();
+  updateTheBoxButton();
 
   cookiesDisplay += (cookies - cookiesDisplay) * 0.5;
   setElementText("money", beautify(Math.round(cookiesDisplay)));
@@ -2653,6 +2735,7 @@ function initialize() {
   initOverlay();
   createBuffDisplay();
   setupStoreTooltips();
+  initTheBoxButton();
   loadGame();
 }
 
