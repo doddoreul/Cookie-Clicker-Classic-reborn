@@ -1,0 +1,311 @@
+/* --------------------------------------------------------------------------
+   The Box mini-game
+   -------------------------------------------------------------------------- */
+
+#theBoxBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 6000000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.75);
+}
+
+#theBoxBackdrop.visible {
+  display: flex;
+}
+
+#theBoxModal {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: #eee;
+  color: #000;
+  border: #000 2px solid;
+  border-radius: 8px;
+  font-family: "Courier New", monospace;
+}
+
+#theBoxClose {
+  position: absolute;
+  right: 10px;
+  top: 4px;
+  color: #000;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#theBoxClose:hover {
+  color: #f00;
+}
+
+#theBoxTitle {
+  padding: 10px 16px 4px;
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+}
+
+#theBoxContent {
+  min-width: 400px;
+  max-width: 90vw;
+  height: min(70vh, 600px);
+  min-height: 300px;
+  padding: 16px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.boxGame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  height: 100%;
+  min-height: 0;
+  font-family: "Courier New", monospace;
+  color: #000;
+}
+
+#boxButtons {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.boxButton {
+  padding: 6px 14px;
+  border: #000 1px solid;
+  border-radius: 4px;
+  background: #ddd;
+  color: #000;
+  font-family: "Courier New", monospace;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.boxButton:hover {
+  background: #cce;
+}
+
+.boxHint {
+  font-size: 12px;
+  color: #555;
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+#boxExperimentArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.boxExperiment {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.boxOuter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.boxContainer {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border: #000 1px solid;
+  border-radius: 6px;
+}
+
+.boxContainer img {
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.boxCat.inside {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.boxCat.inside:last-child {
+  left: auto;
+  right: 4px;
+}
+
+.boxCat.inside img {
+  width: 100%;
+  height: 100%;
+}
+
+.boxInnerTypes {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  min-height: 18px;
+  max-width: 200px;
+}
+
+.boxInnerType {
+  font-size: 10px;
+  color: #000;
+  background: #efefef;
+  border: #000 1px solid;
+  border-radius: 4px;
+  padding: 1px 6px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.boxFirstCat,
+.boxCat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 48px;
+  cursor: grab;
+  user-select: none;
+}
+
+.boxFirstCat img,
+.boxCat img {
+  width: 48px;
+  height: 48px;
+  pointer-events: none;
+}
+
+.boxFirstCat span,
+.boxCat > span {
+  font-size: 9px;
+  line-height: 1.15;
+  text-align: center;
+  color: #333;
+  overflow-wrap: anywhere;
+}
+
+.boxFirstCat:active,
+.boxCat:active {
+  cursor: grabbing;
+}
+
+.dropTarget {
+  background: #bfe3ff;
+}
+
+#boxResult {
+  min-height: 24px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+  flex-shrink: 0;
+}
+
+#boxResult.show {
+  opacity: 1;
+}
+
+.boxResultText {
+  font-size: 13px;
+  color: #000;
+  font-weight: bold;
+}
+
+#boxResult .boxCat {
+  display: inline-flex;
+  width: 40px;
+  vertical-align: top;
+  margin-top: 4px;
+}
+
+#boxResult .boxCat img {
+  width: 40px;
+  height: 40px;
+}
+
+#boxResult .boxCat span {
+  font-size: 9px;
+  text-align: center;
+}
+
+#boxCollection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.boxCatalogueLabel {
+  font-size: 12px;
+  font-weight: bold;
+  color: #333;
+  border-bottom: #000 1px solid;
+  padding-bottom: 2px;
+  width: 100%;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #eee;
+}
+
+.boxCatalogueCount {
+  font-weight: bold;
+  color: #000;
+}
+
+.boxCatalogue {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+  gap: 6px 8px;
+  justify-items: center;
+  align-items: start;
+  width: 100%;
+  padding: 8px;
+  border: #000 1px solid;
+  border-radius: 6px;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.boxCatalogue .boxCat span {
+  font-size: 9px;
+  text-align: center;
+}
+
+.boxCatMissing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 62px;
+  border: #000 1px dashed;
+  border-radius: 6px;
+  background: #fff;
+  color: #777;
+  font-size: 22px;
+  user-select: none;
+}

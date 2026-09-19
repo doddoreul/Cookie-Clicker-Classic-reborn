@@ -311,6 +311,16 @@ const buildings = {
     gain: 325000000,
     description: '<span style="font-size:80%;">Brings cookies from the past, before they were even eaten.</span>',
     icon: "timemachineicon"
+  },
+  "Black Hole": {
+    id: 12,
+    count: 0,
+    basePrice: 150000000000000,
+    gain: 0,
+    description: "A collapsed star of pure cookies. Locked until The Box is completed.",
+    icon: "blackholeicon",
+    iconUrl: "thebox/blackholeicon.png",
+    requiresBoxCompleted: true
   }
 };
 
@@ -857,6 +867,7 @@ function getSaveData() {
     elderPledgeCount: elderPledge.count,
     cookiesBakedAllTime,
     cookiesFromClicking,
+    box: window.Box ? window.Box.saveData() : null,
   };
 }
 
@@ -875,6 +886,7 @@ function resetSaveString() {
     grandmaAnger: 0,
     cookiesBakedAllTime,
     cookiesFromClicking,
+    box: null,
     buildings: {},
     upgrades: [],
     achievements: Object.keys(achievements)
@@ -990,6 +1002,9 @@ function applySaveData(data) {
 
   updateGoldenCookieModifiers();
   scheduleGoldenCookie();
+
+  pendingBoxData = data.box && typeof data.box === "object" ? data.box : null;
+  if (window.Box) window.Box.loadData(pendingBoxData);
 
   refreshAllBuildingVisuals();
   storeToRebuild = true;
@@ -1227,8 +1242,9 @@ function rebuildStore() {
   Object.keys(buildings).forEach(name => {
     const building = buildings[name];
 
+    const iconUrl = building.iconUrl || `${ASSET_PATH}${building.icon}.png`;
     output += `
-      <div id="buy${name}" data-buy="${name}" style="background-image:url(${ASSET_PATH}${building.icon}.png);">
+      <div id="buy${name}" data-buy="${name}" style="background-image:url(${iconUrl});">
         <div class="tooltipStore">
           <div class="building-icon"></div>
           <b>${name}</b>
@@ -1288,6 +1304,7 @@ function getBulkBuildingPrice(name, amount) {
 function buyBuildings(name, amount) {
   const building = getBuilding(name);
   if (!building || !loaded || amount <= 0) return;
+  if (building.requiresBoxCompleted && !isBoxCompleted()) return;
 
   const totalPrice = getBulkBuildingPrice(name, amount);
   if (cookies < totalPrice) return;
@@ -1306,6 +1323,7 @@ function buyBuildings(name, amount) {
 function buyBuilding(name) {
   const building = getBuilding(name);
   if (!building || !loaded || cookies < building.currentPrice) return;
+  if (building.requiresBoxCompleted && !isBoxCompleted()) return;
 
   cookies -= building.currentPrice;
   building.count++;
@@ -1324,14 +1342,15 @@ function updateStoreAffordability() {
     if (!element) return;
 
     const building = buildings[name];
+    const locked = building.requiresBoxCompleted && !isBoxCompleted();
 
-    element.classList.toggle("grayed", cookies < building.currentPrice);
+    element.classList.toggle("grayed", locked || cookies < building.currentPrice);
 
     const bulk = storeBulkElements[name];
     if (!bulk) return;
 
-    if (bulk[10]) bulk[10].classList.toggle("grayed", cookies < building.bulkPrice10);
-    if (bulk[100]) bulk[100].classList.toggle("grayed", cookies < building.bulkPrice100);
+    if (bulk[10]) bulk[10].classList.toggle("grayed", locked || cookies < building.bulkPrice10);
+    if (bulk[100]) bulk[100].classList.toggle("grayed", locked || cookies < building.bulkPrice100);
   });
 }
 
@@ -2365,10 +2384,21 @@ const THE_BOX_UNLOCK_COUNT = 500;
 let theBoxButtonElement = null;
 let theBoxScriptLoaded = false;
 let theBoxScriptLoading = false;
+let pendingBoxData = null;
+
+// The Box saves/loads into window.Box. Inactive buildings (Black Hole)
+// are excluded from the unlock condition.
+function isBoxCompleted() {
+  if (window.Box && window.Box.state) return !!window.Box.state.completed;
+  return !!(pendingBoxData && pendingBoxData.completed);
+}
 
 // The Box is reachable once every building has reached 500.
 function isTheBoxUnlocked() {
-  return buildingNames.every(name => getBuildingCount(name) >= THE_BOX_UNLOCK_COUNT);
+  return buildingNames.every(name => {
+    if (buildings[name].requiresBoxCompleted) return true;
+    return getBuildingCount(name) >= THE_BOX_UNLOCK_COUNT;
+  });
 }
 
 function updateTheBoxButton() {
@@ -2387,10 +2417,25 @@ function loadTheBoxScript() {
   theBoxScriptLoading = true;
 
   const script = document.createElement("script");
-  script.src = "thebox.js";
+  script.src = "thebox/thebox.js";
   script.onload = () => {
     theBoxScriptLoaded = true;
     theBoxScriptLoading = false;
+
+    if (window.Box) {
+      window.Box._notifyHook = () => {
+        if (loaded) saveGame();
+        storeToRebuild = true;
+        invalidateGainCache();
+        updateTheBoxButton();
+      };
+
+      if (pendingBoxData) {
+        window.Box.loadData(pendingBoxData);
+        pendingBoxData = null;
+      }
+    }
+
     if (typeof initTheBox === "function") initTheBox();
   };
   script.onerror = () => {
