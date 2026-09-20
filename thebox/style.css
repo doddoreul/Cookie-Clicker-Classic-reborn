@@ -62,12 +62,13 @@
 .boxGame {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   gap: 12px;
   height: 100%;
   min-height: 0;
   font-family: "Courier New", monospace;
   color: #000;
+  width: 100%;
 }
 
 #boxButtons {
@@ -139,12 +140,34 @@
   margin-bottom: 6px;
 }
 
+.boxMainArea {
+  display: flex;
+  flex-direction: row;
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  gap: 16px;
+  align-items: stretch;
+}
+
 #boxExperimentArea {
+  flex: 1 1 50%;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  flex-shrink: 0;
+}
+
+#boxCollection {
+  flex: 1 1 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 .boxExperiment {
@@ -165,9 +188,8 @@
 
 .boxContainer {
   position: relative;
-  width: 84px;
-  height: 84px;
-  border: #000 1px solid;
+  width: 128px;
+  height: 128px;
   border-radius: 6px;
 }
 
@@ -179,17 +201,17 @@
 
 .boxCat.inside {
   position: absolute;
-  bottom: 5px;
-  left: 5px;
-  width: 34px;
-  height: 34px;
+  bottom: 8px;
+  left: 8px;
+  width: 52px;
+  height: 52px;
   border-radius: 4px;
   background: rgba(255, 255, 255, 0.85);
 }
 
 .boxCat.inside:last-child {
   left: auto;
-  right: 5px;
+  right: 8px;
 }
 
 .boxCat.inside img {
@@ -224,11 +246,23 @@
   align-items: center;
   gap: 3px;
   width: 60px;
+  height: 78px;
   cursor: grab;
   user-select: none;
+  box-sizing: border-box;
 }
 
-.boxFirstCat img,
+.boxFirstCat {
+  width: 128px;
+  height: 128px;
+}
+
+.boxFirstCat img {
+  width: 128px;
+  height: 128px;
+  pointer-events: none;
+}
+
 .boxCat img {
   width: 60px;
   height: 60px;
@@ -249,21 +283,25 @@
   cursor: grabbing;
 }
 
+.boxInitialPair {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+
 .dropTarget {
   background: #bfe3ff;
 }
 
 #boxResult {
-  position: absolute;
-  top: 0;
-  left: calc(100% + 16px);
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: 6px;
-  width: max-content;
-  max-width: 300px;
-  text-align: left;
+  width: 100%;
+  text-align: center;
 }
 
 #boxResult:empty {
@@ -290,18 +328,6 @@
 #boxResult .boxCat span {
   font-size: 11px;
   text-align: center;
-}
-
-#boxCollection {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  width: 100%;
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
-  padding-right: 4px;
 }
 
 .boxCatalogueLabel {
@@ -349,6 +375,7 @@
   border-radius: 6px;
   background: #fff;
   box-sizing: border-box;
+  min-height: 0;
 }
 
 .boxCatalogue .boxCat span {

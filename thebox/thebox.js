@@ -543,8 +543,10 @@ Box.render = function () {
             : ""
         }
       </div>
-      <div id="boxExperimentArea"></div>
-      <div id="boxCollection"></div>
+      <div class="boxMainArea">
+        <div id="boxExperimentArea"></div>
+        <div id="boxCollection"></div>
+      </div>
     </div>
   `;
 
@@ -578,7 +580,6 @@ Box._renderPhase = function () {
   const firstCatHtml = `
     <div class="boxFirstCat" draggable="true" data-cat="FIRST" title="Cat">
       <img src="${Box.ASSET_PATH}${Box.ICON}" alt="Cat" draggable="false">
-      <span>Cat</span>
     </div>
   `;
 
@@ -603,10 +604,12 @@ Box._renderPhase = function () {
     `;
     hint = "";
   } else {
-    // initial: first cat outside the box
+    // initial: first cat outside the box, side by side with the box
     experimentInner = `
-      <div class="boxOuter">${firstCatHtml}</div>
-      <div class="boxOuter">${Box._boxHtml()}${resultSide}</div>
+      <div class="boxOuter boxInitialPair">
+        ${firstCatHtml}
+        ${Box._boxHtml()}${resultSide}
+      </div>
     `;
     hint = "Drag the cat into the box.";
   }
