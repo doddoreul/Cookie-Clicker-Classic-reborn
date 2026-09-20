@@ -81,6 +81,9 @@ const NUMBER_SUFFIXES = [
 ];
 
 function beautifyShort(value) {
+  if (value === Infinity) return "Infinity";
+  if (Number.isNaN(value)) return "NaN";
+
   for (let i = NUMBER_SUFFIXES.length - 1; i >= 0; i--) {
     const [power, suffix] = NUMBER_SUFFIXES[i];
 
@@ -850,7 +853,7 @@ function getSaveData() {
   return {
     formatVersion: SAVE_FORMAT_VERSION,
     gameVersion: VERSION,
-    cookies: Math.floor(cookies),
+    cookies: Number.isFinite(cookies) ? Math.floor(cookies) : null,
     prestige,
     resetCount,
     pledge,
@@ -865,9 +868,10 @@ function getSaveData() {
     goldenCookieBuildingSpecialMultiplier: goldenCookieBuildingSpecialMultiplier,
     goldenCookieBuildingSpecialBuilding: goldenCookieBuildingSpecialBuilding,
     elderPledgeCount: elderPledge.count,
-    cookiesBakedAllTime,
+    cookiesBakedAllTime: cookiesBakedAllTime === Infinity ? "Infinity" : (Number.isFinite(cookiesBakedAllTime) && cookiesBakedAllTime > 0 ? cookiesBakedAllTime : 0),
     cookiesFromClicking,
     box: window.Box ? window.Box.saveData() : null,
+    blackHole: window.BlackHole ? window.BlackHole.saveData() : null,
   };
 }
 
@@ -887,6 +891,7 @@ function resetSaveString() {
     cookiesBakedAllTime,
     cookiesFromClicking,
     box: null,
+    blackHole: window.BlackHole ? window.BlackHole.resetData() : null,
     buildings: {},
     upgrades: [],
     achievements: Object.keys(achievements)
@@ -912,9 +917,13 @@ function applySaveData(data) {
   resetCount = Number.isFinite(data.resetCount) ? data.resetCount : 0;
   pledge = Number.isFinite(data.pledge) ? data.pledge : 0;
   grandmaAnger = Number.isFinite(data.grandmaAnger) ? Math.max(0, data.grandmaAnger) : 0;
-  cookiesBakedAllTime = Number.isFinite(data.cookiesBakedAllTime) ? data.cookiesBakedAllTime : 0;
+  const loadedCbat = data.cookiesBakedAllTime === "Infinity" ? Infinity : (Number.isFinite(data.cookiesBakedAllTime) ? data.cookiesBakedAllTime : 0);
+  if (loadedCbat > 0 || loadedCbat === Infinity) cookiesBakedAllTime = loadedCbat;
   cookiesFromClicking = Number.isFinite(data.cookiesFromClicking) ? data.cookiesFromClicking : 0;
   prestige = calculatePrestige();
+
+  const pendingBlackHole = data.blackHole && typeof data.blackHole === "object" ? data.blackHole : null;
+  if (window.BlackHole) window.BlackHole.loadData(pendingBlackHole);
 
   goldenCookieClickFrenzyTimer = Number.isFinite(data.goldenCookieClickFrenzyTimer)
     ? Math.max(0, data.goldenCookieClickFrenzyTimer)
@@ -1072,6 +1081,7 @@ function importSave() {
 }
 
 function resetGame() {
+  if (window.BlackHole && BlackHole.resetDisabled()) return;
   if (!confirm("Do you REALLY want to start over?")) return;
 
   prestige = calculatePrestige();
@@ -1086,6 +1096,7 @@ function resetGame() {
 /* ---------------------------------------------------------------- */
 
 function getCursorGain() {
+  if (window.BlackHole && BlackHole.productionDisabled()) return 0;
   const cursor = buildings.Cursor;
   const base = pledge > 0 ? Math.ceil(cursor.count * 1.5) : 1;
 
@@ -1106,6 +1117,7 @@ function getCursorAutoClickGain() {
 }
 
 function clickCookie() {
+  if (window.BlackHole && BlackHole.productionDisabled()) return;
   const amount = getCursorClickGain() * getPrestigeMultiplier();
 
   cookies += amount;
@@ -1138,6 +1150,7 @@ function getSynergyMultiplier(name) {
 }
 
 function getBuildingGain(name) {
+  if (window.BlackHole && BlackHole.productionDisabled()) return 0;
   return buildings[name].gain * multipliers[name] * getSynergyMultiplier(name) * goldenCookieCpsMultiplier * goldenCookieBuildingSpecialMultiplier * globalMultiplier * getGrandmaAngerMultiplier();
 }
 
@@ -1202,6 +1215,9 @@ function getCursorCps() {
 }
 
 function getCookiesPerSecond() {
+  const bhCps = window.BlackHole ? BlackHole.cps() : null;
+  if (bhCps !== null) return bhCps;
+
   ensureGainCache();
 
   if (cachedCps !== null) return cachedCps;
@@ -1242,18 +1258,31 @@ function rebuildStore() {
   Object.keys(buildings).forEach(name => {
     const building = buildings[name];
 
+    // Black Hole only appears once The Box is completed
+    if (building.requiresBoxCompleted && !isBoxCompleted()) return;
+
+    // Hide Black Hole after purchase
+    if (name === "Black Hole" && window.BlackHole && BlackHole.isPurchased()) return;
+
     const iconUrl = building.iconUrl || `${ASSET_PATH}${building.icon}.png`;
+    const isBlackHole = name === "Black Hole";
+    const bhActive = window.BlackHole && BlackHole.isPurchased() && BlackHole.phase !== "serenity";
+    const priceDisplay = isBlackHole ? beautify(cookies) : (bhActive ? "∞" : beautify(building.currentPrice));
+    const bulkButtons = (isBlackHole || bhActive) ? "" : `
+        <div class="buySub buy10" data-name="${name}" data-buymulti="10" title="Buy 10">x10</div>
+        <div class="buySub buy100" data-name="${name}" data-buymulti="100" title="Buy 100">x100</div>
+      `;
+
     output += `
       <div id="buy${name}" data-buy="${name}" style="background-image:url(${iconUrl});">
         <div class="tooltipStore">
           <div class="building-icon"></div>
           <b>${name}</b>
-          <moni></moni> ${beautify(building.currentPrice)}
+          <moni></moni> ${priceDisplay}
           ${building.count > 0 ? `<div class="amount">${building.count}</div>` : ""}
           <span class="tooltipTextStore">${building.description}</span>
         </div>
-        <div class="buySub buy10" data-name="${name}" data-buymulti="10" title="Buy 10">x10</div>
-        <div class="buySub buy100" data-name="${name}" data-buymulti="100" title="Buy 100">x100</div>
+        ${bulkButtons}
       </div>
     `;
   });
@@ -1305,6 +1334,7 @@ function buyBuildings(name, amount) {
   const building = getBuilding(name);
   if (!building || !loaded || amount <= 0) return;
   if (building.requiresBoxCompleted && !isBoxCompleted()) return;
+  if (window.BlackHole && BlackHole.buyingBlocked()) return;
 
   const totalPrice = getBulkBuildingPrice(name, amount);
   if (cookies < totalPrice) return;
@@ -1321,9 +1351,15 @@ function buyBuildings(name, amount) {
 }
 
 function buyBuilding(name) {
+  if (name === "Black Hole") {
+    if (window.BlackHole) BlackHole.purchaseAttempt();
+    return;
+  }
+
   const building = getBuilding(name);
   if (!building || !loaded || cookies < building.currentPrice) return;
   if (building.requiresBoxCompleted && !isBoxCompleted()) return;
+  if (window.BlackHole && BlackHole.buyingBlocked()) return;
 
   cookies -= building.currentPrice;
   building.count++;
@@ -1343,14 +1379,20 @@ function updateStoreAffordability() {
 
     const building = buildings[name];
     const locked = building.requiresBoxCompleted && !isBoxCompleted();
+    const buyingBlocked = window.BlackHole && BlackHole.buyingBlocked();
 
-    element.classList.toggle("grayed", locked || cookies < building.currentPrice);
+    if (name === "Black Hole") {
+      element.classList.toggle("grayed", locked || buyingBlocked || cookies <= 0);
+      return;
+    }
+
+    element.classList.toggle("grayed", locked || buyingBlocked || cookies < building.currentPrice);
 
     const bulk = storeBulkElements[name];
     if (!bulk) return;
 
-    if (bulk[10]) bulk[10].classList.toggle("grayed", locked || cookies < building.bulkPrice10);
-    if (bulk[100]) bulk[100].classList.toggle("grayed", locked || cookies < building.bulkPrice100);
+    if (bulk[10]) bulk[10].classList.toggle("grayed", locked || buyingBlocked || cookies < building.bulkPrice10);
+    if (bulk[100]) bulk[100].classList.toggle("grayed", locked || buyingBlocked || cookies < building.bulkPrice100);
   });
 }
 
@@ -1465,6 +1507,7 @@ function buyUpgrade(name) {
   const upgrade = upgrades[name];
 
   if (!upgrade || !isUpgradeAvailable(upgrade) || upgrade.bought || !loaded || cookies < upgrade.price) return;
+  if (window.BlackHole && BlackHole.buyingBlocked()) return;
 
   cookies -= upgrade.price;
   upgrade.bought = true;
@@ -1562,6 +1605,7 @@ function setupStoreUpgradesDelegation() {
 
 function updateUpgradeAffordability() {
   let becameBuyable = false;
+  const buyingBlocked = window.BlackHole && BlackHole.buyingBlocked();
 
   Object.keys(upgradeRowElements).forEach(name => {
     const element = upgradeRowElements[name];
@@ -1570,6 +1614,7 @@ function updateUpgradeAffordability() {
     if (name === "pledge") {
       element.classList.toggle(
         "grayed",
+        buyingBlocked ||
         getGrandmaAngerLevel() <= 0 ||
           pledge > 0 ||
           cookies < elderPledge.currentPrice
@@ -1581,7 +1626,7 @@ function updateUpgradeAffordability() {
     if (!upgrade || upgrade.bought || element.classList.contains("hidden")) return;
 
     const wasGrayed = element.classList.contains("grayed");
-    const isGrayed = cookies < upgrade.price;
+    const isGrayed = buyingBlocked || cookies < upgrade.price;
     element.classList.toggle("grayed", isGrayed);
     if (wasGrayed && !isGrayed) becameBuyable = true;
   });
@@ -1595,6 +1640,7 @@ function updateUpgradeAffordability() {
 
 function buyElderPledge() {
   if (!loaded || getGrandmaAngerLevel() <= 0 || pledge > 0 || cookies < elderPledge.currentPrice) return;
+  if (window.BlackHole && BlackHole.buyingBlocked()) return;
 
   cookies -= elderPledge.currentPrice;
   elderPledge.count++;
@@ -1740,6 +1786,7 @@ function refreshAllBuildingVisuals() {
 function spawnGoldenCookie() {
   // Safety: never spawn two golden cookies at once.
   if (goldenCookieVisible) return;
+  if (window.BlackHole && BlackHole.goldenCookiesDisabled()) return;
 
   goldenCookieVisible = true;
 
@@ -1841,6 +1888,7 @@ function randomGoldenCookieDelay() {
 function scheduleGoldenCookie() {
   // Only active once the upgrade has been bought.
   if (!upgrades["Golden Cookies"]?.bought) return;
+  if (window.BlackHole && BlackHole.goldenCookiesDisabled()) return;
 
   // Never schedule a new golden cookie while one is already present.
   if (goldenCookieVisible || goldenCookieTimer) return;
@@ -2153,6 +2201,9 @@ function renderPops() {
 /* ---------------------------------------------------------------- */
 
 function getComment(totalCookies) {
+  const bhComment = window.BlackHole ? BlackHole.comment() : null;
+  if (bhComment !== null) return bhComment;
+
   if (isTheBoxUnlocked()) return "Maybe you should try The Box";
 
   const milestones = [
@@ -2458,6 +2509,7 @@ function openTheBox() {
 
   backdrop.classList.add("visible");
   loadTheBoxScript();
+  if (typeof initTheBox === "function") initTheBox();
 }
 
 function closeTheBox() {
@@ -2620,6 +2672,8 @@ function main() {
   catchUpIdleTime();
   advanceGrandmaAnger(1);
 
+  if (window.BlackHole) BlackHole.tick();
+
   if (cameBackFromIdle) {
     cameBackFromIdle = false;
     if (cookiesGainedWhileHidden > 0) {
@@ -2685,7 +2739,7 @@ function main() {
 
   if (ticks % 30 === 0) checkAchievements();
 
-  const floater = Math.round(cps * 10 - Math.floor(cps) * 10);
+  const floater = Number.isFinite(cps) ? Math.round(cps * 10 - Math.floor(cps) * 10) : 0;
 
   setElementText(
     "cps",
@@ -2699,17 +2753,25 @@ function main() {
   updateTheBoxButton();
 
   cookiesDisplay += (cookies - cookiesDisplay) * 0.5;
-  setElementText("money", beautify(Math.round(cookiesDisplay)));
+  const displayValue = Number.isFinite(cookiesDisplay) ? Math.round(cookiesDisplay) : (cookies === Infinity ? Infinity : 0);
+  setElementText("money", beautify(displayValue));
   setElementText("comment", getComment(cookies));
-
-  updatePledgeTimer();
+  getElement("overlayAllTimeCookies").innerHTML = "Cookies baked (all time): " + beautify(cookiesBakedAllTime);
 
   setElementText("prestigeDisplay", beautify(prestige));
-  setElementText("prestigeGainDisplay", beautify(Math.max(0, calculatePrestige() - prestige)));
-  setElementText("prestigeUnleashedDisplay", Math.round(getPrestigePowerRatio() * 1000) / 10 + "%");
-  setElementText("resetCounterDisplay", resetCount);
-  setElementText("overlayAllTimeCookies", "Cookies baked (all time): " + beautify(cookiesBakedAllTime));
-  setElementText("grandmaAngerDisplay", getGrandmaAngerStatusText());
+  const bhActive = window.BlackHole && BlackHole.isPurchased();
+  if (bhActive) {
+    setElementText("prestigeGainDisplay", "---");
+    setElementText("prestigeUnleashedDisplay", "---");
+    setElementText("pledgeTimer", "---");
+    setElementText("grandmaAngerDisplay", "Grandmas: ---");
+  } else {
+    const prestigeGain = calculatePrestige() - prestige;
+    setElementText("prestigeGainDisplay", Number.isFinite(prestigeGain) ? beautify(Math.max(0, prestigeGain)) : "");
+    setElementText("prestigeUnleashedDisplay", Math.round(getPrestigePowerRatio() * 1000) / 10 + "%");
+    updatePledgeTimer();
+    setElementText("grandmaAngerDisplay", getGrandmaAngerStatusText());
+  }
 
   if (!cachedAngerDisplayElement) {
     cachedAngerDisplayElement = getElement("grandmaAngerDisplay");

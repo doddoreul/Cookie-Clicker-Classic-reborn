@@ -20,6 +20,8 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  width: min(92vw, 1100px);
+  height: min(90vh, 950px);
   background: #eee;
   color: #000;
   border: #000 2px solid;
@@ -49,11 +51,10 @@
 }
 
 #theBoxContent {
-  min-width: 400px;
-  max-width: 90vw;
-  height: min(70vh, 600px);
-  min-height: 300px;
-  padding: 16px;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  padding: 20px;
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -71,18 +72,59 @@
 
 #boxButtons {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 10px;
   flex-shrink: 0;
 }
 
+.boxCongrats {
+  font-weight: bold;
+  background: #dfd;
+  border: #080 2px solid;
+}
+
+.boxCongrats:hover {
+  background: #cfc;
+}
+
+.boxDone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 20px;
+  border: #080 2px solid;
+  border-radius: 8px;
+  background: #dfd;
+}
+
+.boxDone img {
+  width: 90px;
+  height: 90px;
+}
+
+.boxDoneText {
+  font-size: 20px;
+  font-weight: bold;
+  color: #060;
+  text-align: center;
+}
+
+.boxButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .boxButton {
-  padding: 6px 14px;
+  padding: 8px 18px;
   border: #000 1px solid;
   border-radius: 4px;
   background: #ddd;
   color: #000;
   font-family: "Courier New", monospace;
-  font-size: 14px;
+  font-size: 15px;
   cursor: pointer;
 }
 
@@ -91,7 +133,7 @@
 }
 
 .boxHint {
-  font-size: 12px;
+  font-size: 13px;
   color: #555;
   text-align: center;
   margin-bottom: 6px;
@@ -108,7 +150,7 @@
 .boxExperiment {
   display: flex;
   gap: 14px;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   flex-wrap: wrap;
 }
@@ -118,12 +160,13 @@
   flex-direction: column;
   align-items: center;
   gap: 4px;
+  position: relative;
 }
 
 .boxContainer {
   position: relative;
-  width: 64px;
-  height: 64px;
+  width: 84px;
+  height: 84px;
   border: #000 1px solid;
   border-radius: 6px;
 }
@@ -136,17 +179,17 @@
 
 .boxCat.inside {
   position: absolute;
-  bottom: 4px;
-  left: 4px;
-  width: 26px;
-  height: 26px;
+  bottom: 5px;
+  left: 5px;
+  width: 34px;
+  height: 34px;
   border-radius: 4px;
   background: rgba(255, 255, 255, 0.85);
 }
 
 .boxCat.inside:last-child {
   left: auto;
-  right: 4px;
+  right: 5px;
 }
 
 .boxCat.inside img {
@@ -156,20 +199,20 @@
 
 .boxInnerTypes {
   display: flex;
-  gap: 8px;
+  gap: 12px;
   justify-content: center;
   align-items: center;
-  min-height: 18px;
-  max-width: 200px;
+  min-height: 22px;
+  max-width: 300px;
 }
 
 .boxInnerType {
-  font-size: 10px;
+  font-size: 12px;
   color: #000;
   background: #efefef;
   border: #000 1px solid;
   border-radius: 4px;
-  padding: 1px 6px;
+  padding: 2px 8px;
   text-align: center;
   overflow-wrap: anywhere;
 }
@@ -179,22 +222,22 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  width: 48px;
+  gap: 3px;
+  width: 60px;
   cursor: grab;
   user-select: none;
 }
 
 .boxFirstCat img,
 .boxCat img {
-  width: 48px;
-  height: 48px;
+  width: 60px;
+  height: 60px;
   pointer-events: none;
 }
 
 .boxFirstCat span,
 .boxCat > span {
-  font-size: 9px;
+  font-size: 11px;
   line-height: 1.15;
   text-align: center;
   color: #333;
@@ -211,37 +254,41 @@
 }
 
 #boxResult {
-  min-height: 24px;
-  text-align: center;
-  opacity: 0;
-  transition: opacity 0.2s;
-  flex-shrink: 0;
+  position: absolute;
+  top: 0;
+  left: calc(100% + 16px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  width: max-content;
+  max-width: 300px;
+  text-align: left;
 }
 
-#boxResult.show {
-  opacity: 1;
+#boxResult:empty {
+  display: none;
 }
 
 .boxResultText {
-  font-size: 13px;
+  font-size: 15px;
   color: #000;
   font-weight: bold;
 }
 
 #boxResult .boxCat {
   display: inline-flex;
-  width: 40px;
+  width: 60px;
   vertical-align: top;
-  margin-top: 4px;
 }
 
 #boxResult .boxCat img {
-  width: 40px;
-  height: 40px;
+  width: 60px;
+  height: 60px;
 }
 
 #boxResult .boxCat span {
-  font-size: 9px;
+  font-size: 11px;
   text-align: center;
 }
 
@@ -258,7 +305,7 @@
 }
 
 .boxCatalogueLabel {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: bold;
   color: #333;
   border-bottom: #000 1px solid;
@@ -276,14 +323,28 @@
   color: #000;
 }
 
+.boxCatalogueSection {
+  width: 100%;
+}
+
+.boxCatalogueLevel {
+  font-size: 13px;
+  font-weight: bold;
+  color: #444;
+  letter-spacing: 1px;
+  text-align: center;
+  width: 100%;
+  padding: 4px 0 2px;
+}
+
 .boxCatalogue {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
-  gap: 6px 8px;
+  grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+  gap: 8px 10px;
   justify-items: center;
   align-items: start;
   width: 100%;
-  padding: 8px;
+  padding: 10px;
   border: #000 1px solid;
   border-radius: 6px;
   background: #fff;
@@ -291,7 +352,7 @@
 }
 
 .boxCatalogue .boxCat span {
-  font-size: 9px;
+  font-size: 11px;
   text-align: center;
 }
 
@@ -300,12 +361,12 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 62px;
+  width: 60px;
+  height: 78px;
   border: #000 1px dashed;
   border-radius: 6px;
   background: #fff;
   color: #777;
-  font-size: 22px;
+  font-size: 28px;
   user-select: none;
 }

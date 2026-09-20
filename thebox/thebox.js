@@ -152,6 +152,28 @@ Box.RECIPES = {
   "CAT_TRUE_SUPERPOSITION CAT_QUANTUM_LIFE": "CAT_ALIVE"
 };
 
+// Display sections for the discovery grid: one per level, from level I
+// (the two halves) up to level VII (Alive Cat). Each section shows the
+// unlocked cats and the missing ones ("?"), to guide the player.
+Box.LEVELS = [
+  [CAT_HALF_DEAD, CAT_HALF_ALIVE],
+  [CAT_DEAD_DEAD, CAT_DEAD_ALIVE, CAT_ALIVE_DEAD, CAT_ALIVE_ALIVE],
+  [
+    CAT_MOSTLY_DEAD, CAT_DEAD_PARADOX, CAT_MOSTLY_ALIVE, CAT_DEAD_RESONANCE,
+    CAT_LIVING_PARADOX, CAT_ALIVE_RESONANCE, CAT_DOUBLE_DEAD, CAT_DOUBLE_ALIVE
+  ],
+  [
+    CAT_SCHRODINGERS_CAT, CAT_UNCERTAIN_CAT, CAT_SUPERPOSITION_CAT, CAT_SPLIT_CAT,
+    CAT_CONTRADICTORY_CAT, CAT_QUANTUM_CAT, CAT_UNSTABLE_CAT, CAT_STABLE_QUANTUM_CAT
+  ],
+  [
+    CAT_RECONSTRUCTED_CAT, CAT_COHERENT_CAT, CAT_ALMOST_ALIVE_CAT,
+    CAT_ALMOST_DEAD_CAT, CAT_PERFECT_SUPERPOSITION, CAT_LIVING_PROBABILITY
+  ],
+  [CAT_TRUE_SUPERPOSITION, CAT_FALSE_LIFE, CAT_QUANTUM_LIFE],
+  [CAT_ALIVE]
+];
+
 /* ================================================================ */
 /* Validation (graph coherence)                                      */
 /* ================================================================ */
@@ -239,7 +261,7 @@ Box.validate = function () {
    phase: "initial"      box empty, only the first cat is present
           "schrodinger"  the very first cat is inside the box
           "combination"  first manipulation done, recipes unlocked
-          "completed"    Alive Cat found
+          "completed"    all cats discovered + reward button clicked
 */
 Box.state = {
   phase: "initial",
@@ -253,14 +275,29 @@ Box.hasCat = function (id) {
   return Box.state.discovered.includes(id);
 };
 
+// Some combinations work whatever the drop order: when a recipe exists
+// only in one direction, the reversed order gives the same result.
 Box.tryRecipe = function (a, b) {
   if (!a || !b) return null;
-  return Box.RECIPES[`${a} ${b}`] || null;
+  return Box.RECIPES[`${a} ${b}`] || Box.RECIPES[`${b} ${a}`] || null;
 };
 
 Box.notifyBoxProgress = function () {
   if (!Box._notifyHook) return;
   try { Box._notifyHook(); } catch (e) { /* ignore */ }
+};
+
+Box.allCatsDiscovered = function () {
+  return Object.keys(Box.CATS).length === Box.state.discovered.length;
+};
+
+Box.finishBox = function () {
+  if (Box.state.completed || !Box.allCatsDiscovered()) return;
+  Box.state.completed = true;
+  Box.state.phase = "completed";
+  Box.notifyBoxProgress();
+  Box.render();
+  Box.showResult({ text: "congratulations, you've unlocked a new building", discoveries: [] });
 };
 
 Box._discover = function (id) {
@@ -272,9 +309,9 @@ Box._discover = function (id) {
 };
 
 // Called by a click or a drop: cats go straight into the box (max 2).
-Box._addToBox = function (catId) {
+Box._addToBox = function (catId, deferRender) {
   if (catId === "FIRST" || !Box.hasCat(catId)) return;
-  if (!(Box.state.phase === "combination" || Box.state.phase === "completed")) return;
+  if (Box.state.phase !== "combination") return;
 
   if (Box.state.inBoxCats.length >= 2) {
     Box.showResult({ text: "Mmmm, can't do that, too unstable.", discoveries: [] });
@@ -282,7 +319,8 @@ Box._addToBox = function (catId) {
   }
 
   Box.state.inBoxCats.push(catId);
-  Box.render();
+  if (deferRender) setTimeout(Box.render, 0);
+  else Box.render();
 };
 
 // Removes whatever is inside the box.
@@ -342,7 +380,7 @@ Box.manipulate = function () {
     Box.notifyBoxProgress();
     Box.render();
 
-    return { text: "The box opens. Half-Dead and Half-Alive come out.", discoveries: newOnes, completed: false };
+    return { text: "oh well, you dropped the box, two cats got out of the box, but they look weird", discoveries: newOnes, completed: false, keepText: true };
   }
 
   // --- Combination phase: two cats must be inside the box ---
@@ -362,26 +400,13 @@ Box.manipulate = function () {
   const isNew = Box._discover(result);
   Box.state.inBoxCats = [];
 
-  let completed = false;
-  if (result === CAT_ALIVE && !Box.state.completed) {
-    Box.state.completed = true;
-    Box.state.phase = "completed";
-    completed = true;
-  }
-
   Box.notifyBoxProgress();
   Box.render();
 
-  if (completed) {
-    return {
-      text: `${Box.CATS[result].name} — the puzzle is solved.`,
-      discoveries: isNew ? [result] : [],
-      completed: true
-    };
-  }
-
   return {
-    text: Box.CATS[result].name,
+    text: result === CAT_ALIVE
+      ? `${Box.CATS[result].name} — you restored the Cat! Click the button to unlock your reward.`
+      : Box.CATS[result].name,
     discoveries: isNew ? [result] : [],
     completed: false
   };
@@ -441,13 +466,13 @@ Box.showResult = function (result) {
   let html = `<div class="boxResultText">${result.text}</div>`;
 
   if (result.discoveries && result.discoveries.length) {
-    html = `<div class="boxResultText">New cat discovered!</div>` +
+    html = (result.keepText
+      ? `<div class="boxResultText">${result.text}</div>`
+      : `<div class="boxResultText">New cat discovered!</div>`) +
       Box._discoveryHtml(result.discoveries);
   }
 
   el.innerHTML = html;
-  el.classList.add("show");
-  Box._messageTimers.push(setTimeout(() => el.classList.remove("show"), 2600));
 };
 
 Box._discoveryHtml = function (ids) {
@@ -500,17 +525,25 @@ Box._boxHtml = function () {
 Box.render = function () {
   if (!Box._content) return;
 
+  const prevCollection = Box.$("#boxCollection");
+  const prevScrollTop = Box._dragScrollTop != null ? Box._dragScrollTop : (prevCollection ? prevCollection.scrollTop : 0);
+
   const canEmpty = Box.state.inBoxCats.length > 0 || Box.state.firstCatInBox;
+  const locked = Box.state.completed;
 
   Box._content.innerHTML = `
     <div class="boxGame">
       <div id="boxButtons">
-        <button class="boxButton" data-action="look">Look Inside</button>
-        <button class="boxButton" data-action="manipulate">Manipulate</button>
-        <button class="boxButton" data-action="empty" ${canEmpty ? "" : "disabled"}>Empty the box</button>
+        <button class="boxButton" data-action="look"${locked ? " disabled" : ""}>Look Inside</button>
+        <button class="boxButton" data-action="manipulate"${locked ? " disabled" : ""}>Manipulate</button>
+        <button class="boxButton" data-action="empty" ${canEmpty && !locked ? "" : "disabled"}>Empty the box</button>
+        ${
+          Box.allCatsDiscovered() && !Box.state.completed
+            ? `<button class="boxButton boxCongrats" data-action="congrats">congratulations, you restored the Cat, click here to unlock your reward</button>`
+            : ""
+        }
       </div>
       <div id="boxExperimentArea"></div>
-      <div id="boxResult"></div>
       <div id="boxCollection"></div>
     </div>
   `;
@@ -527,8 +560,15 @@ Box.render = function () {
     Box.emptyBox();
   });
 
+  const congratsEl = Box._content.querySelector("[data-action='congrats']");
+  if (congratsEl) congratsEl.addEventListener("click", () => Box.finishBox());
+
   Box._bindContent();
   Box._renderPhase();
+
+  const collection = Box.$("#boxCollection");
+  if (collection) collection.scrollTop = prevScrollTop;
+  Box._dragScrollTop = null;
 };
 
 Box._renderPhase = function () {
@@ -542,38 +582,66 @@ Box._renderPhase = function () {
     </div>
   `;
 
-  let experimentHtml, hint = "";
+  let experimentInner, hint = "";
+
+  // The result (messages + freshly discovered cats) is displayed to the
+  // right of the box. It is absolutely positioned so the box never moves.
+  const resultSide = `<div id="boxResult"></div>`;
+
   if (Box.state.phase === "schrodinger" || (Box.state.phase === "initial" && Box.state.firstCatInBox)) {
-    experimentHtml = `<div class="boxExperiment"><div class="boxOuter">${Box._boxHtml()}</div></div>`;
+    experimentInner = `<div class="boxOuter">${Box._boxHtml()}${resultSide}</div>`;
     hint = "The cat is in the box.";
-  } else if (Box.state.phase === "combination" || Box.state.phase === "completed") {
-    experimentHtml = `<div class="boxExperiment"><div class="boxOuter">${Box._boxHtml()}</div></div>`;
+  } else if (Box.state.phase === "combination") {
+    experimentInner = `<div class="boxOuter">${Box._boxHtml()}${resultSide}</div>`;
     hint = "Drop up to 2 cats into the box.";
+  } else if (Box.state.phase === "completed") {
+    experimentInner = `
+      <div class="boxDone">${resultSide}
+        <img src="${Box.ASSET_PATH}${Box.ICON}" alt="Alive Cat">
+        <span class="boxDoneText">You finished The Box.</span>
+      </div>
+    `;
+    hint = "";
   } else {
     // initial: first cat outside the box
-    experimentHtml = `
-      <div class="boxExperiment">
-        <div class="boxOuter">${firstCatHtml}</div>
-        <div class="boxOuter">${Box._boxHtml()}</div>
-      </div>
+    experimentInner = `
+      <div class="boxOuter">${firstCatHtml}</div>
+      <div class="boxOuter">${Box._boxHtml()}${resultSide}</div>
     `;
     hint = "Drag the cat into the box.";
   }
 
-  area.innerHTML = `<div class="boxHint">${hint}</div>` + experimentHtml;
+  area.innerHTML =
+    `<div class="boxHint">${hint}</div>` +
+    `<div class="boxExperiment">${experimentInner}</div>`;
 
   const catalogue = Box.$("#boxCollection");
   if (catalogue) {
-    const total = Object.keys(Box.CATS).length;
-    const discovered = Object.keys(Box.CATS).filter(id => Box.hasCat(id));
-    const missing = Object.keys(Box.CATS).filter(id => !Box.hasCat(id));
+    const revealed = Box.state.phase === "combination" || Box.state.phase === "completed";
+    if (!revealed) {
+      catalogue.innerHTML = "";
+    } else {
+      const total = Object.keys(Box.CATS).length;
 
-    const label = `<div class="boxCatalogueLabel">Discovered <span class="boxCatalogueCount">${discovered.length}/${total}</span></div>`;
-    const items = [
-      ...discovered.map(id => Box._catHtml(id)),
-      ...missing.map(() => `<div class="boxCatMissing" title="Undiscovered cat">?</div>`)
-    ].join("");
-    catalogue.innerHTML = label + `<div class="boxCatalogue">${items}</div>`;
+      const label = `<div class="boxCatalogueLabel">Discovered <span class="boxCatalogueCount">${Box.state.discovered.length}/${total}</span></div>`;
+
+      const romans = ["I", "II", "III", "IV", "V", "VI", "VII"];
+      const sections = Box.LEVELS.map((levelIds, index) => {
+        const items = levelIds.map(id =>
+          Box.hasCat(id)
+            ? Box._catHtml(id)
+            : `<div class="boxCatMissing" title="Undiscovered cat">?</div>`
+        ).join("");
+        return `
+          <div class="boxCatalogueSection">
+            <div class="boxCatalogueLevel">Niveau ${romans[index]}</div>
+            <div class="boxCatalogue">${items}</div>
+          </div>
+        `;
+      }).join("");
+
+      catalogue.innerHTML = label + sections;
+    }
   }
 
   Box._bindDrag();
@@ -588,6 +656,7 @@ Box._bindContent = function () {
   Box._content._boxBound = true;
 
   Box._content.addEventListener("click", event => {
+    if (Box.state.completed) return;
     const catEl = event.target.closest("[data-cat]");
     if (!catEl) return;
     const catId = catEl.dataset.cat;
@@ -621,11 +690,23 @@ Box._bindContent = function () {
 
 Box._bindDrag = function () {
   if (!Box._content) return;
+  if (Box.state.completed) return;
 
   Box._content.querySelectorAll("[data-cat]").forEach(el => {
     el.addEventListener("dragstart", event => {
+      const collection = Box.$("#boxCollection");
+      if (collection) Box._dragScrollTop = collection.scrollTop;
       event.dataTransfer.setData("text/plain", el.dataset.cat);
       event.dataTransfer.effectAllowed = "copy";
+    });
+    // The browser auto-scrolls the collection while dragging; restore the
+    // pre-drag position once the drag is over (drop or cancel).
+    el.addEventListener("dragend", () => {
+      const collection = Box.$("#boxCollection");
+      if (collection && Box._dragScrollTop != null) {
+        collection.scrollTop = Box._dragScrollTop;
+      }
+      Box._dragScrollTop = null;
     });
   });
 
@@ -647,18 +728,21 @@ Box._bindDrag = function () {
 };
 
 Box.handleDrop = function (catId, zone) {
+  if (Box.state.completed) return;
   if (!zone.dataset || zone.dataset.zone !== "box") return;
 
   if (catId === "FIRST") {
     if (!Box.state.firstCatInBox) {
       Box.state.firstCatInBox = true;
       Box.state.phase = "schrodinger";
-      Box.render();
+      // Defer the render until after the drag ends, so the collection
+      // does not scroll and the box stays put.
+      setTimeout(Box.render, 0);
     }
     return;
   }
 
-  Box._addToBox(catId);
+  Box._addToBox(catId, true);
 };
 
 /* ================================================================ */
@@ -730,15 +814,19 @@ Box.runTests = function () {
     `solved ${solved.size}/32`
   ]);
 
-  // 15. Alive Cat completes the box
+  // 15. Alive Cat: all 32 discovered, box emptied, completion via finishBox
   fresh();
   Box.state.phase = "combination";
-  Box.state.discovered = Object.keys(Box.CATS);
+  Box.state.discovered = Object.keys(Box.CATS).filter(id => id !== CAT_ALIVE);
   Box.state.inBoxCats = [CAT_TRUE_SUPERPOSITION, CAT_QUANTUM_LIFE];
   const rComplete = Box.manipulate();
+  const discoveredAlive = Box.state.discovered.length === 32;
+  const notCompletedYet = !Box.state.completed;
+  const boxEmptied = Box.state.inBoxCats.length === 0;
+  Box.finishBox();
   results.push([
-    "15 alive completes + box emptied",
-    rComplete.completed && Box.state.completed && Box.state.inBoxCats.length === 0 ? "PASS" : "FAIL",
+    "15 alive + button completes",
+    discoveredAlive && notCompletedYet && boxEmptied && Box.state.completed ? "PASS" : "FAIL",
     rComplete.text + ` (cats=${Box.state.inBoxCats.length})`
   ]);
 
