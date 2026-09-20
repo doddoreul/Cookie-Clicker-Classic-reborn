@@ -1096,7 +1096,9 @@ function resetGame() {
 /* ---------------------------------------------------------------- */
 
 function getCursorGain() {
-  if (window.BlackHole && BlackHole.productionDisabled()) return 0;
+  if (window.BlackHole && BlackHole.isPurchased()) {
+    if (BlackHole.productionDisabled() || BlackHole.phase === "serenity") return 0;
+  }
   const cursor = buildings.Cursor;
   const base = pledge > 0 ? Math.ceil(cursor.count * 1.5) : 1;
 
@@ -1117,7 +1119,7 @@ function getCursorAutoClickGain() {
 }
 
 function clickCookie() {
-  if (window.BlackHole && BlackHole.productionDisabled()) return;
+  if (window.BlackHole && BlackHole.isPurchased() && BlackHole.productionDisabled()) return;
   const amount = getCursorClickGain() * getPrestigeMultiplier();
 
   cookies += amount;
@@ -1150,7 +1152,9 @@ function getSynergyMultiplier(name) {
 }
 
 function getBuildingGain(name) {
-  if (window.BlackHole && BlackHole.productionDisabled()) return 0;
+  if (window.BlackHole && BlackHole.isPurchased()) {
+    if (BlackHole.productionDisabled() || BlackHole.phase === "serenity") return 0;
+  }
   return buildings[name].gain * multipliers[name] * getSynergyMultiplier(name) * goldenCookieCpsMultiplier * goldenCookieBuildingSpecialMultiplier * globalMultiplier * getGrandmaAngerMultiplier();
 }
 
@@ -1216,7 +1220,8 @@ function getCursorCps() {
 
 function getCookiesPerSecond() {
   const bhCps = window.BlackHole ? BlackHole.cps() : null;
-  if (bhCps !== null) return bhCps;
+  if (typeof bhCps === "number" && isFinite(bhCps)) return bhCps;
+  if (bhCps === Infinity) return Infinity;
 
   ensureGainCache();
 
@@ -1266,15 +1271,16 @@ function rebuildStore() {
 
     const iconUrl = building.iconUrl || `${ASSET_PATH}${building.icon}.png`;
     const isBlackHole = name === "Black Hole";
-    const bhActive = window.BlackHole && BlackHole.isPurchased() && BlackHole.phase !== "serenity";
+    const bhActive = window.BlackHole && BlackHole.isPurchased();
     const priceDisplay = isBlackHole ? beautify(cookies) : (bhActive ? "∞" : beautify(building.currentPrice));
-    const bulkButtons = (isBlackHole || bhActive) ? "" : `
+    const bulkButtons = isBlackHole ? "" : `
         <div class="buySub buy10" data-name="${name}" data-buymulti="10" title="Buy 10">x10</div>
         <div class="buySub buy100" data-name="${name}" data-buymulti="100" title="Buy 100">x100</div>
       `;
+    const safeName = name.replace(/\s+/g, "_");
 
     output += `
-      <div id="buy${name}" data-buy="${name}" style="background-image:url(${iconUrl});">
+      <div id="buy${safeName}" data-buy="${name}" style="background-image:url(${iconUrl});">
         <div class="tooltipStore">
           <div class="building-icon"></div>
           <b>${name}</b>
@@ -1530,6 +1536,7 @@ function rebuildUpgradesStore() {
   let output = "";
   let visibleCount = 0;
   const smallFont = "font-size:80%;";
+  const bhActive = window.BlackHole && BlackHole.isPurchased();
 
   Object.entries(upgrades)
     .sort(([, a], [, b]) => {
@@ -1557,12 +1564,14 @@ function rebuildUpgradesStore() {
       const classes = visibleCount < MAX_VISIBLE_UPGRADES ? "" : "hidden";
       visibleCount++;
 
+      const priceDisplay = bhActive ? "∞" : beautify(upgrade.price);
+
       output += `
         <div id="upgrade${name}" data-upgrade="${name}" class="${classes}" style="${smallFont}background-image:url(${upgrade.icon});">
           <div class="tooltipStore">
             <div class="building-icon"></div>
             <b>${name}</b>
-            <moni></moni> ${beautify(upgrade.price)}
+            <moni></moni> ${priceDisplay}
             <span class="tooltipTextStore">${upgrade.description}</span>
           </div>
         </div>
@@ -2381,6 +2390,7 @@ function renderChangelog() {
 function renderOverlayUpgrades() {
   const bought = Object.values(upgrades).filter(u => u.bought).length;
   const total = Object.keys(upgrades).length;
+  const bhActive = window.BlackHole && BlackHole.isPurchased();
 
   const header = `
     <div class="overlayAchievementsHeader">Upgrades ${bought}/${total}</div>
@@ -2389,7 +2399,7 @@ function renderOverlayUpgrades() {
   getElement("overlayUpgradesList").innerHTML = header + Object.entries(upgrades).map(([name, upgrade]) => {
     const unlocked = isUpgradeAvailable(upgrade) || upgrade.bought;
     const status = upgrade.bought ? "bought" : unlocked ? "" : "locked";
-    const label = upgrade.bought ? "Bought" : unlocked ? beautify(upgrade.price) : "Locked";
+    const label = upgrade.bought ? "Bought" : unlocked ? (bhActive ? "∞" : beautify(upgrade.price)) : "Locked";
 
     return `
       <div class="overlayUpgradeRow ${status}">

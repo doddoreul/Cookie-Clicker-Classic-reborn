@@ -20,7 +20,8 @@ Complete gameplay documentation for **Cookie Clicker Classic — Reborn** (v0.13
 12. [Offline & idle](#12-offline--idle)
 13. [Save system & settings](#13-save-system--settings)
 14. [UI & shortcuts](#14-ui--shortcuts)
-15. [Project structure](#15-project-structure)
+15. [Console commands](#15-console-commands)
+16. [Project structure](#16-project-structure)
 
 ---
 
@@ -524,7 +525,24 @@ cookies**, and zeroes buildings, upgrades, cookies, anger and pledge count.
 
 ---
 
-## 15. Project structure
+## 15. Console commands (dev/debug)
+
+### The Box
+| Command | Description |
+| ------- | ----------- |
+| `Box.console.unlockAllCats()` | Unlock all 32 cats (sets phase to "completed" but `completed: false`). |
+| `Box.console.resetBox()` | Reset The Box to initial state (empty, no cats discovered). |
+
+### Black Hole
+| Command | Description |
+| ------- | ----------- |
+| `BlackHole.console.purchase()` | Attempt to purchase the Black Hole. |
+| `BlackHole.console.forcePhase("void" \| "infinity" \| "serenity")` | Jump directly to a phase (requires The Box completed). |
+| `BlackHole.console.status()` | Return current state: purchased, phase, targets, ticks, absorbedSoFar, totalTargets. |
+
+---
+
+## 16. Project structure
 
 ```
 .

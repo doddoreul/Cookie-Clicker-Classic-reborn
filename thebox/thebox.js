@@ -889,6 +889,27 @@ Box.init = function () {
   }
 };
 
+Box.console = {
+  unlockAllCats() {
+    const allCats = Object.keys(Box.CATS);
+    Box.state.discovered = allCats.slice();
+    Box.state.phase = "completed";
+    Box.state.completed = false;
+    Box._notifyHook();
+    return "All 32 cats unlocked (game not completed)";
+  },
+
+  resetBox() {
+    Box.state.phase = "initial";
+    Box.state.discovered = [];
+    Box.state.inBoxCats = [];
+    Box.state.firstCatInBox = false;
+    Box.state.completed = false;
+    Box._notifyHook();
+    return "The Box reset to initial state";
+  }
+};
+
 // Called by script.js once the script has loaded.
 function initTheBox() {
   Box.init();

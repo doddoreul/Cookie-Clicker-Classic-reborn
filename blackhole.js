@@ -18,6 +18,11 @@ const BlackHole = (() => {
     "Wizard tower", "Shipment", "Alchemy lab", "Portal", "Time machine"
   ];
 
+  // Safe ID for DOM elements (replace spaces)
+  function safeId(name) {
+    return name.replace(/\s+/g, "_");
+  }
+
   const ABSORBING_COMMENTS = [
     "Something is pulling the cookies apart.",
     "Your farmhands feel lighter than air.",
@@ -241,7 +246,7 @@ const BlackHole = (() => {
 
       // Update DOM counts every tick for smooth visual countdown
       BUILDING_ORDER.forEach(name => {
-        const el = document.querySelector(`#buy${name} .amount`);
+        const el = document.querySelector(`#buy${safeId(name)} .amount`);
         if (el) el.textContent = buildings[name].count;
       });
 
@@ -357,6 +362,18 @@ const BlackHole = (() => {
         }
         saveGame();
         return "phase forced to: " + phase;
+      },
+
+      status() {
+        return {
+          purchased: state.purchased,
+          phase: state.phase,
+          targets: state.targets,
+          absorbTicks: state.absorbTicks,
+          phaseTicks: state.phaseTicks,
+          absorbedSoFar: state.absorbedSoFar,
+          totalTargets: totalTargets()
+        };
       }
     }
   };
