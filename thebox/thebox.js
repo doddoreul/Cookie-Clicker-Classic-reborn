@@ -61,44 +61,44 @@ Box.ICON = "kittens.png";
 Box.BOX_ICON = "thebox.png";
 
 Box.CATS = {
-  CAT_HALF_DEAD: { id: "CAT_HALF_DEAD", name: "Half-Dead" },
-  CAT_HALF_ALIVE: { id: "CAT_HALF_ALIVE", name: "Half-Alive" },
+  CAT_HALF_DEAD: { id: "CAT_HALF_DEAD", name: "Half-Dead", icon: "cats/cat_half_dead.png" },
+  CAT_HALF_ALIVE: { id: "CAT_HALF_ALIVE", name: "Half-Alive", icon: "cats/cat_half_alive.png" },
 
-  CAT_DEAD_DEAD: { id: "CAT_DEAD_DEAD", name: "Dead-Dead" },
-  CAT_DEAD_ALIVE: { id: "CAT_DEAD_ALIVE", name: "Dead-Alive" },
-  CAT_ALIVE_DEAD: { id: "CAT_ALIVE_DEAD", name: "Alive-Dead" },
-  CAT_ALIVE_ALIVE: { id: "CAT_ALIVE_ALIVE", name: "Alive-Alive" },
+  CAT_DEAD_DEAD: { id: "CAT_DEAD_DEAD", name: "Dead-Dead", icon: "cats/cat_dead_dead.png" },
+  CAT_DEAD_ALIVE: { id: "CAT_DEAD_ALIVE", name: "Dead-Alive", icon: "cats/cat_dead_alive.png" },
+  CAT_ALIVE_DEAD: { id: "CAT_ALIVE_DEAD", name: "Alive-Dead", icon: "cats/cat_alive_dead.png" },
+  CAT_ALIVE_ALIVE: { id: "CAT_ALIVE_ALIVE", name: "Alive-Alive", icon: "cats/cat_alive_alive.png" },
 
-  CAT_MOSTLY_DEAD: { id: "CAT_MOSTLY_DEAD", name: "Mostly Dead" },
-  CAT_DEAD_PARADOX: { id: "CAT_DEAD_PARADOX", name: "Dead Paradox" },
-  CAT_MOSTLY_ALIVE: { id: "CAT_MOSTLY_ALIVE", name: "Mostly Alive" },
-  CAT_DEAD_RESONANCE: { id: "CAT_DEAD_RESONANCE", name: "Dead Resonance" },
-  CAT_LIVING_PARADOX: { id: "CAT_LIVING_PARADOX", name: "Living Paradox" },
-  CAT_ALIVE_RESONANCE: { id: "CAT_ALIVE_RESONANCE", name: "Alive Resonance" },
-  CAT_DOUBLE_DEAD: { id: "CAT_DOUBLE_DEAD", name: "Double Dead" },
-  CAT_DOUBLE_ALIVE: { id: "CAT_DOUBLE_ALIVE", name: "Double Alive" },
+  CAT_MOSTLY_DEAD: { id: "CAT_MOSTLY_DEAD", name: "Mostly Dead", icon: "cats/cat_mostly_dead.png" },
+  CAT_DEAD_PARADOX: { id: "CAT_DEAD_PARADOX", name: "Dead Paradox", icon: "cats/cat_dead_paradox.png" },
+  CAT_MOSTLY_ALIVE: { id: "CAT_MOSTLY_ALIVE", name: "Mostly Alive", icon: "cats/cat_mostly_alive.png" },
+  CAT_DEAD_RESONANCE: { id: "CAT_DEAD_RESONANCE", name: "Dead Resonance", icon: "cats/cat_dead_resonance.png" },
+  CAT_LIVING_PARADOX: { id: "CAT_LIVING_PARADOX", name: "Living Paradox", icon: "cats/cat_living_paradox.png" },
+  CAT_ALIVE_RESONANCE: { id: "CAT_ALIVE_RESONANCE", name: "Alive Resonance", icon: "cats/cat_alive_resonance.png" },
+  CAT_DOUBLE_DEAD: { id: "CAT_DOUBLE_DEAD", name: "Double Dead", icon: "cats/cat_double_dead.png" },
+  CAT_DOUBLE_ALIVE: { id: "CAT_DOUBLE_ALIVE", name: "Double Alive", icon: "cats/cat_double_alive.png" },
 
-  CAT_SCHRODINGERS_CAT: { id: "CAT_SCHRODINGERS_CAT", name: "Schrödinger's Cat" },
-  CAT_UNCERTAIN_CAT: { id: "CAT_UNCERTAIN_CAT", name: "Uncertain Cat" },
-  CAT_SUPERPOSITION_CAT: { id: "CAT_SUPERPOSITION_CAT", name: "Superposition Cat" },
-  CAT_SPLIT_CAT: { id: "CAT_SPLIT_CAT", name: "Split Cat" },
-  CAT_CONTRADICTORY_CAT: { id: "CAT_CONTRADICTORY_CAT", name: "Contradictory Cat" },
-  CAT_QUANTUM_CAT: { id: "CAT_QUANTUM_CAT", name: "Quantum Cat" },
-  CAT_UNSTABLE_CAT: { id: "CAT_UNSTABLE_CAT", name: "Unstable Cat" },
-  CAT_STABLE_QUANTUM_CAT: { id: "CAT_STABLE_QUANTUM_CAT", name: "Stable Quantum Cat" },
+  CAT_SCHRODINGERS_CAT: { id: "CAT_SCHRODINGERS_CAT", name: "Schrödinger's Cat", icon: "cats/cat_schrodinger.png" },
+  CAT_UNCERTAIN_CAT: { id: "CAT_UNCERTAIN_CAT", name: "Uncertain Cat", icon: "cats/cat_uncertain.png" },
+  CAT_SUPERPOSITION_CAT: { id: "CAT_SUPERPOSITION_CAT", name: "Superposition Cat", icon: "cats/cat_superposition.png" },
+  CAT_SPLIT_CAT: { id: "CAT_SPLIT_CAT", name: "Split Cat", icon: "cats/cat_split.png" },
+  CAT_CONTRADICTORY_CAT: { id: "CAT_CONTRADICTORY_CAT", name: "Contradictory Cat", icon: "cats/cat_contradictory.png" },
+  CAT_QUANTUM_CAT: { id: "CAT_QUANTUM_CAT", name: "Quantum Cat", icon: "cats/cat_quantum.png" },
+  CAT_UNSTABLE_CAT: { id: "CAT_UNSTABLE_CAT", name: "Unstable Cat", icon: "cats/cat_unstable.png" },
+  CAT_STABLE_QUANTUM_CAT: { id: "CAT_STABLE_QUANTUM_CAT", name: "Stable Quantum Cat", icon: "cats/cat_stable_quantum.png" },
 
-  CAT_RECONSTRUCTED_CAT: { id: "CAT_RECONSTRUCTED_CAT", name: "Reconstructed Cat" },
-  CAT_COHERENT_CAT: { id: "CAT_COHERENT_CAT", name: "Coherent Cat" },
-  CAT_ALMOST_ALIVE_CAT: { id: "CAT_ALMOST_ALIVE_CAT", name: "Almost Alive Cat" },
-  CAT_ALMOST_DEAD_CAT: { id: "CAT_ALMOST_DEAD_CAT", name: "Almost Dead Cat" },
-  CAT_PERFECT_SUPERPOSITION: { id: "CAT_PERFECT_SUPERPOSITION", name: "Perfect Superposition" },
-  CAT_LIVING_PROBABILITY: { id: "CAT_LIVING_PROBABILITY", name: "Living Probability" },
+  CAT_RECONSTRUCTED_CAT: { id: "CAT_RECONSTRUCTED_CAT", name: "Reconstructed Cat", icon: "cats/cat_reconstructed.png" },
+  CAT_COHERENT_CAT: { id: "CAT_COHERENT_CAT", name: "Coherent Cat", icon: "cats/cat_coherent.png" },
+  CAT_ALMOST_ALIVE_CAT: { id: "CAT_ALMOST_ALIVE_CAT", name: "Almost Alive Cat", icon: "cats/cat_almost_alive.png" },
+  CAT_ALMOST_DEAD_CAT: { id: "CAT_ALMOST_DEAD_CAT", name: "Almost Dead Cat", icon: "cats/cat_almost_dead.png" },
+  CAT_PERFECT_SUPERPOSITION: { id: "CAT_PERFECT_SUPERPOSITION", name: "Perfect Superposition", icon: "cats/cat_perfect_superposition.png" },
+  CAT_LIVING_PROBABILITY: { id: "CAT_LIVING_PROBABILITY", name: "Living Probability", icon: "cats/cat_living_probability.png" },
 
-  CAT_TRUE_SUPERPOSITION: { id: "CAT_TRUE_SUPERPOSITION", name: "True Superposition" },
-  CAT_FALSE_LIFE: { id: "CAT_FALSE_LIFE", name: "False Life" },
-  CAT_QUANTUM_LIFE: { id: "CAT_QUANTUM_LIFE", name: "Quantum Life" },
+  CAT_TRUE_SUPERPOSITION: { id: "CAT_TRUE_SUPERPOSITION", name: "True Superposition", icon: "cats/cat_true_superposition.png" },
+  CAT_FALSE_LIFE: { id: "CAT_FALSE_LIFE", name: "False Life", icon: "cats/cat_false_life.png" },
+  CAT_QUANTUM_LIFE: { id: "CAT_QUANTUM_LIFE", name: "Quantum Life", icon: "cats/cat_quantum_life.png" },
 
-  CAT_ALIVE: { id: "CAT_ALIVE", name: "Alive Cat" }
+  CAT_ALIVE: { id: "CAT_ALIVE", name: "Alive Cat", icon: "cats/first_cat.png" }
 };
 
 /*
@@ -478,7 +478,7 @@ Box.showResult = function (result) {
 Box._discoveryHtml = function (ids) {
   return ids.map(id => `
     <div class="boxCat discovered" data-cat="${id}">
-      <img src="${Box.ASSET_PATH}${Box.ICON}" alt="${Box.CATS[id].name}" draggable="false">
+      <img src="${Box.ASSET_PATH}${Box.CATS[id]?.icon || Box.ICON}" alt="${Box.CATS[id].name}" draggable="false">
       <span>${Box.CATS[id].name}</span>
     </div>
   `).join("");
@@ -487,7 +487,7 @@ Box._discoveryHtml = function (ids) {
 Box._catHtml = function (id) {
   return `
     <div class="boxCat" draggable="true" data-cat="${id}" title="${Box.CATS[id].name}">
-      <img src="${Box.ASSET_PATH}${Box.ICON}" alt="${Box.CATS[id].name}" draggable="false">
+      <img src="${Box.ASSET_PATH}${Box.CATS[id]?.icon || Box.ICON}" alt="${Box.CATS[id].name}" draggable="false">
       <span>${Box.CATS[id].name}</span>
     </div>
   `;
@@ -499,13 +499,13 @@ Box._boxHtml = function () {
 
   if (Box.state.firstCatInBox) {
     inner = `<div class="boxCat inside" data-cat="FIRST" title="Cat">
-      <img src="${Box.ASSET_PATH}${Box.ICON}" alt="Cat" draggable="false">
+      <img src="${Box.ASSET_PATH}cats/first_cat.png" alt="Cat" draggable="false">
     </div>`;
     labels = `<span class="boxInnerType">Cat</span>`;
   } else if (Box.state.inBoxCats.length) {
     inner = Box.state.inBoxCats.map(id => `
       <div class="boxCat inside" data-cat="${id}" title="${Box.CATS[id].name}">
-        <img src="${Box.ASSET_PATH}${Box.ICON}" alt="${Box.CATS[id].name}" draggable="false">
+        <img src="${Box.ASSET_PATH}${Box.CATS[id]?.icon || Box.ICON}" alt="${Box.CATS[id].name}" draggable="false">
       </div>
     `).join("");
     labels = Box.state.inBoxCats
@@ -579,7 +579,7 @@ Box._renderPhase = function () {
 
   const firstCatHtml = `
     <div class="boxFirstCat" draggable="true" data-cat="FIRST" title="Cat">
-      <img src="${Box.ASSET_PATH}${Box.ICON}" alt="Cat" draggable="false">
+      <img src="${Box.ASSET_PATH}cats/first_cat.png" alt="Cat" draggable="false">
     </div>
   `;
 
@@ -598,7 +598,7 @@ Box._renderPhase = function () {
   } else if (Box.state.phase === "completed") {
     experimentInner = `
       <div class="boxDone">${resultSide}
-        <img src="${Box.ASSET_PATH}${Box.ICON}" alt="Alive Cat">
+        <img src="${Box.ASSET_PATH}${Box.CATS.CAT_ALIVE?.icon || Box.ICON}" alt="Alive Cat">
         <span class="boxDoneText">You finished The Box.</span>
       </div>
     `;
