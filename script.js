@@ -1358,6 +1358,7 @@ function buyBuildings(name, amount) {
 
 function buyBuilding(name) {
   if (name === "Black Hole") {
+    if (!confirm("Are you sure? This could lead to something unexpected")) return;
     if (window.BlackHole) BlackHole.purchaseAttempt();
     return;
   }
@@ -2289,7 +2290,8 @@ function applyFlashEffect() {
   const whole = getElement("whole");
   const backdrop = getElement("eldersBackdrop");
 
-  if (whole.style.background !== "#ccc") whole.style.background = "#ccc";
+  const bhActive = window.BlackHole && BlackHole.isPurchased();
+  if (!bhActive && whole.style.background !== "#ccc") whole.style.background = "#ccc";
   if (backdrop && backdrop.style.background !== "") backdrop.style.background = "";
 
   if (!grandmasAreAngry() || !settings.flashing) return;

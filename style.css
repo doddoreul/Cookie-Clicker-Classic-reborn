@@ -781,30 +781,26 @@ moni {
   pointer-events: none;
   opacity: 0;
   transition: opacity 2s ease;
-  background: radial-gradient(ellipse at center, rgba(20, 0, 30, 0) 0%, rgba(0, 0, 0, 1) 100%);
+  background: radial-gradient(
+    circle,
+    rgba(204, 204, 204, 0) 0%,
+    rgba(204, 204, 204, 0) 5%,
+    rgba(0, 0, 0, 1) 100%
+  );
+  transform-origin: center;
 }
 
-body.blackhole-absorbing {
-  background: radial-gradient(ellipse at center, rgba(15, 0, 25, 0.3) 0%, rgba(0, 0, 0, 1) 100%) !important;
+#blackHoleOverlay.pulsing {
+  opacity: 0.9 !important;
+  animation: pulse 3s ease-in-out infinite alternate;
 }
 
-body.blackhole-absorbing #blackHoleOverlay {
-  opacity: 0.3;
-  background: radial-gradient(ellipse at center, rgba(20, 0, 30, 0) 0%, rgba(0, 0, 0, 1) 100%);
-}
-
-body.blackhole-void #blackHoleOverlay {
-  opacity: 0.85;
-  background: radial-gradient(ellipse at center, rgba(10, 0, 15, 0) 0%, rgba(0, 0, 0, 1) 100%);
-}
-
-body.blackhole-infinity #blackHoleOverlay {
-  opacity: 0.55;
-  background: radial-gradient(ellipse at center, rgba(40, 0, 60, 0.3) 0%, rgba(10, 0, 20, 1) 100%);
-}
-
-body.blackhole-serenity #blackHoleOverlay {
-  opacity: 0.4;
-  background: radial-gradient(ellipse at center, rgba(60, 0, 80, 0.2) 0%, rgba(20, 0, 30, 0.8) 100%);
+@keyframes pulse {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.3);
+  }
 }
 

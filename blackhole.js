@@ -107,6 +107,24 @@ const BlackHole = (() => {
       document.body.appendChild(overlay);
     }
 
+    const isSerenity = state.phase === "serenity";
+    overlay.style.cssText = `
+      position: fixed;
+      inset: 0px;
+      z-index: 10000000;
+      pointer-events: none;
+      opacity: 0.9;
+      background: ${isSerenity
+        ? "radial-gradient(circle, rgba(204, 204, 204, 0) 0%, rgba(255, 255, 255, 1) 100%)"
+        : "radial-gradient(circle, rgba(204, 204, 204, 0) 0%, rgba(204, 204, 204, 0) 5%, rgba(0, 0, 0, 1) 100%)"
+      };
+    `;
+    if (!isSerenity) {
+      requestAnimationFrame(() => {
+        overlay.classList.add("pulsing");
+      });
+    }
+
     body.classList.add("blackhole-" + state.phase);
   }
 

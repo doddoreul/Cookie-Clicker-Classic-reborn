@@ -297,7 +297,7 @@ Box.finishBox = function () {
   Box.state.phase = "completed";
   Box.notifyBoxProgress();
   Box.render();
-  Box.showResult({ text: "congratulations, you've unlocked a new building", discoveries: [] });
+  Box.showResult({ text: "Congratulations, you've unlocked a new building", discoveries: [] });
 };
 
 Box._discover = function (id) {
