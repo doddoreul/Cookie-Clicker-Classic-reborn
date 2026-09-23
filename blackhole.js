@@ -8,7 +8,7 @@
 
 const BlackHole = (() => {
 
-  const ABSORB_DURATION_SECONDS = 60;   // 1 minute
+  const ABSORB_DURATION_SECONDS = 30;   // 30 seconds
   const VOID_DURATION_SECONDS = 15;   // 15 seconds
   const RAMP_DURATION_SECONDS = 60;   // 1 minute
   const UVIGINTILLION = 1e66;
@@ -69,6 +69,7 @@ const BlackHole = (() => {
     rebuildStore();
     refreshAllBuildingVisuals();
     syncDOM();
+    if (typeof main === "function") main();
   }
 
   function silenceGoldenCookies() {
@@ -159,7 +160,8 @@ const BlackHole = (() => {
     cps() {
       if (!state.purchased) return null;
       if (state.phase === "absorbing" || state.phase === "void") return 0;
-      return Infinity;
+      if (state.phase === "serenity") return Infinity;
+      return null; // infinity phase: let game compute normally
     },
 
     comment() {
@@ -187,7 +189,7 @@ const BlackHole = (() => {
     purchaseAttempt() {
       if (state.purchased) return false;
       if (!isBoxCompleted()) return false;
-      if (!Number.isFinite(cookies) || cookies <= 0) return false;
+      if (!Number.isFinite(window.cookies) || window.cookies <= 0) return false;
 
       state.targets = BUILDING_ORDER.map(name => buildings[name].count || 0);
       state.purchased = true;
@@ -195,7 +197,8 @@ const BlackHole = (() => {
       state.phaseTicks = 0;
       state.absorbedSoFar = 0;
 
-      cookies = 0;
+      window.cookies = 0;
+      window.cookiesDisplay = 0;
       buildings["Black Hole"].count = 1;
 
       silenceGoldenCookies();
@@ -207,6 +210,9 @@ const BlackHole = (() => {
         invalidateGainCache();
         syncDOM();
       }
+
+      // Force immediate sync of cookies variable in script.js
+      if (typeof main === "function") main();
 
       rebuildStore();
       saveGame();
@@ -281,8 +287,8 @@ const BlackHole = (() => {
 
       if (progress >= 1) {
         enterPhase("serenity");
-        cookies = Infinity;
-        cookiesBakedAllTime = Infinity;
+        window.cookies = Infinity;
+        window.cookiesBakedAllTime = Infinity;
         prestige = calculatePrestige();
         invalidateGainCache();
         saveGame();
@@ -294,9 +300,8 @@ const BlackHole = (() => {
       const eased = progress * progress * progress;
       const target = UVIGINTILLION * eased;
 
-      if (target > cookies) {
-        cookies = target;
-        if (target > cookiesBakedAllTime) cookiesBakedAllTime = target;
+      if (target > window.cookies) {
+        window.cookies = target;
       }
     },
 
@@ -335,8 +340,8 @@ const BlackHole = (() => {
 
       if (state.purchased) {
         if (state.phase === "serenity") {
-          cookies = Infinity;
-          cookiesBakedAllTime = Infinity;
+          window.cookies = Infinity;
+          window.cookiesBakedAllTime = Infinity;
           prestige = calculatePrestige();
         } else if (state.phase === "void" || state.phase === "infinity") {
           BUILDING_ORDER.forEach(name => { buildings[name].count = 0; });
@@ -369,12 +374,12 @@ const BlackHole = (() => {
           state.targets = BUILDING_ORDER.map(name => buildings[name].count || 0);
           state.purchased = true;
         }
-        cookies = 0;
+        window.cookies = 0;
         buildings["Black Hole"].count = 1;
         enterPhase(phase);
         if (phase === "serenity") {
-          cookies = Infinity;
-          cookiesBakedAllTime = Infinity;
+          window.cookies = Infinity;
+          window.cookiesBakedAllTime = Infinity;
           prestige = calculatePrestige();
           invalidateGainCache();
         }

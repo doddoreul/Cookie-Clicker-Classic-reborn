@@ -167,6 +167,11 @@ let saveTimer = SAVE_INTERVAL_SECONDS;
 let resetCount = 0;
 let globalMultiplier = 1;
 
+// Expose globally for blackhole.js (loads before script.js)
+window.cookies = cookies;
+window.cookiesBakedAllTime = cookiesBakedAllTime;
+window.cookiesFromClicking = cookiesFromClicking;
+
 /* Gain cache (synergy multipliers and cookies per second) */
 let gainCacheDirty = true;
 let cachedSynergy = {};
@@ -914,12 +919,17 @@ function applySaveData(data) {
   if (data.formatVersion !== SAVE_FORMAT_VERSION) return false;
 
   cookies = Number.isFinite(data.cookies) ? data.cookies : 0;
+  window.cookies = cookies;
   resetCount = Number.isFinite(data.resetCount) ? data.resetCount : 0;
   pledge = Number.isFinite(data.pledge) ? data.pledge : 0;
   grandmaAnger = Number.isFinite(data.grandmaAnger) ? Math.max(0, data.grandmaAnger) : 0;
   const loadedCbat = data.cookiesBakedAllTime === "Infinity" ? Infinity : (Number.isFinite(data.cookiesBakedAllTime) ? data.cookiesBakedAllTime : 0);
-  if (loadedCbat > 0 || loadedCbat === Infinity) cookiesBakedAllTime = loadedCbat;
+  if (loadedCbat > 0 || loadedCbat === Infinity) {
+    cookiesBakedAllTime = loadedCbat;
+    window.cookiesBakedAllTime = cookiesBakedAllTime;
+  }
   cookiesFromClicking = Number.isFinite(data.cookiesFromClicking) ? data.cookiesFromClicking : 0;
+  window.cookiesFromClicking = cookiesFromClicking;
   prestige = calculatePrestige();
 
   const pendingBlackHole = data.blackHole && typeof data.blackHole === "object" ? data.blackHole : null;
@@ -1097,7 +1107,8 @@ function resetGame() {
 
 function getCursorGain() {
   if (window.BlackHole && BlackHole.isPurchased()) {
-    if (BlackHole.productionDisabled() || BlackHole.phase === "serenity") return 0;
+    if (BlackHole.productionDisabled()) return 0;
+    if (BlackHole.phase === "serenity") return 0;
   }
   const cursor = buildings.Cursor;
   const base = pledge > 0 ? Math.ceil(cursor.count * 1.5) : 1;
@@ -1121,10 +1132,20 @@ function getCursorAutoClickGain() {
 function clickCookie() {
   if (window.BlackHole && BlackHole.isPurchased() && BlackHole.productionDisabled()) return;
   const amount = getCursorClickGain() * getPrestigeMultiplier();
+  if (!Number.isFinite(amount) || amount <= 0) {
+    if (window.cookies === Infinity) {
+      new Pop("cookie", "+Infinity");
+      return;
+    }
+    return;
+  }
 
   cookies += amount;
   cookiesBakedAllTime += amount;
   cookiesFromClicking += amount;
+  window.cookies = cookies;
+  window.cookiesBakedAllTime = cookiesBakedAllTime;
+  window.cookiesFromClicking = cookiesFromClicking;
 
   if (pops.length < 260 && settings.numbersOn) {
     new Pop("cookie", "+" + beautify(amount));
@@ -1153,7 +1174,8 @@ function getSynergyMultiplier(name) {
 
 function getBuildingGain(name) {
   if (window.BlackHole && BlackHole.isPurchased()) {
-    if (BlackHole.productionDisabled() || BlackHole.phase === "serenity") return 0;
+    if (BlackHole.productionDisabled()) return 0;
+    if (BlackHole.phase === "serenity") return 0;
   }
   return buildings[name].gain * multipliers[name] * getSynergyMultiplier(name) * goldenCookieCpsMultiplier * goldenCookieBuildingSpecialMultiplier * globalMultiplier * getGrandmaAngerMultiplier();
 }
@@ -1162,6 +1184,8 @@ function addCookies(amount, elementId) {
   amount *= getPrestigeMultiplier();
   cookies += amount;
   cookiesBakedAllTime += amount;
+  window.cookies = cookies;
+  window.cookiesBakedAllTime = cookiesBakedAllTime;
 
   if (elementId && pops.length < 250 && settings.numbersOn) {
     new Pop(elementId, "+" + beautify(amount));
@@ -1176,6 +1200,7 @@ function produceCursorCookies() {
 
   addCookies(perTick, null);
   cookiesFromClicking += perTick * getPrestigeMultiplier();
+  window.cookiesFromClicking = cookiesFromClicking;
   accumulateProductionPop("cursor", "cookie", perTick * getPrestigeMultiplier());
 }
 
@@ -1938,8 +1963,8 @@ function goldenCookieLucky() {
 
   cookies += reward;
   cookiesBakedAllTime += reward;
-
-  new Pop("credits", `Lucky! +${beautify(Math.floor(reward))} cookies`);
+  window.cookies = cookies;
+  window.cookiesBakedAllTime = cookiesBakedAllTime;
 }
 
 function goldenCookieFrenzy() {
@@ -2640,6 +2665,8 @@ function catchUpIdleTime() {
   const gained = getCookiesPerSecond() * (missedTicks / TICKS_PER_SECOND) * 0.25;
   cookies += gained;
   cookiesBakedAllTime += gained;
+  window.cookies = cookies;
+  window.cookiesBakedAllTime = cookiesBakedAllTime;
   ticks += missedTicks;
   saveTimer -= missedTicks;
   const pledgeBefore = pledge;
@@ -2682,6 +2709,7 @@ function handleVisibilityChange() {
 /* ---------------------------------------------------------------- */
 
 function main() {
+  cookies = window.cookies;
   invalidateCpsCache();
   catchUpIdleTime();
   advanceGrandmaAnger(1);
@@ -2765,6 +2793,10 @@ function main() {
   updateStoreAffordability();
   updateUpgradeAffordability();
   updateTheBoxButton();
+
+  cookies = window.cookies;
+  cookiesBakedAllTime = window.cookiesBakedAllTime;
+  cookiesFromClicking = window.cookiesFromClicking;
 
   cookiesDisplay += (cookies - cookiesDisplay) * 0.5;
   const displayValue = Number.isFinite(cookiesDisplay) ? Math.round(cookiesDisplay) : (cookies === Infinity ? Infinity : 0);
