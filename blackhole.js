@@ -92,7 +92,7 @@ const BlackHole = (() => {
     if (!body) return;
 
     body.classList.remove(
-      "blackhole-absorbing", "blackhole-void", "blackhole-infinity", "blackhole-serenity"
+      "blackhole-absorbing", "blackhole-void", "blackhole-infinity", "blackhole-serenity", "blackhole-voidFade"
     );
 
     if (!state.purchased) {
@@ -109,17 +109,37 @@ const BlackHole = (() => {
     }
 
     const isSerenity = state.phase === "serenity";
-    overlay.style.cssText = `
-      position: fixed;
-      inset: 0px;
-      z-index: 10000000;
-      pointer-events: none;
-      opacity: 0.9;
-      background: ${isSerenity
-        ? "radial-gradient(circle, rgba(204, 204, 204, 0) 0%, rgba(255, 255, 255, 1) 100%)"
-        : "radial-gradient(circle, rgba(204, 204, 204, 0) 0%, rgba(204, 204, 204, 0) 5%, rgba(0, 0, 0, 1) 100%)"
-      };
-    `;
+    const isVoidFade = state.phase === "voidFade";
+
+    if (isSerenity) {
+      overlay.style.cssText = `
+        position: fixed;
+        inset: 0px;
+        z-index: 10000000;
+        pointer-events: none;
+        opacity: 0.9;
+        background: radial-gradient(circle, rgba(204, 204, 204, 0) 0%, rgba(255, 255, 255, 1) 100%);
+      `;
+    } else if (isVoidFade) {
+      overlay.style.cssText = `
+        position: fixed;
+        inset: 0px;
+        z-index: 10000000;
+        pointer-events: none;
+        opacity: 0.9;
+        background: radial-gradient(circle, rgba(204, 204, 204, 0) 0%, rgba(204, 204, 204, 0) 5%, rgba(0, 0, 0, 1) 100%);
+      `;
+    } else {
+      overlay.style.cssText = `
+        position: fixed;
+        inset: 0px;
+        z-index: 10000000;
+        pointer-events: none;
+        opacity: 0.9;
+        background: radial-gradient(circle, rgba(204, 204, 204, 0) 0%, rgba(204, 204, 204, 0) 5%, rgba(0, 0, 0, 1) 100%);
+      `;
+    }
+
     if (!isSerenity) {
       requestAnimationFrame(() => {
         overlay.classList.add("pulsing");
@@ -140,7 +160,7 @@ const BlackHole = (() => {
 
     // Production is completely dead during absorption and the void.
     productionDisabled() {
-      return state.purchased && (state.phase === "absorbing" || state.phase === "void");
+      return state.purchased && (state.phase === "absorbing" || state.phase === "void" || state.phase === "voidFade");
     },
 
     // Nothing can be bought until serenity.
@@ -159,7 +179,7 @@ const BlackHole = (() => {
     // null means: let the game compute it normally.
     cps() {
       if (!state.purchased) return null;
-      if (state.phase === "absorbing" || state.phase === "void") return 0;
+      if (state.phase === "absorbing" || state.phase === "void" || state.phase === "voidFade") return 0;
       if (state.phase === "serenity") return Infinity;
       return null; // infinity phase: let game compute normally
     },
@@ -171,6 +191,8 @@ const BlackHole = (() => {
         const index = Math.floor(state.absorbTicks / TICKS_PER_SECOND / 6) % ABSORBING_COMMENTS.length;
         return ABSORBING_COMMENTS[index];
       }
+
+      if (state.phase === "voidFade") return "The void approaches...";
 
       if (state.phase === "void") return "Well&hellip;";
 
@@ -227,6 +249,9 @@ const BlackHole = (() => {
       if (state.phase === "absorbing") {
         state.absorbTicks++;
         this._tickAbsorbing();
+      } else if (state.phase === "voidFade") {
+        state.phaseTicks++;
+        this._tickVoidFade();
       } else if (state.phase === "void") {
         state.phaseTicks++;
         if (state.phaseTicks >= VOID_DURATION_SECONDS * TICKS_PER_SECOND) {
@@ -262,7 +287,7 @@ const BlackHole = (() => {
 
       if (state.absorbedSoFar >= total) {
         BUILDING_ORDER.forEach(name => { buildings[name].count = 0; });
-        enterPhase("void");
+        enterPhase("voidFade");
         return;
       }
 
@@ -278,6 +303,24 @@ const BlackHole = (() => {
         state.storeUpdateTick = ticks;
         rebuildStore();
         refreshAllBuildingVisuals();
+      }
+    },
+
+    _tickVoidFade() {
+      const fadeDuration = 2 * TICKS_PER_SECOND; // 2 seconds
+      const progress = Math.min(1, state.phaseTicks / fadeDuration);
+
+      if (progress >= 1) {
+        enterPhase("void");
+        return;
+      }
+
+      // Update overlay for fade to black
+      const overlay = document.getElementById("blackHoleOverlay");
+      if (overlay) {
+        const opacity = 0.3 + 0.6 * progress;
+        overlay.style.opacity = opacity;
+        overlay.style.background = `radial-gradient(circle, rgba(0, 0, 0, ${0.15 * (1 - progress)}) 0%, rgba(0, 0, 0, ${0.4 + 0.6 * progress}) 100%)`;
       }
     },
 
@@ -343,7 +386,7 @@ const BlackHole = (() => {
           window.cookies = Infinity;
           window.cookiesBakedAllTime = Infinity;
           prestige = calculatePrestige();
-        } else if (state.phase === "void" || state.phase === "infinity") {
+        } else if (state.phase === "void" || state.phase === "infinity" || state.phase === "voidFade") {
           BUILDING_ORDER.forEach(name => { buildings[name].count = 0; });
         } else if (state.phase === "absorbing") {
           const total = totalTargets();
