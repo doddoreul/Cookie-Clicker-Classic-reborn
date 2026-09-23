@@ -4,7 +4,7 @@
 /* Constants                                                        */
 /* ---------------------------------------------------------------- */
 
-const VERSION = "0.141";
+const VERSION = "0.142";
 const SAVE_KEY = "CookieClickerClassic_Reborn_Save";
 const SETTINGS_KEY = "CookieClickerClassic_Reborn_Settings";
 const SAVE_FORMAT_VERSION = 2;
@@ -2385,6 +2385,7 @@ function initOverlay() {
 
 function renderChangelog() {
   const entries = [
+    { version: "0.142", date: "23/09/2026", notes: ["Black Hole: added a voidFade transition — full fade to black over 2s between Absorbing and Void"] },
     { version: "0.141", date: "20/09/2026", notes: ["The Box: per-cat images (31 unique + shared first/alive), images in cats/ folder", "The Box: first cat uses first_cat.png (same as final alive cat)", "The Box: scroll fixes for multi-row catalogue, vertical scroll on right panel"] },
     { version: "0.140", date: "20/09/2026", notes: ["Black Hole: full end-game sequence (Absorbing → Void → Infinity → Serenity)", "Absorption: smooth 1-by-1 building countdown over 60s, background gradient", "Black Hole UI: prices show ∞ during all phases, x10/x100 buttons stay visible but disabled", "The Box: complete UI redesign — two-column layout, 128×128 box, side-by-side initial cat", "The Box: discovered cats catalogue with horizontal scroll, vertical scroll on right panel", "Cookie Baked All Time: fixed Infinity serialization, prevents reset to 0 on load", "Production: fixed pre-Black Hole gameplay (cookies increment normally when not purchased)"] },
     { version: "0.139", date: "18/09/2026", notes: ["adding a rudimentary Grandmapocalypse : grandmas get angry over time (Calm to Apocalypse, 4 stages) and cut your production by up to 30%", "Elder Pledge now instantly calms grandmas for 6 minutes, then the anger resumes from zero", "syncing the background flashing with the grandmas' anger level", "optimizing the runtime : the gain/synergy cache is no longer flushed every tick, and redundant DOM writes were removed"] },
