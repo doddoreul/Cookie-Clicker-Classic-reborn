@@ -1373,6 +1373,8 @@ function buyBuildings(name, amount) {
   cookies -= totalPrice;
   building.count += amount;
 
+  window.cookies = cookies;
+
   updateBuildingPrice(name);
   rebuildStore();
   refreshAllBuildingVisuals();
@@ -1395,6 +1397,8 @@ function buyBuilding(name) {
 
   cookies -= building.currentPrice;
   building.count++;
+
+  window.cookies = cookies;
 
   updateBuildingPrice(name);
   rebuildStore();
@@ -1542,6 +1546,7 @@ function buyUpgrade(name) {
   if (window.BlackHole && BlackHole.buyingBlocked()) return;
 
   cookies -= upgrade.price;
+  window.cookies = cookies;
   upgrade.bought = true;
 
   applyUpgradeMultiplier(upgrade);
@@ -1678,6 +1683,7 @@ function buyElderPledge() {
   if (window.BlackHole && BlackHole.buyingBlocked()) return;
 
   cookies -= elderPledge.currentPrice;
+  window.cookies = cookies;
   elderPledge.count++;
   elderPledge.currentPrice = Math.ceil(elderPledge.basePrice * Math.pow(64, elderPledge.count));
 
@@ -2101,7 +2107,7 @@ function getActiveBuffs() {
     buffs.push({
       id: "buildingSpecial",
       name: "Building special",
-      icon: ASSET_PATH + "buildingspecialicon.png",
+      icon: ASSET_PATH + "GCicon.png",
       description: `${goldenCookieBuildingSpecialBuilding ?? ""} x${multiplier} cookie production.`,
       timer: goldenCookieBuildingSpecialTimer
     });
@@ -2613,8 +2619,14 @@ function ensureBakeryName() {
     return;
   }
 
-  const name = prompt("Welcome! What is the name of your bakery?");
-  settings.bakeryName = (name === null ? "" : name.trim()) || "Cookie";
+  let name = "Cookie";
+  try {
+    const prompted = prompt("Welcome! What is the name of your bakery?");
+    if (prompted !== null) name = prompted.trim() || "Cookie";
+  } catch (e) {
+    name = "Cookie";
+  }
+  settings.bakeryName = name;
 
   saveSettings();
   refreshBakeryName();
