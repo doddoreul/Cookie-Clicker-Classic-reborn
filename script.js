@@ -4,7 +4,7 @@
 /* Constants                                                        */
 /* ---------------------------------------------------------------- */
 
-const VERSION = "0.143";
+const VERSION = "0.144";
 const SAVE_KEY = "CookieClickerClassic_Reborn_Save";
 const SETTINGS_KEY = "CookieClickerClassic_Reborn_Settings";
 const SAVE_FORMAT_VERSION = 2;
@@ -930,7 +930,11 @@ function applySaveData(data) {
   }
   cookiesFromClicking = Number.isFinite(data.cookiesFromClicking) ? data.cookiesFromClicking : 0;
   window.cookiesFromClicking = cookiesFromClicking;
-  prestige = calculatePrestige();
+  if (data.prestige === Infinity || Number.isFinite(data.prestige)) {
+    prestige = data.prestige;
+  } else {
+    prestige = calculatePrestige();
+  }
 
   const pendingBlackHole = data.blackHole && typeof data.blackHole === "object" ? data.blackHole : null;
   if (window.BlackHole) window.BlackHole.loadData(pendingBlackHole);
@@ -2391,6 +2395,7 @@ function initOverlay() {
 
 function renderChangelog() {
   const entries = [
+    { version: "0.144", date: "14/10/2026", notes: ["Fix: prestige upgrades no longer unlock without reset; saved owned prestige is loaded instead of recalculating current gain"] },
     { version: "0.143", date: "14/10/2026", notes: ["Fix: cookies are now correctly deducted when buying buildings/upgrades/Elder Pledge (window sync)", "Fix: Golden Cookie building-special buff icon now resolves", "Fix: bakery name initialization no longer breaks when prompt() is unavailable"] },
     { version: "0.142", date: "23/09/2026", notes: ["Black Hole: added a voidFade transition — full fade to black over 2s between Absorbing and Void"] },
     { version: "0.141", date: "20/09/2026", notes: ["The Box: per-cat images (31 unique + shared first/alive), images in cats/ folder", "The Box: first cat uses first_cat.png (same as final alive cat)", "The Box: scroll fixes for multi-row catalogue, vertical scroll on right panel"] },
